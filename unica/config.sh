@@ -56,6 +56,21 @@ case "$TARGET_SINGLE_SYSTEM_IMAGE" in
         SOURCE_SSRM_CONFIG_NAME="siop_dm1q_sm8550"
         SOURCE_SUPPORT_CUTOUT_PROTECTION=false
         ;;
+    # Exynos
+    "essi")
+        # Galaxy S22 (One UI 6.0)
+        SOURCE_FIRMWARE="SM-S901B/BTE"
+        SOURCE_EXTRA_FIRMWARES=()
+        SOURCE_API_LEVEL=34
+        SOURCE_VNDK_VERSION=31
+        SOURCE_HAS_SYSTEM_EXT=false
+        # SEC Product Feature
+        SOURCE_HAS_KNOX_DUALDAR=true
+        SOURCE_HAS_KNOX_SDP=true
+        SOURCE_HAS_MASS_CAMERA_APP=false
+        SOURCE_HAS_OPTICAL_FP_SENSOR=false
+        SOURCE_IS_ESIM_SUPPORTED=true
+        ;;
     *)
         echo "\"$TARGET_SINGLE_SYSTEM_IMAGE\" is not a valid system image."
         return 1
