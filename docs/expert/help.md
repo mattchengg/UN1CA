@@ -6,12 +6,12 @@ nav_order: 3
 ---
 
 # Available commands
-{: .pb-2 }
+
 
 In this section you'll find all the build system commands available via `run_cmd` and their usage.
 
 ## apktool
-{: .pb-2 }
+
 ```bash
 run_cmd apktool d[ecode]/b[uild] <file/dir> (<file/dir>...)
 ```
@@ -32,7 +32,7 @@ run_cmd apktool b /system_ext/priv-app/SystemUI/SystemUI.apk # yes
 ```
 
 ## build_dependencies
-{: .pb-2 }
+
 ```bash
 run_cmd build_dependencies
 ```
@@ -42,7 +42,7 @@ This command will build all the tools required by the build system and copy them
 If you need to update or rebuild your tools, clean the tools folder first with `run_cmd cleanup tools`, as `build_dependencies` will only attempt to build the missing executables.
 
 ## build_fs_image
-{: .pb-2 }
+
 ```bash
 run_cmd build_fs_image <fs> <dir> <file_context> <fs_config>
 ```
@@ -56,7 +56,7 @@ This command will build a `.img` system image with the desidered file system. Th
 The output image will be saved in the parent directory of the partition dir one (dir/..).
 
 ## cleanup
-{: .pb-2 }
+
 ```bash
 run_cmd cleanup <type> (<type>...)
 ```
@@ -72,7 +72,7 @@ This command will clean the desidered directory to free up space or start a fres
 The command `run_cmd cleanup apktool work_dir` is enough to run a fresh build.
 
 ## download_fw
-{: .pb-2 }
+
 ```bash
 run_cmd download_fw
 ```
@@ -81,7 +81,7 @@ This command will download all the firmwares required by the generated build con
 It also keep track of the currently downloaded firmware builds and will warn the user when a new one is available for download.
 
 ## extract_fw
-{: .pb-2 }
+
 ```bash
 run_cmd extract_fw
 ```
@@ -90,7 +90,7 @@ This command will extract all the firmwares required by the generated build conf
 It also keep track of the currently downloaded firmware builds and will warn the user when a new one is available to extract.
 
 ## make_rom
-{: .pb-2 }
+
 ```bash
 run_cmd make_rom (-f/--force) (--no-rom-zip) (--no-rom-tar)
 ```
@@ -102,7 +102,7 @@ The following additional flags are also available:
 - `--no-rom-tar`: disable generating a flashable tar at the end of the build, ignored if `TARGET_INSTALL_METHOD` is set to `zip`
 
 ## print_modules_info
-{: .pb-2 }
+
 ```bash
 run_cmd print_modules_info
 ```
@@ -110,7 +110,7 @@ run_cmd print_modules_info
 This command will print out all the packages and patches that will be processed by the build system for the selected target device.
 
 ## unsign_bin
-{: .pb-2 }
+
 ```bash
 run_cmd unsign_bin <image> (<image>...)
 ```
@@ -118,5 +118,5 @@ run_cmd unsign_bin <image> (<image>...)
 This command will strip off the [AVB footer](https://android.googlesource.com/platform/external/avb/+/master/README.md#the-vbmeta-struct) and/or Samsung signature from the supplied image files, useful to avoid bumping the target device's rollback prevention bit.
 **Do not supply bootloader images** as flashing those might hard brick your device.
 
-{: .highlight }
-*Continue to [Build flags]({% link expert/flags.md %})*
+
+*Continue to [Build flags](flags.md)*

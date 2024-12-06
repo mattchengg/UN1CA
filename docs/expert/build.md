@@ -6,17 +6,17 @@ nav_order: 1
 ---
 
 # Build UN1CA
-{: .pb-2 }
+
 Building UN1CA is pretty straightforward and only requires running a few commands to get the job done. However, setting up your environment correctly is necessary before proceeding to avoid errors/issues.
 
 ## Minimum requirements
-{: .pb-2 }
+
 - Linux-based OS x64 (WSL has not been tested yet)
 - 16 GB+ RAM
 - 40 GB+ free space
 
 ## System dependencies
-{: .pb-2 }
+
 The following dependencies must be installed:
 - [brotli](https://github.com/google/brotli)
 - [Ccache](https://ccache.dev/)
@@ -45,7 +45,7 @@ sudo apt install -y \
 ```
 
 ## Building UN1CA
-{: .pb-2 }
+
 Once you have made sure all the dependencies are installed, you can now clone the repository via git:
 ```bash
 git clone --recurse-submodules https://github.com/BlackMesa123/UN1CA.git && cd UN1CA
@@ -68,5 +68,5 @@ run_cmd make_rom
 
 If everything went right, you'll find the generated flashable zip/tar file inside the `out` folder.
 
-{: .highlight }
-*Continue to [How the build system works]({% link expert/details.md %})*
+
+*Continue to [How the build system works](details.md)*
