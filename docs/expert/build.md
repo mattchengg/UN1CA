@@ -38,10 +38,11 @@ The following dependencies must be installed:
 
 For reference, here's an example on how to install most of the dependencies via APT:
 ```bash
-sudo apt install -y \
-    attr ccache clang git golang libbrotli-dev \
-    libgtest-dev libprotobuf-dev libunwind-dev libusb-1.0-0-dev libzstd-dev lld \
-    ninja-build openjdk-11-jdk protobuf-compiler zip zipalign
+sudo apt install -yq \
+            attr ccache clang ffmpeg golang \
+            libbrotli-dev libgtest-dev libprotobuf-dev libunwind-dev libpcre2-dev \
+            libzstd-dev linux-modules-extra-$(uname -r) lld protobuf-compiler webp \
+            zipalign
 ```
 
 ## Building UN1CA
