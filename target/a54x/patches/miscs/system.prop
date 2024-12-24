@@ -1,0 +1,5 @@
+# Netflix
+ro.netflix.bsp_rev=EXYNOS1380-36589-1
+
+# Fix Edge lighting corner radius
+ro.factory.model=SM-A5460
