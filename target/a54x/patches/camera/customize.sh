@@ -152,8 +152,6 @@ done
 
 BLOBS_LIST="
 system/etc/public.libraries-camera.samsung.txt
-system/system/app/FactoryCameraFB/FactoryCameraFB.apk
-system/system/app/CameraExtensionsProxy/CameraExtensionsProxy.apk
 system/system/lib64/libSlowShutter_jni.media.samsung.so
 system/system/lib64/libFaceRestoration.camera.samsung.so
 system/system/lib64/libFace_Landmark_API.camera.samsung.so
