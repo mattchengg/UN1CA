@@ -152,12 +152,12 @@ done
 
 BLOBS_LIST="
 system/etc/public.libraries-camera.samsung.txt
-system/system/lib/libcamera_client.so
-system/system/lib/libcamera_metadata.so
-system/system/lib/libcamera2ndk.so
-system/system/lib64/libcamera_client.so
-system/system/lib64/libcamera_metadata.so
-system/system/lib64/libcamera2ndk.so
+system/lib/libcamera_client.so
+system/lib/libcamera_metadata.so
+system/lib/libcamera2ndk.so
+system/lib64/libcamera_client.so
+system/lib64/libcamera_metadata.so
+system/lib64/libcamera2ndk.so
 "
 for blob in $BLOBS_LIST
 do
