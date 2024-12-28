@@ -152,18 +152,12 @@ done
 
 BLOBS_LIST="
 system/etc/public.libraries-camera.samsung.txt
-system/system/lib64/libSlowShutter_jni.media.samsung.so
-system/system/lib64/libFaceRestoration.camera.samsung.so
-system/system/lib64/libFace_Landmark_API.camera.samsung.so
-system/system/lib64/libFace_Landmark_Engine.camera.samsung.so
-system/system/lib64/libFacialStickerEngine.arcsoft.so
-system/system/lib64/libImageCropper.camera.samsung.so
-system/system/lib64/libImageTagger.camera.samsung.so
-system/system/lib64/libPortraitDistortionCorrection.arcsoft.so
-system/system/lib64/libSupernightWrapper.camera.samsung.so
-system/system/lib64/libhumantracking.arcsoft.so
-system/system/lib64/libhumantracking_util.camera.samsung.so
-system/system/lib64/libUltraWideDistortionCorrection.camera.samsung.so
+system/system/lib/libcamera_client.so
+system/system/lib/libcamera_metadata.so
+system/system/lib/libcamera2ndk.so
+system/system/lib64/libcamera_client.so
+system/system/lib64/libcamera_metadata.so
+system/system/lib64/libcamera2ndk.so
 "
 for blob in $BLOBS_LIST
 do
