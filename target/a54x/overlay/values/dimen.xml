@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<resources>
+    <float name="config_screenBrightnessDimFloat">0.043137256</float>
+    <float name="config_screenBrightnessSettingDefaultFloat">0.5019608</float>
+    <float name="config_screenBrightnessSettingMaximumFloat">1.0</float>
+    <float name="config_screenBrightnessSettingMinimumFloat">0.0</float>
+    <dimen name="cover_clear_view_bottom">242.0dp</dimen>
+    <dimen name="cover_clear_view_left">204.0dp</dimen>
+    <dimen name="cover_clear_view_right">360.0dp</dimen>
+    <dimen name="cover_clear_view_rounded_corner">33.0dp</dimen>
+    <dimen name="cover_clear_view_top">1.0dp</dimen>
+    <dimen name="status_bar_camera_side_padding">30.0px</dimen>
+    <dimen name="status_bar_camera_top_margin">22.0px</dimen>
+    <dimen name="status_bar_height_portrait">80.0px</dimen>
+    <dimen name="status_bar_indicator_corner_padding">60.0px</dimen>
+</resources>
