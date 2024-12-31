@@ -1,5 +1,5 @@
 {
-  "image": "mcr.microsoft.com/devcontainers/cpp:ubuntu-24.04",
+  "image": "mcr.microsoft.com/devcontainers/base:1.2.3-ubuntu-24.04",
   "features": {
   }
 }
