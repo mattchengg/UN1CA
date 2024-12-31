@@ -1,5 +1,8 @@
 {
   "image": "mcr.microsoft.com/devcontainers/base:1.2.3-ubuntu-24.04",
-  "features": {
-  }
+  "runArgs": [
+    "--device=/dev/fuse",
+    "--cap-add=SYS_ADMIN",
+    "--security-opt=apparmor:unconfined"
+  ]
 }
