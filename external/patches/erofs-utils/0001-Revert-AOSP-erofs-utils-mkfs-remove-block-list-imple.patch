@@ -1,6 +1,6 @@
-From c1dfa1dfb4b88216866afd92b37d915d3dc14c81 Mon Sep 17 00:00:00 2001
+From 90a9ce61b444e90a3daddf92b996cc0291117cbf Mon Sep 17 00:00:00 2001
 From: Salvo Giangreco <giangrecosalvo9@gmail.com>
-Date: Fri, 16 May 2025 09:18:44 +0200
+Date: Tue, 26 Aug 2025 23:40:35 +0200
 Subject: [PATCH] Revert "AOSP: erofs-utils: mkfs: remove block list
  implementation"
 
@@ -46,18 +46,18 @@ index 9d06c9c..8cc87d7 100644
  }
  #endif
 diff --git a/lib/blobchunk.c b/lib/blobchunk.c
-index 4fc6c77..301f46a 100644
+index af6ddd7..5d22857 100644
 --- a/lib/blobchunk.c
 +++ b/lib/blobchunk.c
-@@ -145,6 +145,7 @@ int erofs_blob_write_chunk_indexes(struct erofs_inode *inode,
- 	erofs_blk_t extent_end, chunkblks;
+@@ -144,6 +144,7 @@ int erofs_write_chunk_indexes(struct erofs_inode *inode, struct erofs_vfile *vf,
  	erofs_off_t source_offset;
  	unsigned int dst, src, unit, zeroedlen;
+ 	bool _48bit;
 +	bool first_extent = true;
  
  	if (inode->u.chunkformat & EROFS_CHUNK_FORMAT_INDEXES)
  		unit = sizeof(struct erofs_inode_chunk_index);
-@@ -175,6 +176,11 @@ int erofs_blob_write_chunk_indexes(struct erofs_inode *inode,
+@@ -175,6 +176,11 @@ int erofs_write_chunk_indexes(struct erofs_inode *inode, struct erofs_vfile *vf,
  				tarerofs_blocklist_write(extent_start,
  						extent_end - extent_start,
  						source_offset, 0);
@@ -67,9 +67,9 @@ index 4fc6c77..301f46a 100644
 +					first_extent, false);
 +				first_extent = false;
  			}
- 			extent_start = idx.blkaddr;
+ 			extent_start = startblk;
  			source_offset = chunk->sourceoffset;
-@@ -197,6 +203,11 @@ int erofs_blob_write_chunk_indexes(struct erofs_inode *inode,
+@@ -201,6 +207,11 @@ int erofs_write_chunk_indexes(struct erofs_inode *inode, struct erofs_vfile *vf,
  		tarerofs_blocklist_write(extent_start, extent_end - extent_start,
  					 source_offset, zeroedlen);
  	}
@@ -78,16 +78,16 @@ index 4fc6c77..301f46a 100644
 +					0 : extent_end - extent_start,
 +					   first_extent, true);
 +
- 	return erofs_dev_write(inode->sbi, inode->chunkindexes, off,
- 			       inode->extent_isize);
- }
+ 	off = roundup(off, unit);
+ 	return erofs_io_pwrite(vf, inode->chunkindexes,
+ 			       off, inode->extent_isize);
 diff --git a/lib/block_list.c b/lib/block_list.c
-index 4a6466d..6bbe4ec 100644
+index f8dc913..ead8b4b 100644
 --- a/lib/block_list.c
 +++ b/lib/block_list.c
 @@ -44,3 +44,80 @@ void tarerofs_blocklist_write(erofs_blk_t blkaddr, erofs_blk_t nblocks,
- 		fprintf(block_list_fp, "%08x %8x %08" PRIx64 "\n",
- 			blkaddr, nblocks, srcoff);
+ 		fprintf(block_list_fp, "%08llx %8llx %08" PRIx64 "\n",
+ 			blkaddr | 0ULL, nblocks | 0ULL, srcoff);
  }
 +
 +#ifdef WITH_ANDROID
@@ -156,21 +156,21 @@ index 4a6466d..6bbe4ec 100644
 +
 +	/* XXX: another hack, which means it has been outputed before */
 +	if (erofs_blknr(inode->sbi, inode->i_size)) {
-+		if (blkaddr == NULL_ADDR)
++		if (blkaddr == EROFS_NULL_ADDR)
 +			fprintf(block_list_fp, "\n");
 +		else
 +			fprintf(block_list_fp, " %u\n", blkaddr);
 +		return;
 +	}
-+	if (blkaddr != NULL_ADDR)
++	if (blkaddr != EROFS_NULL_ADDR)
 +		blocklist_write(inode->i_srcpath, blkaddr, 1, true, true);
 +}
 +#endif
 diff --git a/lib/compress.c b/lib/compress.c
-index d046112..1742529 100644
+index 622a205..763e7e8 100644
 --- a/lib/compress.c
 +++ b/lib/compress.c
-@@ -1238,6 +1238,9 @@ int erofs_commit_compressed_file(struct z_erofs_compress_ictx *ictx,
+@@ -1397,6 +1397,9 @@ int erofs_commit_compressed_file(struct z_erofs_compress_ictx *ictx,
  		DBG_BUGON(ret);
  	}
  	inode->compressmeta = compressmeta;
@@ -181,10 +181,10 @@ index d046112..1742529 100644
  
  err_free_meta:
 diff --git a/lib/inode.c b/lib/inode.c
-index f5ad546..e1b6c0b 100644
+index 5167d69..0ab36ab 100644
 --- a/lib/inode.c
 +++ b/lib/inode.c
-@@ -564,6 +564,7 @@ static int write_uncompressed_file_from_fd(struct erofs_inode *inode, int fd)
+@@ -663,6 +663,7 @@ static int write_uncompressed_file_from_fd(struct erofs_inode *inode, int fd,
  			return -EIO;
  		}
  	}
@@ -192,16 +192,16 @@ index f5ad546..e1b6c0b 100644
  	return 0;
  }
  
-@@ -842,6 +843,8 @@ static int erofs_write_tail_end(struct erofs_inode *inode)
+@@ -1009,6 +1010,8 @@ static int erofs_write_tail_end(struct erofs_inode *inode)
  
  		ibh->fsprivate = erofs_igrab(inode);
  		ibh->op = &erofs_write_inline_bhops;
 +
-+		erofs_droid_blocklist_write_tail_end(inode, NULL_ADDR);
++		erofs_droid_blocklist_write_tail_end(inode, EROFS_NULL_ADDR);
  	} else {
- 		int ret;
- 		erofs_off_t pos, zero_pos;
-@@ -896,6 +899,8 @@ static int erofs_write_tail_end(struct erofs_inode *inode)
+ 		struct iovec iov[2];
+ 		erofs_off_t pos;
+@@ -1059,6 +1062,8 @@ static int erofs_write_tail_end(struct erofs_inode *inode)
  		inode->idata_size = 0;
  		free(inode->idata);
  		inode->idata = NULL;
@@ -211,10 +211,10 @@ index f5ad546..e1b6c0b 100644
  out:
  	/* now bh_data can drop directly */
 diff --git a/mkfs/main.c b/mkfs/main.c
-index 2907789..6d1a2de 100644
+index e0ba55d..343ef4f 100644
 --- a/mkfs/main.c
 +++ b/mkfs/main.c
-@@ -63,6 +63,7 @@ static struct option long_options[] = {
+@@ -65,6 +65,7 @@ static struct option long_options[] = {
  #ifdef WITH_ANDROID
  	{"product-out", required_argument, NULL, 513},
  	{"fs-config-file", required_argument, NULL, 514},
@@ -222,7 +222,7 @@ index 2907789..6d1a2de 100644
  #endif
  	{"ovlfs-strip", optional_argument, NULL, 516},
  	{"offset", required_argument, NULL, 517},
-@@ -212,6 +213,7 @@ static void usage(int argc, char **argv)
+@@ -235,6 +236,7 @@ static void usage(int argc, char **argv)
  		"Android-specific options:\n"
  		" --product-out=X       X=product_out directory\n"
  		" --fs-config-file=X    X=fs_config file\n"
@@ -230,7 +230,7 @@ index 2907789..6d1a2de 100644
  #endif
  #ifdef EROFS_MT_ENABLED
  		, erofs_get_available_processors() /* --workers= */
-@@ -721,6 +723,9 @@ static int mkfs_parse_options_cfg(int argc, char *argv[])
+@@ -1014,6 +1016,9 @@ static int mkfs_parse_options_cfg(struct erofs_importer_params *params,
  		case 514:
  			cfg.fs_config_file = optarg;
  			break;
@@ -240,9 +240,9 @@ index 2907789..6d1a2de 100644
  #endif
  		case 'C':
  			i = strtoull(optarg, &endptr, 0);
-@@ -1236,6 +1241,14 @@ int main(int argc, char **argv)
+@@ -1535,6 +1540,14 @@ int main(int argc, char **argv)
  		erofs_err("failed to load fs config %s", cfg.fs_config_file);
- 		return 1;
+ 		goto exit;
  	}
 +
 +	if (cfg.block_list_file) {
@@ -254,7 +254,7 @@ index 2907789..6d1a2de 100644
 +	}
  #endif
  	erofs_show_config();
- 	if (cfg.c_fragments || cfg.c_extra_ea_name_prefixes) {
+ 
 -- 
-2.49.0
+2.51.0
 
