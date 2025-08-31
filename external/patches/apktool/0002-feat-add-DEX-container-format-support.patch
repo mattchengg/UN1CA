@@ -1,0 +1,169 @@
+From 48565f72d9c6ea69f0f6d18040e9f00775c6a580 Mon Sep 17 00:00:00 2001
+From: Salvo Giangreco <giangrecosalvo9@gmail.com>
+Date: Sun, 31 Aug 2025 23:56:46 +0200
+Subject: [PATCH] feat: add DEX container format support
+
+---
+ .../main/java/brut/androlib/ApkDecoder.java   |   3 +
+ .../java/brut/androlib/src/SmaliDecoder.java  | 104 +++++++++++-------
+ 2 files changed, 65 insertions(+), 42 deletions(-)
+
+diff --git a/brut.apktool/apktool-lib/src/main/java/brut/androlib/ApkDecoder.java b/brut.apktool/apktool-lib/src/main/java/brut/androlib/ApkDecoder.java
+index 985ce062..c55d781b 100644
+--- a/brut.apktool/apktool-lib/src/main/java/brut/androlib/ApkDecoder.java
++++ b/brut.apktool/apktool-lib/src/main/java/brut/androlib/ApkDecoder.java
+@@ -195,6 +195,9 @@ public class ApkDecoder {
+ 
+         // record minSdkVersion for jars
+         int minSdkVersion = dexFile.getOpcodes().api;
++        if (minSdkVersion > 29) {
++            minSdkVersion = 29;
++        }
+         if (mMinSdkVersion == 0 || mMinSdkVersion > minSdkVersion) {
+             mMinSdkVersion = minSdkVersion;
+         }
+diff --git a/brut.apktool/apktool-lib/src/main/java/brut/androlib/src/SmaliDecoder.java b/brut.apktool/apktool-lib/src/main/java/brut/androlib/src/SmaliDecoder.java
+index de382753..5b860c27 100644
+--- a/brut.apktool/apktool-lib/src/main/java/brut/androlib/src/SmaliDecoder.java
++++ b/brut.apktool/apktool-lib/src/main/java/brut/androlib/src/SmaliDecoder.java
+@@ -17,6 +17,8 @@
+ package brut.androlib.src;
+ 
+ import brut.androlib.exceptions.AndrolibException;
++import brut.util.OS;
++
+ import com.android.tools.smali.baksmali.Baksmali;
+ import com.android.tools.smali.baksmali.BaksmaliOptions;
+ import com.android.tools.smali.dexlib2.DexFileFactory;
+@@ -28,6 +30,7 @@ import com.android.tools.smali.dexlib2.iface.DexFile;
+ import com.android.tools.smali.dexlib2.iface.MultiDexContainer;
+ 
+ import java.io.*;
++import java.util.ArrayList;
+ 
+ public class SmaliDecoder {
+     private final File mApkFile;
+@@ -44,61 +47,78 @@ public class SmaliDecoder {
+ 
+     public DexFile decode(File outDir) throws AndrolibException {
+         try {
+-            BaksmaliOptions options = new BaksmaliOptions();
+-
+-            // options
+-            options.deodex = false;
+-            options.implicitReferences = false;
+-            options.parameterRegisters = true;
+-            options.localsDirective = true;
+-            options.sequentialLabels = true;
+-            options.debugInfo = mBakDeb;
+-            options.codeOffsets = false;
+-            options.accessorComments = false;
+-            options.registerInfo = 0;
+-            options.inlineResolver = null;
+-
+-            // set jobs automatically
+-            int jobs = Runtime.getRuntime().availableProcessors();
+-            if (jobs > 6) {
+-                jobs = 6;
+-            }
+-
+             // create the container
+-            MultiDexContainer<? extends DexBackedDexFile> container =
+-                    DexFileFactory.loadDexContainer(mApkFile, mApiLevel > 0 ? Opcodes.forApi(mApiLevel) : null);
+-            MultiDexContainer.DexEntry<? extends DexBackedDexFile> dexEntry;
+-            DexBackedDexFile dexFile;
+-
+-            // If we have 1 item, ignore the passed file. Pull the DexFile we need.
+-            if (container.getDexEntryNames().size() == 1) {
+-                dexEntry = container.getEntry(container.getDexEntryNames().get(0));
++            MultiDexContainer<? extends DexBackedDexFile> container = DexFileFactory.loadDexContainer(mApkFile,
++                    mApiLevel > 0 ? Opcodes.forApi(mApiLevel) : null);
++            ArrayList<MultiDexContainer.DexEntry<? extends DexBackedDexFile>> dexEntries = new ArrayList<>();
++            DexBackedDexFile dexFile = null;
++
++            if (container.getDexEntryNames().size() >= 1) {
++                for (String s : container.getDexEntryNames()) {
++                    dexEntries.add(container.getEntry(s));
++                }
+             } else {
+-                dexEntry = container.getEntry(mDexName);
++                dexEntries.add(container.getEntry(mDexName));
+             }
+ 
+             // Double-check the passed param exists
+-            if (dexEntry == null) {
+-                dexEntry = container.getEntry(container.getDexEntryNames().get(0));
++            if (dexEntries.isEmpty()) {
++                dexEntries.add(container.getEntry(container.getDexEntryNames().get(0)));
+             }
+ 
+-            assert dexEntry != null;
+-            dexFile = dexEntry.getDexFile();
+-
+-            if (dexFile.supportsOptimizedOpcodes()) {
+-                throw new AndrolibException("Warning: You are disassembling an odex file without deodexing it.");
+-            }
++            assert !dexEntries.isEmpty();
+ 
+-            if (dexFile instanceof DexBackedOdexFile) {
+-                options.inlineResolver =
+-                        InlineMethodResolver.createInlineMethodResolver(((DexBackedOdexFile) dexFile).getOdexVersion());
++            for (MultiDexContainer.DexEntry<? extends DexBackedDexFile> dexEntry : dexEntries) {
++                int index = dexEntries.indexOf(dexEntry) + 1;
++                if (index > 1 && outDir.getName().equals("smali")) {
++                    outDir = new File(outDir.getParent(), "smali_classes" + index);
++                    OS.rmdir(outDir);
++                    OS.mkdir(outDir);
++                }
++                dexFile = decodeInternal(dexEntry, outDir);
+             }
+ 
+-            Baksmali.disassembleDexFile(dexFile, outDir, jobs, options);
+-
+             return dexFile;
+         } catch (IOException ex) {
+             throw new AndrolibException("Could not baksmali file: " + mDexName, ex);
+         }
+     }
++
++    private DexBackedDexFile decodeInternal(MultiDexContainer.DexEntry<? extends DexBackedDexFile> dexEntry,
++            File outDir) throws IOException, AndrolibException {
++        BaksmaliOptions options = new BaksmaliOptions();
++
++        // options
++        options.deodex = false;
++        options.implicitReferences = false;
++        options.parameterRegisters = true;
++        options.localsDirective = true;
++        options.sequentialLabels = true;
++        options.debugInfo = mBakDeb;
++        options.codeOffsets = false;
++        options.accessorComments = false;
++        options.registerInfo = 0;
++        options.inlineResolver = null;
++
++        // set jobs automatically
++        int jobs = Runtime.getRuntime().availableProcessors();
++        if (jobs > 6) {
++            jobs = 6;
++        }
++
++        DexBackedDexFile dexFile = dexEntry.getDexFile();
++
++        if (dexFile.supportsOptimizedOpcodes()) {
++            throw new AndrolibException("Warning: You are disassembling an odex file without deodexing it.");
++        }
++
++        if (dexFile instanceof DexBackedOdexFile) {
++            options.inlineResolver = InlineMethodResolver
++                    .createInlineMethodResolver(((DexBackedOdexFile) dexFile).getOdexVersion());
++        }
++
++        Baksmali.disassembleDexFile(dexFile, outDir, jobs, options);
++
++        return dexFile;
++    }
+ }
+-- 
+2.51.0
+
