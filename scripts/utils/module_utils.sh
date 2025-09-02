@@ -146,14 +146,21 @@ GET_GALAXY_STORE_DOWNLOAD_URL()
     return 1
 }
 
-# GET_FLOATING_FEATURE_CONFIG "<config>"
-# Returns the supplied config value.
+# GET_FLOATING_FEATURE_CONFIG "<file>" "<config>"
+# Returns the supplied config value, file can be omitted.
 GET_FLOATING_FEATURE_CONFIG()
 {
+    local FILE
+    if [ "$2" ]; then
+        FILE="$1"
+        shift
+    else
+        FILE="$WORK_DIR/system/system/etc/floating_feature.xml"
+    fi
+
     _CHECK_NON_EMPTY_PARAM "CONFIG" "$1" || return 1
 
     local CONFIG="$1"
-    local FILE="$WORK_DIR/system/system/etc/floating_feature.xml"
 
     if [ ! -f "$FILE" ]; then
         LOGE "File not found: ${FILE//$WORK_DIR/}"
