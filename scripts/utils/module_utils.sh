@@ -167,7 +167,7 @@ GET_FLOATING_FEATURE_CONFIG()
         return 1
     fi
 
-    grep -o -P "(?<=<$CONFIG>)[^<]+" "$FILE" 2> /dev/null
+    grep -o -P "(?<=<$CONFIG>)[^<]+" "$FILE" 2> /dev/null || true
 }
 
 # HEX_PATCH "<file>" "<old pattern>" "<new pattern>"
@@ -227,7 +227,7 @@ SET_FLOATING_FEATURE_CONFIG()
     if grep -q "$CONFIG" "$FILE"; then
         if [[ "$VALUE" == "-d" ]] || [[ "$VALUE" == "--delete" ]]; then
             LOG "- Deleting \"$CONFIG\" config in /system/system/etc/floating_feature.xml"
-            sed -i "/$CONFIG/d" "$FILE"
+            sed -i "/<$CONFIG>/d" "$FILE"
         else
             LOG "- Replacing \"$CONFIG\" config with \"$VALUE\" in /system/system/etc/floating_feature.xml"
             sed -i "$(sed -n "/<${CONFIG}>/=" "$FILE") c\ \ \ \ <${CONFIG}>${VALUE}</${CONFIG}>" "$FILE"
