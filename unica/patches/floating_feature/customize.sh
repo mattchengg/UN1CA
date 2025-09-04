@@ -140,7 +140,7 @@ APPLY_TARGET_FEATURE()
 
         FEATURE="$(awk -F '<|>' '{print $2}' <<< "$l")"
 
-        if grep -q "$FEATURE" <<< "$BLACKLIST"; then
+        if grep -q -w "$FEATURE" <<< "$BLACKLIST"; then
             continue
         fi
 
@@ -148,7 +148,7 @@ APPLY_TARGET_FEATURE()
         TARGET_VALUE="$(GET_FLOATING_FEATURE_CONFIG "$TARGET_FILE" "$FEATURE")"
 
         if [ ! "$TARGET_VALUE" ]; then
-            TARGET_VALUE="$(cut -d "=" -f 2- < <(grep "$FEATURE" <<< "$FALLBACK"))"
+            TARGET_VALUE="$(cut -d "=" -f 2- < <(grep -w "$FEATURE" <<< "$FALLBACK"))"
         elif [[ "$TARGET_VALUE"  == "-1" ]] && \
                 [[ "$FEATURE" == "SEC_FLOATING_FEATURE_CAMERA_CONFIG_HIGH_RESOLUTION_MAX_CAPTURE" ]]; then
             TARGET_VALUE="0"
@@ -173,11 +173,11 @@ APPLY_TARGET_FEATURE()
 
         FEATURE="$(awk -F '<|>' '{print $2}' <<< "$l")"
 
-        if grep -q "$FEATURE" <<< "$BLACKLIST"; then
+        if grep -q -w "$FEATURE" <<< "$BLACKLIST"; then
             continue
         fi
 
-        if ! grep -q -w "$FEATURE" "$SOURCE_FILE" && ! grep -q "$FEATURE" <<< "$DEPRECATED"; then
+        if ! grep -q -w "$FEATURE" "$SOURCE_FILE" && ! grep -q -w "$FEATURE" <<< "$DEPRECATED"; then
             SET_FLOATING_FEATURE_CONFIG "$FEATURE" "$(GET_FLOATING_FEATURE_CONFIG "$TARGET_FILE" "$FEATURE")"
         fi
     done < "$TARGET_FILE"
