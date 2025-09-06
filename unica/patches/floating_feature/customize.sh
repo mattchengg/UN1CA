@@ -185,29 +185,32 @@ APPLY_TARGET_FEATURE()
 
 APPLY_CUSTOM_FEATURE()
 {
-    local FILE="$SRC_DIR/target/$TARGET_CODENAME/sff.sh"
+    while IFS= read -r l; do
+        [[ "$l" == "#"* ]] && continue
+        [ ! "$l" ] && continue
 
-    if [ -f "$FILE" ]; then
-        while IFS= read -r l; do
-            [[ "$l" == "#"* ]] && continue
-            [ ! "$l" ] && continue
-
-            if [[ "$l" == "SEC_FLOATING_FEATURE_"*"="* ]]; then
-                if [ ! "$(cut -d "=" -f 2- <<< "$l")" ]; then
-                    SET_FLOATING_FEATURE_CONFIG "$(cut -d "=" -f 1 <<< "$l")" --delete
-                else
-                    SET_FLOATING_FEATURE_CONFIG "$(cut -d "=" -f 1 <<< "$l")" "$(cut -d "=" -f 2- <<< "$l")"
-                fi
+        if [[ "$l" == "SEC_FLOATING_FEATURE_"*"="* ]]; then
+            if [ ! "$(cut -d "=" -f 2- <<< "$l")" ]; then
+                SET_FLOATING_FEATURE_CONFIG "$(cut -d "=" -f 1 <<< "$l")" --delete
             else
-                ABORT "Malformed string in target/$TARGET_CODENAME/sff.sh: \"$l\""
+                SET_FLOATING_FEATURE_CONFIG "$(cut -d "=" -f 1 <<< "$l")" "$(cut -d "=" -f 2- <<< "$l")"
             fi
-        done < "$FILE"
-    fi
+        else
+            ABORT "Malformed string in ${1//$SRC_DIR\//}: \"$l\""
+        fi
+    done < "$1"
 }
 # ]
 
+LOG_STEP_IN "- Applying target floating feature config"
 APPLY_TARGET_FEATURE
-APPLY_CUSTOM_FEATURE
+LOG_STEP_OUT
+
+if [ -f "$SRC_DIR/target/$TARGET_CODENAME/sff.sh" ]; then
+    LOG_STEP_IN "- Applying custom floating feature config"
+    APPLY_CUSTOM_FEATURE "$SRC_DIR/target/$TARGET_CODENAME/sff.sh"
+    LOG_STEP_OUT
+fi
 
 # TODO move this somewhere else
 # Smart Tutor
