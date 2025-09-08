@@ -1,12 +1,12 @@
-From 48565f72d9c6ea69f0f6d18040e9f00775c6a580 Mon Sep 17 00:00:00 2001
+From 8186f41fc304352dfae22b0cccfd9feacee50e9b Mon Sep 17 00:00:00 2001
 From: Salvo Giangreco <giangrecosalvo9@gmail.com>
 Date: Sun, 31 Aug 2025 23:56:46 +0200
 Subject: [PATCH] feat: add DEX container format support
 
 ---
  .../main/java/brut/androlib/ApkDecoder.java   |   3 +
- .../java/brut/androlib/src/SmaliDecoder.java  | 104 +++++++++++-------
- 2 files changed, 65 insertions(+), 42 deletions(-)
+ .../java/brut/androlib/src/SmaliDecoder.java  | 107 +++++++++++-------
+ 2 files changed, 71 insertions(+), 39 deletions(-)
 
 diff --git a/brut.apktool/apktool-lib/src/main/java/brut/androlib/ApkDecoder.java b/brut.apktool/apktool-lib/src/main/java/brut/androlib/ApkDecoder.java
 index 985ce062..c55d781b 100644
@@ -23,7 +23,7 @@ index 985ce062..c55d781b 100644
              mMinSdkVersion = minSdkVersion;
          }
 diff --git a/brut.apktool/apktool-lib/src/main/java/brut/androlib/src/SmaliDecoder.java b/brut.apktool/apktool-lib/src/main/java/brut/androlib/src/SmaliDecoder.java
-index de382753..5b860c27 100644
+index de382753..c6496def 100644
 --- a/brut.apktool/apktool-lib/src/main/java/brut/androlib/src/SmaliDecoder.java
 +++ b/brut.apktool/apktool-lib/src/main/java/brut/androlib/src/SmaliDecoder.java
 @@ -17,6 +17,8 @@
@@ -43,7 +43,7 @@ index de382753..5b860c27 100644
  
  public class SmaliDecoder {
      private final File mApkFile;
-@@ -44,61 +47,78 @@ public class SmaliDecoder {
+@@ -44,61 +47,87 @@ public class SmaliDecoder {
  
      public DexFile decode(File outDir) throws AndrolibException {
          try {
@@ -68,22 +68,20 @@ index de382753..5b860c27 100644
 -            }
 -
              // create the container
--            MultiDexContainer<? extends DexBackedDexFile> container =
--                    DexFileFactory.loadDexContainer(mApkFile, mApiLevel > 0 ? Opcodes.forApi(mApiLevel) : null);
+             MultiDexContainer<? extends DexBackedDexFile> container =
+                     DexFileFactory.loadDexContainer(mApkFile, mApiLevel > 0 ? Opcodes.forApi(mApiLevel) : null);
 -            MultiDexContainer.DexEntry<? extends DexBackedDexFile> dexEntry;
 -            DexBackedDexFile dexFile;
--
++            ArrayList<MultiDexContainer.DexEntry<? extends DexBackedDexFile>> dexEntries = new ArrayList<>();
++            DexBackedDexFile dexFile = null;
++            boolean isDexContainerFormat = false;
+ 
 -            // If we have 1 item, ignore the passed file. Pull the DexFile we need.
 -            if (container.getDexEntryNames().size() == 1) {
 -                dexEntry = container.getEntry(container.getDexEntryNames().get(0));
-+            MultiDexContainer<? extends DexBackedDexFile> container = DexFileFactory.loadDexContainer(mApkFile,
-+                    mApiLevel > 0 ? Opcodes.forApi(mApiLevel) : null);
-+            ArrayList<MultiDexContainer.DexEntry<? extends DexBackedDexFile>> dexEntries = new ArrayList<>();
-+            DexBackedDexFile dexFile = null;
-+
-+            if (container.getDexEntryNames().size() >= 1) {
-+                for (String s : container.getDexEntryNames()) {
-+                    dexEntries.add(container.getEntry(s));
++            if (isDexContainerFormat = isDexContainerFormat(container)) {
++                for (String entry : container.getDexEntryNames()) {
++                    dexEntries.add(container.getEntry(entry));
 +                }
              } else {
 -                dexEntry = container.getEntry(mDexName);
@@ -109,13 +107,16 @@ index de382753..5b860c27 100644
 -                options.inlineResolver =
 -                        InlineMethodResolver.createInlineMethodResolver(((DexBackedOdexFile) dexFile).getOdexVersion());
 +            for (MultiDexContainer.DexEntry<? extends DexBackedDexFile> dexEntry : dexEntries) {
-+                int index = dexEntries.indexOf(dexEntry) + 1;
-+                if (index > 1 && outDir.getName().equals("smali")) {
-+                    outDir = new File(outDir.getParent(), "smali_classes" + index);
-+                    OS.rmdir(outDir);
-+                    OS.mkdir(outDir);
++                File smaliDir = outDir;
++                if (isDexContainerFormat) {
++                    int index = dexEntries.indexOf(dexEntry) + 1;
++                    if (index > 1) {
++                        smaliDir = new File(outDir.getParent(), "smali_classes" + index);
++                        OS.rmdir(smaliDir);
++                        OS.mkdir(smaliDir);
++                    }
 +                }
-+                dexFile = decodeInternal(dexEntry, outDir);
++                dexFile = decodeInternal(dexEntry, smaliDir);
              }
  
 -            Baksmali.disassembleDexFile(dexFile, outDir, jobs, options);
@@ -155,13 +156,18 @@ index de382753..5b860c27 100644
 +        }
 +
 +        if (dexFile instanceof DexBackedOdexFile) {
-+            options.inlineResolver = InlineMethodResolver
-+                    .createInlineMethodResolver(((DexBackedOdexFile) dexFile).getOdexVersion());
++            options.inlineResolver =
++                    InlineMethodResolver.createInlineMethodResolver(((DexBackedOdexFile) dexFile).getOdexVersion());
 +        }
 +
 +        Baksmali.disassembleDexFile(dexFile, outDir, jobs, options);
 +
 +        return dexFile;
++    }
++
++    private boolean isDexContainerFormat(MultiDexContainer<? extends DexBackedDexFile> container) throws IOException {
++        return mDexName.equals("classes.dex") && container.getDexEntryNames().size() > 1
++                && container.getDexEntryNames().get(1).contains("/");
 +    }
  }
 -- 
