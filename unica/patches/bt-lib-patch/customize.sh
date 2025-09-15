@@ -1,10 +1,10 @@
 if [ ! -f "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" ]; then
-    LOG_STEP_IN "- Extracting libbluetooth_jni.so from com.android.btservices.apex"
+    LOG_STEP_IN "- Extracting libbluetooth_jni.so from com.android.bt.apex"
 
     [ -d "$TMP_DIR" ] && EVAL "rm -rf \"$TMP_DIR\""
     mkdir -p "$TMP_DIR"
 
-    EVAL "unzip -j \"$WORK_DIR/system/system/apex/com.android.btservices.apex\" \"apex_payload.img\" -d \"$TMP_DIR\""
+    EVAL "unzip -j \"$WORK_DIR/system/system/apex/com.android.bt.apex\" \"apex_payload.img\" -d \"$TMP_DIR\""
 
     if ! sudo -n -v &> /dev/null; then
         LOG "\033[0;33m! Asking user for sudo password\033[0m"
@@ -25,6 +25,6 @@ if [ ! -f "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" ]; then
     LOG_STEP_OUT
 fi
 
-# https://github.com/3arthur6/BluetoothLibraryPatcher/blob/e22da26ae7eb0856f1342bb565e6aa26a5ccaa73/hexpatch.sh#L12
+# https://github.com/3arthur6/BluetoothLibraryPatcher/blob/64a360eb5780b6fc716b5c62d499a8861834486f/hexpatch.sh#L12
 HEX_PATCH "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" \
-    "480500352800805228" "530100142800805228"
+    "00122a0140395f01086b00020054" "00122a0140395f01086bde030014"
