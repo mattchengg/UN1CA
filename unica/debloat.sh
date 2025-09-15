@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2023 Salvo Giangreco
+# Copyright (C) 2025 Salvo Giangreco
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,10 +28,20 @@ VENDOR_DEBLOAT+="
 etc/dpolicy
 "
 
+# Samsung GameDriver
+EVAL "rm -r \"$WORK_DIR/system/system/priv-app/GameDriver-\"*"
+EVAL "sed -i \"/GameDriver/d\" \"$WORK_DIR/configs/file_context-system\""
+EVAL "sed -i \"/GameDriver/d\" \"$WORK_DIR/configs/fs_config-system\""
+
+# Samsung PROCA certificate DB
+SYSTEM_DEBLOAT+="
+system/etc/proca.db
+"
+
 # Samsung SIM Unlock
 SYSTEM_DEBLOAT+="
 system/bin/ssud
-system/etc/init/ssu_dm1qxxx.rc
+system/etc/init/ssu_$(GET_PROP "system" "ro.product.system.name").rc
 system/etc/init/ssu.rc
 system/etc/permissions/privapp-permissions-com.samsung.ssu.xml
 system/etc/sysconfig/samsungsimunlock.xml
@@ -47,128 +57,274 @@ bin/install-recovery.sh
 etc/init/vendor_flash_recovery.rc
 "
 
-# Apps debloat
-PRODUCT_DEBLOAT+="
-app/AssistantShell
-app/Chrome
-app/DuoStub
-app/Gmail2
-app/Maps
-app/YouTube
-overlay/GmsConfigOverlaySearchSelector.apk
-priv-app/Messages
-priv-app/SearchSelector
-"
+# PDP apps
 SYSTEM_DEBLOAT+="
-system/app/AutomationTest_FB
-system/app/DRParser
-system/app/DictDiotekForSec
-system/app/FactoryAirCommandManager
-system/app/FactoryCameraFB
-system/app/FBAppManager_NS
-system/app/HMT
-system/app/MoccaMobile
-system/app/PlayAutoInstallConfig
-system/app/SamsungCalendar
-system/app/SamsungPassAutofill_v1
-system/app/SamsungTTSVoice_de_DE_f00
-system/app/SamsungTTSVoice_en_GB_f00
-system/app/SamsungTTSVoice_en_US_l03
-system/app/SamsungTTSVoice_es_ES_f00
-system/app/SamsungTTSVoice_es_MX_f00
-system/app/SamsungTTSVoice_es_US_f00
-system/app/SamsungTTSVoice_fr_FR_f00
-system/app/SamsungTTSVoice_hi_IN_f00
-system/app/SamsungTTSVoice_it_IT_f00
-system/app/SamsungTTSVoice_pl_PL_f00
-system/app/SamsungTTSVoice_pt_BR_f00
-system/app/SamsungTTSVoice_ru_RU_f00
-system/app/SamsungTTSVoice_th_TH_f00
-system/app/SamsungTTSVoice_vi_VN_f00
-system/app/SilentLog
-system/app/SmartReminder
-system/app/WebManual
-system/app/WlanTest
-system/etc/init/digitalkey_init_nfc_tss2.rc
-system/etc/init/samsung_pass_authenticator_service.rc
-system/etc/permissions/privapp-permissions-com.microsoft.skydrive.xml
-system/etc/permissions/privapp-permissions-com.samsung.android.app.kfa.xml
-system/etc/permissions/privapp-permissions-com.samsung.android.authfw.xml
-system/etc/permissions/privapp-permissions-com.samsung.android.carkey.xml
-system/etc/permissions/privapp-permissions-com.samsung.android.cidmanager.xml
-system/etc/permissions/privapp-permissions-com.samsung.android.dkey.xml
-system/etc/permissions/privapp-permissions-com.samsung.android.game.gamehome.xml
-system/etc/permissions/privapp-permissions-com.samsung.android.providers.factory.xml
-system/etc/permissions/privapp-permissions-com.samsung.android.samsungpass.xml
-system/etc/permissions/privapp-permissions-com.samsung.android.spayfw.xml
-system/etc/permissions/privapp-permissions-com.sec.android.app.factorykeystring.xml
-system/etc/permissions/privapp-permissions-com.sec.android.diagmonagent.xml
-system/etc/permissions/privapp-permissions-com.sec.android.soagent.xml
-system/etc/permissions/privapp-permissions-com.sec.bcservice.xml
-system/etc/permissions/privapp-permissions-com.sec.epdgtestapp.xml
-system/etc/permissions/privapp-permissions-com.sec.facatfunction.xml
-system/etc/permissions/privapp-permissions-com.sem.factoryapp.xml
-system/etc/permissions/privapp-permissions-com.wssyncmldm.xml
-system/etc/permissions/privapp-permissions-de.axelspringer.yana.zeropage.xml
-system/etc/permissions/privapp-permissions-meta.xml
-system/etc/sysconfig/digitalkey.xml
-system/etc/sysconfig/meta-hiddenapi-package-allowlist.xml
-system/etc/sysconfig/preinstalled-packages-com.samsung.android.dkey.xml
-system/etc/sysconfig/preinstalled-packages-com.samsung.android.spayfw.xml
-system/etc/sysconfig/samsungauthframework.xml
-system/etc/sysconfig/samsungpassapp.xml
-system/hidden/SmartTutor
-system/lib64/librildump_jni.so
+system/etc/default-permissions/default-permissions-com.samsung.android.app.tips.xml
+system/etc/permissions/privapp-permissions-com.samsung.android.app.tips.xml
+system/etc/permissions/signature-permissions-com.samsung.android.app.tips.xml
 system/preload
-system/priv-app/AuthFramework
-system/priv-app/BCService
-system/priv-app/CIDManager
-system/priv-app/DeviceKeystring
-system/priv-app/DiagMonAgent91
-system/priv-app/DigitalKey
-system/priv-app/FBInstaller_NS
-system/priv-app/FBServices
-system/priv-app/FacAtFunction
-system/priv-app/FactoryTestProvider
-system/priv-app/FotaAgent
-system/priv-app/GameHome
-system/priv-app/ModemServiceMode
-system/priv-app/OneDrive_Samsung_v3
-system/priv-app/PaymentFramework
-system/priv-app/SEMFactoryApp
-system/priv-app/SOAgent7
-system/priv-app/SamsungCarKeyFw
-system/priv-app/SamsungPass
-system/priv-app/SmartEpdgTestApp
-system/priv-app/Upday
 "
+
+truncate -s 0 "$WORK_DIR/system/system/etc/vpl_apks_count_list.txt"
 
 # eSIM
-if $SOURCE_IS_ESIM_SUPPORTED; then
-    if ! $TARGET_IS_ESIM_SUPPORTED; then
-        SYSTEM_DEBLOAT+="
-        system/etc/permissions/privapp-permissions-com.samsung.android.app.esimkeystring.xml
-        system/etc/permissions/privapp-permissions-com.samsung.euicc.xml
-        system/etc/sysconfig/preinstalled-packages-com.samsung.android.app.esimkeystring.xml
-        system/etc/sysconfig/preinstalled-packages-com.samsung.euicc.xml
-        system/priv-app/EsimKeyString
-        system/priv-app/EuiccService
-        "
-    fi
-fi
+[[ "$TARGET_IS_ESIM_SUPPORTED" == "false" ]] && SYSTEM_DEBLOAT+="
+system/etc/permissions/privapp-permissions-com.samsung.android.app.esimkeystring.xml
+system/etc/permissions/privapp-permissions-com.samsung.euicc.xml
+system/etc/sysconfig/preinstalled-packages-com.samsung.android.app.esimkeystring.xml
+system/etc/sysconfig/preinstalled-packages-com.samsung.euicc.xml
+system/priv-app/EsimKeyString
+system/priv-app/EuiccService
+"
 
 # fabric_crypto
-if [[ "$TARGET_API_LEVEL" -lt 34 ]]; then
-    SYSTEM_DEBLOAT+="
-    system/bin/fabric_crypto
-    system/etc/init/fabric_crypto.rc
-    system/etc/permissions/FabricCryptoLib.xml
-    system/etc/permissions/privapp-permissions-com.samsung.android.kmxservice.xml
-    system/etc/vintf/manifest/fabric_crypto_manifest.xml
-    system/framework/FabricCryptoLib.jar
-    system/lib64/com.samsung.security.fabric.cryptod-V1-cpp.so
-    system/lib64/vendor.samsung.hardware.security.fkeymaster-V1-cpp.so
-    system/lib64/vendor.samsung.hardware.security.fkeymaster-V1-ndk.so
-    system/priv-app/KmxService
-    "
-fi
+[ "$TARGET_API_LEVEL" -lt "34" ] && SYSTEM_DEBLOAT+="
+system/bin/fabric_crypto
+system/etc/init/fabric_crypto.rc
+system/etc/permissions/FabricCryptoLib.xml
+system/etc/permissions/privapp-permissions-com.samsung.android.kmxservice.xml
+system/etc/vintf/manifest/fabric_crypto_manifest.xml
+system/framework/FabricCryptoLib.jar
+system/lib64/com.samsung.security.fabric.cryptod-V1-cpp.so
+system/lib64/vendor.samsung.hardware.security.fkeymaster-V1-cpp.so
+system/lib64/vendor.samsung.hardware.security.fkeymaster-V1-ndk.so
+system/priv-app/KmxService
+"
+
+# SmartFPSAdjuster
+[ "$TARGET_HFR_MODE" -lt "1" ] && SYSTEM_DEBLOAT+="
+system/priv-app/IntelligentDynamicFpsService
+"
+
+# Application recommendations
+SYSTEM_DEBLOAT+="
+system/app/MAPSAgent
+"
+
+# AppUpdateCenter
+SYSTEM_DEBLOAT+="
+system/etc/permissions/privapp-permissions-com.samsung.android.app.updatecenter.xml
+system/priv-app/AppUpdateCenter
+"
+
+# BCService
+SYSTEM_DEBLOAT+="
+system/etc/permissions/privapp-permissions-com.sec.bcservice.xml
+system/priv-app/BCService
+"
+
+# Gaming Hub
+SYSTEM_DEBLOAT+="
+system/etc/permissions/privapp-permissions-com.samsung.android.game.gamehome.xml
+system/priv-app/GameHome
+"
+
+# Gemini shortcut
+PRODUCT_DEBLOAT+="
+app/BardShell
+"
+
+# Gmail
+PRODUCT_DEBLOAT+="
+app/Gmail2
+"
+
+# Google Chrome
+PRODUCT_DEBLOAT+="
+app/Chrome
+"
+
+# Google Duo
+PRODUCT_DEBLOAT+="
+app/DuoStub
+"
+
+# Google Maps
+PRODUCT_DEBLOAT+="
+app/Maps
+"
+
+# Google PAI (Play Autoinstall)
+SYSTEM_DEBLOAT+="
+system/app/PlayAutoInstallConfig
+"
+
+# Language packs
+SYSTEM_DEBLOAT+="
+system/app/SamsungTTSVoice_en_US_f00
+system/app/SamsungTTSVoice_es_MX_f00
+system/app/SamsungTTSVoice_pt_BR_f00
+"
+
+# Live Transcribe
+SYSTEM_DEBLOAT+="
+system/app/LiveTranscribe
+system/etc/sysconfig/feature-a11y-preload.xml
+"
+
+# Meta
+SYSTEM_DEBLOAT+="
+system/app/FBAppManager_NS
+system/etc/default-permissions/default-permissions-meta.xml
+system/etc/permissions/privapp-permissions-meta.xml
+system/etc/sysconfig/meta-hiddenapi-package-allowlist.xml
+system/priv-app/FBInstaller_NS
+system/priv-app/FBServices
+"
+
+# Microsoft OneDrive
+SYSTEM_DEBLOAT+="
+system/etc/permissions/privapp-permissions-com.microsoft.skydrive.xml
+system/priv-app/OneDrive_Samsung_v3
+"
+
+# My Galaxy
+SYSTEM_DEBLOAT+="
+system/etc/permissions/privapp-permissions-com.mygalaxy.service.xml
+system/etc/sysconfig/preinstalled-packages-com.mygalaxy.service.xml
+system/priv-app/MyGalaxyService
+"
+
+# Samsung Analytics
+SYSTEM_DEBLOAT+="
+system/app/DsmsAPK
+system/etc/permissions/privapp-permissions-com.samsung.android.dqagent.xml
+system/etc/permissions/privapp-permissions-com.sec.android.diagmonagent.xml
+system/etc/permissions/privapp-permissions-com.sec.android.soagent.xml
+system/priv-app/DeviceQualityAgent36
+system/priv-app/DiagMonAgent95
+system/priv-app/SOAgent76
+"
+
+SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_CONTEXTSERVICE_ENABLE_SURVEY_MODE" --delete
+
+# Samsung AR Emoji
+SYSTEM_DEBLOAT+="
+system/etc/default-permissions/default-permissions-com.sec.android.mimage.avatarstickers.xml
+system/etc/permissions/privapp-permissions-com.samsung.android.aremojieditor.xml
+system/etc/permissions/privapp-permissions-com.sec.android.mimage.avatarstickers.xml
+system/etc/permissions/signature-permissions-com.sec.android.mimage.avatarstickers.xml
+system/priv-app/AREmojiEditor
+system/priv-app/AvatarEmojiSticker
+"
+
+# Samsung Calendar
+SYSTEM_DEBLOAT+="
+system/app/SamsungCalendar
+"
+
+# Samsung Clock
+SYSTEM_DEBLOAT+="
+system/app/ClockPackage
+system/etc/permissions/signature-permissions-com.sec.android.app.clockpackage.xml
+"
+
+# Samsung Free
+SYSTEM_DEBLOAT+="
+system/app/MinusOnePage
+system/etc/permissions/signature-permissions-com.samsung.android.app.spage.xml
+"
+
+# Samsung Messages
+SYSTEM_DEBLOAT+="
+system/etc/default-permissions/default-permissions-com.samsung.android.messaging.xml
+system/etc/permissions/privapp-permissions-com.samsung.android.messaging.xml
+system/priv-app/SamsungMessages
+"
+
+# Samsung Pass
+SYSTEM_DEBLOAT+="
+system/app/SamsungPassAutofill_v1
+system/etc/init/samsung_pass_authenticator_service.rc
+system/etc/permissions/authfw.xml
+system/etc/permissions/privapp-permissions-com.samsung.android.authfw.xml
+system/etc/permissions/privapp-permissions-com.samsung.android.samsungpass.xml
+system/etc/permissions/signature-permissions-com.samsung.android.samsungpass.xml
+system/etc/permissions/signature-permissions-com.samsung.android.samsungpassautofill.xml
+system/etc/sysconfig/samsungauthframework.xml
+system/etc/sysconfig/samsungpassapp.xml
+system/priv-app/AuthFramework
+system/priv-app/SamsungPass
+"
+
+# Samsung Reminder
+SYSTEM_DEBLOAT+="
+system/app/SmartReminder
+"
+
+# Samsung Visit In
+SYSTEM_DEBLOAT+="
+system/etc/permissions/privapp-permissions-com.samsung.android.ipsgeofence.xml
+system/priv-app/IpsGeofence
+"
+
+# Samsung Wallet
+SYSTEM_DEBLOAT+="
+system/etc/init/digitalkey_init_ble_tss2.rc
+system/etc/permissions/privapp-permissions-com.samsung.android.carkey.xml
+system/etc/permissions/privapp-permissions-com.samsung.android.dkey.xml
+system/etc/permissions/privapp-permissions-com.samsung.android.spayfw.xml
+system/etc/permissions/signature-permissions-com.samsung.android.spay.xml
+system/etc/permissions/signature-permissions-com.samsung.android.spayfw.xml
+system/etc/sysconfig/digitalkey.xml
+system/etc/sysconfig/preinstalled-packages-com.samsung.android.dkey.xml
+system/etc/sysconfig/preinstalled-packages-com.samsung.android.spayfw.xml
+system/priv-app/DigitalKey
+system/priv-app/PaymentFramework
+system/priv-app/SamsungCarKeyFw
+"
+
+# Search engine selector
+PRODUCT_DEBLOAT+="
+overlay/GmsConfigOverlaySearchSelector.apk
+priv-app/SearchSelector
+"
+
+# SettingsHelper
+SYSTEM_DEBLOAT+="
+system/etc/permissions/privapp-permissions-com.samsung.android.settingshelper.xml
+system/etc/sysconfig/settingshelper.xml
+system/priv-app/SHClient
+"
+
+# Smart Touch Call
+SYSTEM_DEBLOAT+="
+system/etc/default-permissions/default-permissions-com.samsung.android.visualars.xml
+system/etc/permissions/privapp-permissions-com.samsung.android.visualars.xml
+system/priv-app/SmartTouchCall
+"
+
+# Smart Tutor
+SYSTEM_DEBLOAT+="
+system/hidden/SmartTutor
+"
+
+SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_COMMON_CONFIG_SMARTTUTOR_PACKAGES_PATH" --delete
+
+# Software update
+SYSTEM_DEBLOAT+="
+system/etc/permissions/privapp-permissions-com.wssyncmldm.xml
+system/priv-app/FotaAgent
+"
+
+# SVC Agent
+SYSTEM_DEBLOAT+="
+system/etc/permissions/privapp-permissions-com.samsung.android.svcagent.xml
+system/priv-app/SVCAgent
+"
+
+# SVoiceIME
+SYSTEM_DEBLOAT+="
+system/priv-app/SVoiceIME
+"
+
+# Voice Access
+SYSTEM_DEBLOAT+="
+system/app/VoiceAccess
+system/etc/sysconfig/feature-a11y-preload-voacc.xml
+"
+
+# YouTube
+PRODUCT_DEBLOAT+="
+app/YouTube
+"
