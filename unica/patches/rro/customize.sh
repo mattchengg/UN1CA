@@ -1,13 +1,19 @@
+SOURCE_PRODUCT_NAME="$(GET_PROP "system" "ro.product.system.name")"
+TARGET_PRODUCT_NAME="$(GET_PROP "vendor" "ro.product.vendor.name")"
+
 if [ ! -d "$SRC_DIR/target/$TARGET_CODENAME/overlay" ]; then
-    LOG "\033[0;33m! Nothing to do\033[0m"
-    return 0
+    if [[ "$SOURCE_PRODUCT_NAME" == "$TARGET_PRODUCT_NAME" ]] || $DEBUG; then
+        LOG "\033[0;33m! Nothing to do\033[0m"
+        return 0
+    else
+        LOGE "Folder not found: target/$TARGET_CODENAME/overlay"
+        unset SOURCE_PRODUCT_NAME TARGET_PRODUCT_NAME
+        ABORT
+    fi
 fi
 
 alias _LOG=ABORT
 $DEBUG && alias _LOG=LOGW
-
-SOURCE_PRODUCT_NAME="$(GET_PROP "system" "ro.product.system.name")"
-TARGET_PRODUCT_NAME="$(GET_PROP "vendor" "ro.product.vendor.name")"
 
 DECODE_APK "product" "overlay/framework-res__${SOURCE_PRODUCT_NAME}__auto_generated_rro_product.apk"
 
