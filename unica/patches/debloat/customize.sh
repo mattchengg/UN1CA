@@ -39,3 +39,5 @@ VENDOR_DEBLOAT="$(sed "/^$/d" <<< "$VENDOR_DEBLOAT" | sort)"
 [ "$VENDOR_DEBLOAT" ] && xargs -I "{}" -P "$(nproc)" \
     bash -c 'source "$SRC_DIR/scripts/utils/module_utils.sh"; DELETE_FROM_WORK_DIR "vendor" "$1"' "bash" "{}" \
     <<< "$VENDOR_DEBLOAT"
+
+unset ODM_DEBLOAT PRODUCT_DEBLOAT SYSTEM_DEBLOAT SYSTEM_EXT_DEBLOAT VENDOR_DEBLOAT

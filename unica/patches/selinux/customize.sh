@@ -71,3 +71,6 @@ for e in $ENTRIES; do
         fi
     fi
 done
+
+unset ENTRIES CIL_NAME VENDOR_API_LIST
+unset -f GET_SYSTEM_EXT
