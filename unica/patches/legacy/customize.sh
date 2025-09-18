@@ -15,3 +15,12 @@ if [ "$TARGET_API_LEVEL" -lt "36" ]; then
         } >> "$WORK_DIR/system/system/etc/init/hw/init.rc"
     fi
 fi
+
+# Ensure IMAGE_CODEC_SAMSUNG support (pre-API 35)
+if [ "$TARGET_API_LEVEL" -lt "35" ]; then
+    if [ "$(GET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_CAMERA_CONFIG_VENDOR_LIB_INFO")" ] && \
+            [[ "$(GET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_CAMERA_CONFIG_VENDOR_LIB_INFO")" != *"image_codec.samsung"* ]]; then
+        SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_CAMERA_CONFIG_VENDOR_LIB_INFO" \
+            "$(GET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_CAMERA_CONFIG_VENDOR_LIB_INFO"),image_codec.samsung.v1"
+    fi
+fi
