@@ -98,6 +98,16 @@ if [ "$TARGET_API_LEVEL" -lt "36" ]; then
     fi
 fi
 
+# Support legacy sdFAT kernel drivers (pre-API 35)
+# https://android.googlesource.com/platform/system/vold/+/refs/tags/android-16.0.0_r2/fs/Vfat.cpp#150
+# - Check for 'bogus directory:' to determine if newer sdFAT drivers are in place
+if [ "$TARGET_API_LEVEL" -lt "35" ] && \
+        grep -q "SDFAT" "$WORK_DIR/kernel/boot.img" && \
+        ! grep -q "bogus directory:" "$WORK_DIR/kernel/boot.img"; then
+    # ",time_offset=%d" -> "NUL"
+    HEX_PATCH "$WORK_DIR/system/system/bin/vold" "2c74696d655f6f66667365743d2564" "000000000000000000000000000000"
+fi
+
 # Ensure IMAGE_CODEC_SAMSUNG support (pre-API 35)
 if [ "$TARGET_API_LEVEL" -lt "35" ]; then
     if [ "$(GET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_CAMERA_CONFIG_VENDOR_LIB_INFO")" ] && \
