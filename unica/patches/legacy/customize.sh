@@ -90,6 +90,7 @@ fi
 if [ "$TARGET_API_LEVEL" -lt "36" ]; then
     if ! grep -q "ro.telephony.sim_slots.count" "$WORK_DIR/vendor/bin/secril_config_svc" && \
             ! grep -q -r "config_num_physical_slots" "$WORK_DIR/vendor/overlay"; then
+        LOG "- Set \"ro.telephony.sim_slots.count\" prop at boot"
         {
             echo ""
             echo "on property:ro.vendor.multisim.simslotcount=*"
