@@ -190,11 +190,6 @@ HEX_PATCH()
     FROM="$(tr "[:upper:]" "[:lower:]" <<< "$FROM")"
     TO="$(tr "[:upper:]" "[:lower:]" <<< "$TO")"
 
-    if xxd -p "$FILE" | tr -d "\n" | tr -d " " | grep -q "$TO"; then
-        LOGW "\"$TO\" already applied in ${FILE//$WORK_DIR/}"
-        return 0
-    fi
-
     if ! xxd -p "$FILE" | tr -d "\n" | tr -d " " | grep -q "$FROM"; then
         LOGE "No \"$FROM\" match in ${FILE//$WORK_DIR/}"
         return 1
