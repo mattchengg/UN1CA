@@ -77,20 +77,6 @@ system/priv-app/EsimKeyString
 system/priv-app/EuiccService
 "
 
-# fabric_crypto
-[ "$TARGET_API_LEVEL" -lt "34" ] && SYSTEM_DEBLOAT+="
-system/bin/fabric_crypto
-system/etc/init/fabric_crypto.rc
-system/etc/permissions/FabricCryptoLib.xml
-system/etc/permissions/privapp-permissions-com.samsung.android.kmxservice.xml
-system/etc/vintf/manifest/fabric_crypto_manifest.xml
-system/framework/FabricCryptoLib.jar
-system/lib64/com.samsung.security.fabric.cryptod-V1-cpp.so
-system/lib64/vendor.samsung.hardware.security.fkeymaster-V1-cpp.so
-system/lib64/vendor.samsung.hardware.security.fkeymaster-V1-ndk.so
-system/priv-app/KmxService
-"
-
 # SmartFPSAdjuster
 [ "$TARGET_HFR_MODE" -lt "1" ] && SYSTEM_DEBLOAT+="
 system/priv-app/IntelligentDynamicFpsService

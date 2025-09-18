@@ -117,6 +117,22 @@ if [ "$TARGET_API_LEVEL" -lt "35" ]; then
     fi
 fi
 
+# Ensure Knox Matrix support
+# - Check if target firmware runs on One UI 5.1.1 or above
+TARGET_FIRMWARE_PATH="$(cut -d "/" -f 1 -s <<< "$TARGET_FIRMWARE")_$(cut -d "/" -f 2 -s <<< "$TARGET_FIRMWARE")"
+if [ "$(GET_PROP "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/build.prop" "ro.build.version.oneui")" -lt "50101" ]; then
+    DELETE_FROM_WORK_DIR "system" "system/bin/fabric_crypto"
+    DELETE_FROM_WORK_DIR "system" "system/etc/init/fabric_crypto.rc"
+    DELETE_FROM_WORK_DIR "system" "system/etc/permissions/FabricCryptoLib.xml"
+    DELETE_FROM_WORK_DIR "system" "system/etc/permissions/privapp-permissions-com.samsung.android.kmxservice.xml"
+    DELETE_FROM_WORK_DIR "system" "system/etc/vintf/manifest/fabric_crypto_manifest.xml"
+    DELETE_FROM_WORK_DIR "system" "system/framework/FabricCryptoLib.jar"
+    DELETE_FROM_WORK_DIR "system" "system/lib64/com.samsung.security.fabric.cryptod-V1-cpp.so"
+    DELETE_FROM_WORK_DIR "system" "system/lib64/vendor.samsung.hardware.security.fkeymaster-V1-cpp.so"
+    DELETE_FROM_WORK_DIR "system" "system/lib64/vendor.samsung.hardware.security.fkeymaster-V1-ndk.so"
+    DELETE_FROM_WORK_DIR "system" "system/priv-app/KmxService"
+fi
+
 # Ensure KSMBD support in kernel
 # - 4.19.x and below: unsupported
 # - 5.4.x-5.10.x: backport (https://github.com/namjaejeon/ksmbd.git)
@@ -136,4 +152,5 @@ if [ -f "$WORK_DIR/system/system/priv-app/StorageShare/StorageShare.apk" ] && \
     DELETE_FROM_WORK_DIR "system" "system/priv-app/StorageShare"
 fi
 
+unset TARGET_FIRMWARE_PATH
 unset -f BACKPORT_SF_PROPS
