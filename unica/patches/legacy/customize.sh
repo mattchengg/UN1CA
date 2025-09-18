@@ -75,6 +75,14 @@ BACKPORT_SF_PROPS()
 # - Add ro.surface_flinger.game_default_frame_rate_override if missing
 BACKPORT_SF_PROPS
 
+# Support legacy Face HAL (pre-API 34)
+if [ "$TARGET_API_LEVEL" -lt "34" ]; then
+    if [ ! -f "$WORK_DIR/vendor/bin/hw/vendor.samsung.hardware.biometrics.face@3.0-service" ]; then
+        APPLY_PATCH "system" "system/framework/services.jar" \
+            "$SRC_DIR/unica/patches/legacy/face/services.jar/0001-Fallback-to-Face-HIDL-2.0.patch"
+    fi
+fi
+
 # Support legacy SehLights HAL (pre-API 35)
 # - Check for [lsr wD, wS, #0x18] to determine if the newer HAL is already in place
 if [ "$TARGET_API_LEVEL" -lt "35" ]; then
