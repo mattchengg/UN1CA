@@ -117,4 +117,23 @@ if [ "$TARGET_API_LEVEL" -lt "35" ]; then
     fi
 fi
 
+# Ensure KSMBD support in kernel
+# - 4.19.x and below: unsupported
+# - 5.4.x-5.10.x: backport (https://github.com/namjaejeon/ksmbd.git)
+# - 5.15.x and above: supported
+if [ -f "$WORK_DIR/system/system/priv-app/StorageShare/StorageShare.apk" ] && \
+        ! grep -q "ksmbd" "$WORK_DIR/kernel/boot.img"; then
+    DELETE_FROM_WORK_DIR "system" "system/bin/ksmbd.addshare"
+    DELETE_FROM_WORK_DIR "system" "system/bin/ksmbd.adduser"
+    DELETE_FROM_WORK_DIR "system" "system/bin/ksmbd.control"
+    DELETE_FROM_WORK_DIR "system" "system/bin/ksmbd.mountd"
+    DELETE_FROM_WORK_DIR "system" "system/bin/ksmbd.tools"
+    DELETE_FROM_WORK_DIR "system" "system/etc/default-permissions/default-permissions-com.samsung.android.hwresourceshare.storage.xml"
+    DELETE_FROM_WORK_DIR "system" "system/etc/init/ksmbd.rc"
+    DELETE_FROM_WORK_DIR "system" "system/etc/permissions/privapp-permissions-com.samsung.android.hwresourceshare.storage.xml"
+    DELETE_FROM_WORK_DIR "system" "system/etc/sysconfig/preinstalled-packages-com.samsung.android.hwresourceshare.storage.xml"
+    DELETE_FROM_WORK_DIR "system" "system/etc/ksmbd.conf"
+    DELETE_FROM_WORK_DIR "system" "system/priv-app/StorageShare"
+fi
+
 unset -f BACKPORT_SF_PROPS
