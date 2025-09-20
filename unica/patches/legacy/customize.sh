@@ -169,5 +169,13 @@ if [ -f "$WORK_DIR/system/system/bin/sbauth" ] && \
     DELETE_FROM_WORK_DIR "system" "system/etc/init/sbauth.rc"
 fi
 
+# Ensure PASS support (pre-API 35)
+if [ "$TARGET_API_LEVEL" -lt "35" ]; then
+    if ! grep -q "sec_pass_data_file" "$WORK_DIR/vendor/etc/selinux/vendor_sepolicy.cil"; then
+        APPLY_PATCH "system" "system/framework/services.jar" \
+            "$SRC_DIR/unica/patches/legacy/storage/services.jar/0001-Disable-Pass-Storage-support.patch"
+    fi
+fi
+
 unset TARGET_FIRMWARE_PATH
 unset -f BACKPORT_SF_PROPS
