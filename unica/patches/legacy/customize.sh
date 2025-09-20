@@ -161,5 +161,13 @@ if [ -f "$WORK_DIR/system/system/priv-app/StorageShare/StorageShare.apk" ] && \
     DELETE_FROM_WORK_DIR "system" "system/priv-app/StorageShare"
 fi
 
+# Ensure sbauth support in target firmware
+TARGET_FIRMWARE_PATH="$(cut -d "/" -f 1 -s <<< "$TARGET_FIRMWARE")_$(cut -d "/" -f 2 -s <<< "$TARGET_FIRMWARE")"
+if [ -f "$WORK_DIR/system/system/bin/sbauth" ] && \
+        [ ! -f "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/bin/sbauth" ]; then
+    DELETE_FROM_WORK_DIR "system" "system/bin/sbauth"
+    DELETE_FROM_WORK_DIR "system" "system/etc/init/sbauth.rc"
+fi
+
 unset TARGET_FIRMWARE_PATH
 unset -f BACKPORT_SF_PROPS
