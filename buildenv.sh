@@ -120,7 +120,9 @@ export TMP_DIR="$OUT_DIR/tmp"
 export ODIN_DIR="$OUT_DIR/odin"
 export FW_DIR="$OUT_DIR/fw"
 export TOOLS_DIR="$OUT_DIR/tools"
-export PATH="$TOOLS_DIR/bin:$PATH"
+if [[ ":$PATH:" != *":$TOOLS_DIR/bin:"* ]]; then
+    export PATH="$TOOLS_DIR/bin:$PATH"
+fi
 
 TARGETS=()
 while IFS= read -r t; do
