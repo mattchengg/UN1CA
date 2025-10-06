@@ -1,7 +1,10 @@
 #!/system/bin/sh
 
 rezetprop -n ro.boot.flash.locked "1"
+rezetprop -n ro.boot.vbmeta.avb_version "1.3"
 rezetprop -n ro.boot.vbmeta.device_state "locked"
+rezetprop -n ro.boot.vbmeta.hash_alg "sha256"
+rezetprop -n ro.boot.vbmeta.invalidate_on_error "yes"
 rezetprop -n ro.boot.warranty_bit "0"
 rezetprop -n ro.boot.verifiedbootstate "green"
 rezetprop -n ro.boot.veritymode "enforcing"
