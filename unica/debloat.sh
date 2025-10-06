@@ -59,9 +59,6 @@ etc/init/vendor_flash_recovery.rc
 
 # PDP apps
 SYSTEM_DEBLOAT+="
-system/etc/default-permissions/default-permissions-com.samsung.android.app.tips.xml
-system/etc/permissions/privapp-permissions-com.samsung.android.app.tips.xml
-system/etc/permissions/signature-permissions-com.samsung.android.app.tips.xml
 system/preload
 "
 
@@ -202,13 +199,11 @@ system/app/SamsungCalendar
 # Samsung Clock
 SYSTEM_DEBLOAT+="
 system/app/ClockPackage
-system/etc/permissions/signature-permissions-com.sec.android.app.clockpackage.xml
 "
 
 # Samsung Free
 SYSTEM_DEBLOAT+="
 system/app/MinusOnePage
-system/etc/permissions/signature-permissions-com.samsung.android.app.spage.xml
 "
 
 # Samsung Messages
