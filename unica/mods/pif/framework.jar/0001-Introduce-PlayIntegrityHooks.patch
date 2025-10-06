@@ -1,54 +1,32 @@
-From 6898acad7347f3cb381688173a75bfeefe2b9c11 Mon Sep 17 00:00:00 2001
+From b194d8dfaea7037add9817f22eac229554a6b136 Mon Sep 17 00:00:00 2001
 From: Salvo Giangreco <giangrecosalvo9@gmail.com>
-Date: Fri, 13 Sep 2024 11:04:24 +0200
+Date: Mon, 6 Oct 2025 15:14:36 +0200
 Subject: [PATCH] Introduce PlayIntegrityHooks
 
+UN1CA: this patch is not complete! Please check unica/mods/pif/customize.sh for more info.
 ---
- smali/android/app/Instrumentation.smali       |    4 +
  .../keystore2/AndroidKeyStoreSpi.smali        |    2 +
  ...grityHooks$$ExternalSyntheticLambda0.smali |   30 +
  .../mesalabs/unica/PlayIntegrityHooks$1.smali |   79 ++
- .../mesalabs/unica/PlayIntegrityHooks.smali   | 1049 +++++++++++++++++
- 5 files changed, 1164 insertions(+)
+ .../mesalabs/unica/PlayIntegrityHooks.smali   | 1037 +++++++++++++++++
+ 4 files changed, 1148 insertions(+)
  create mode 100644 smali_classes6/io/mesalabs/unica/PlayIntegrityHooks$$ExternalSyntheticLambda0.smali
  create mode 100644 smali_classes6/io/mesalabs/unica/PlayIntegrityHooks$1.smali
  create mode 100644 smali_classes6/io/mesalabs/unica/PlayIntegrityHooks.smali
 
-diff --git a/smali/android/app/Instrumentation.smali b/smali/android/app/Instrumentation.smali
-index 86460ff3..a0f4bf02 100644
---- a/smali/android/app/Instrumentation.smali
-+++ b/smali/android/app/Instrumentation.smali
-@@ -632,6 +632,8 @@
- 
-     invoke-virtual {v0, p1}, Landroid/app/Application;->attach(Landroid/content/Context;)V
- 
-+    invoke-static {p1}, Lio/mesalabs/unica/PlayIntegrityHooks;->setProps(Landroid/content/Context;)V
-+
-     return-object v0
- .end method
- 
-@@ -3842,6 +3844,8 @@
- 
-     invoke-virtual {v0, p3}, Landroid/app/Application;->attach(Landroid/content/Context;)V
- 
-+    invoke-static {p3}, Lio/mesalabs/unica/PlayIntegrityHooks;->setProps(Landroid/content/Context;)V
-+
-     return-object v0
- .end method
- 
 diff --git a/smali_classes3/android/security/keystore2/AndroidKeyStoreSpi.smali b/smali_classes3/android/security/keystore2/AndroidKeyStoreSpi.smali
-index f8640991..502e7662 100644
+index c724b464..0579bc5c 100644
 --- a/smali_classes3/android/security/keystore2/AndroidKeyStoreSpi.smali
 +++ b/smali_classes3/android/security/keystore2/AndroidKeyStoreSpi.smali
-@@ -3877,6 +3877,8 @@
+@@ -3223,6 +3223,8 @@
  .method public whitelist test-api engineGetCertificateChain(Ljava/lang/String;)[Ljava/security/cert/Certificate;
-     .locals 9
+     .locals 4
  
 +    invoke-static {}, Lio/mesalabs/unica/PlayIntegrityHooks;->onEngineGetCertificateChain()V
 +
      invoke-direct {p0, p1}, Landroid/security/keystore2/AndroidKeyStoreSpi;->getKeyMetadata(Ljava/lang/String;)Landroid/system/keystore2/KeyEntryResponse;
  
-     move-result-object v0
+     move-result-object p0
 diff --git a/smali_classes6/io/mesalabs/unica/PlayIntegrityHooks$$ExternalSyntheticLambda0.smali b/smali_classes6/io/mesalabs/unica/PlayIntegrityHooks$$ExternalSyntheticLambda0.smali
 new file mode 100644
 index 00000000..807bf498
@@ -172,10 +150,10 @@ index 00000000..fe159605
 +.end method
 diff --git a/smali_classes6/io/mesalabs/unica/PlayIntegrityHooks.smali b/smali_classes6/io/mesalabs/unica/PlayIntegrityHooks.smali
 new file mode 100644
-index 00000000..0d5593e1
+index 00000000..4e919d7f
 --- /dev/null
 +++ b/smali_classes6/io/mesalabs/unica/PlayIntegrityHooks.smali
-@@ -0,0 +1,1049 @@
+@@ -0,0 +1,1037 @@
 +.class public final Lio/mesalabs/unica/PlayIntegrityHooks;
 +.super Ljava/lang/Object;
 +.source "PlayIntegrityHooks.java"
@@ -186,31 +164,33 @@ index 00000000..0d5593e1
 +
 +.field private static final blacklist GMS_ADD_ACCOUNT_ACTIVITY:Landroid/content/ComponentName;
 +
++.field private static final blacklist PACKAGE_FINSKY:Ljava/lang/String; = "com.android.vending"
++
 +.field private static final blacklist PACKAGE_GMS:Ljava/lang/String; = "com.google.android.gms"
 +
-+.field private static final blacklist PIF_BRAND:Ljava/lang/String; = "google"
++.field private static final blacklist PIF_BRAND:Ljava/lang/String; = "null"
 +
-+.field private static final blacklist PIF_DEVICE:Ljava/lang/String; = "shiba"
++.field private static final blacklist PIF_DEVICE:Ljava/lang/String; = "null"
 +
 +.field private static final blacklist PIF_DEVICE_INITIAL_SDK_INT:Ljava/lang/String; = "null"
 +
-+.field private static final blacklist PIF_FINGERPRINT:Ljava/lang/String; = "google/shiba_beta/shiba:16/BP22.250221.015/13278879:user/release-keys"
++.field private static final blacklist PIF_FINGERPRINT:Ljava/lang/String; = "google/shiba_beta/shiba:16/BP41.250822.010/14082742:user/release-keys"
 +
 +.field private static final blacklist PIF_ID:Ljava/lang/String; = "null"
 +
 +.field private static final blacklist PIF_INCREMENTAL:Ljava/lang/String; = "null"
 +
-+.field private static final blacklist PIF_MANUFACTURER:Ljava/lang/String; = "Google"
++.field private static final blacklist PIF_MANUFACTURER:Ljava/lang/String; = "null"
 +
-+.field private static final blacklist PIF_MODEL:Ljava/lang/String; = "Pixel 8"
++.field private static final blacklist PIF_MODEL:Ljava/lang/String; = "null"
 +
-+.field private static final blacklist PIF_PRODUCT:Ljava/lang/String; = "shiba_beta"
++.field private static final blacklist PIF_PRODUCT:Ljava/lang/String; = "null"
 +
 +.field private static final blacklist PIF_RELEASE:Ljava/lang/String; = "null"
 +
 +.field private static final blacklist PIF_SECURITY_PATCH:Ljava/lang/String; = "null"
 +
-+.field private static final blacklist PIF_VERSION:Ljava/lang/String; = "20250406"
++.field private static final blacklist PIF_VERSION:Ljava/lang/String; = "20251005"
 +
 +.field private static final blacklist TAG:Ljava/lang/String; = "PlayIntegrityHooks"
 +
@@ -368,21 +348,34 @@ index 00000000..0d5593e1
 +.method public static blacklist onEngineGetCertificateChain()V
 +    .locals 1
 +
++    invoke-static {}, Lio/mesalabs/unica/PlayIntegrityHooks;->shouldBlockKeyAttestation()Z
++
++    move-result v0
++
++    if-eqz v0, :cond_0
++
++    const-string v0, "Key attestation blocking is disabled because a keybox is defined to spoof"
++
++    invoke-static {v0}, Lio/mesalabs/unica/PlayIntegrityHooks;->dlog(Ljava/lang/String;)V
++
++    return-void
++
++    :cond_0
 +    invoke-static {}, Lio/mesalabs/unica/PlayIntegrityHooks;->isPIFEnabled()Z
 +
 +    move-result v0
 +
-+    if-eqz v0, :cond_1
++    if-eqz v0, :cond_2
 +
 +    invoke-static {}, Lio/mesalabs/unica/PlayIntegrityHooks;->isCallerSafetyNet()Z
 +
 +    move-result v0
 +
-+    if-nez v0, :cond_0
++    if-nez v0, :cond_1
 +
 +    goto :goto_0
 +
-+    :cond_0
++    :cond_1
 +    const-string v0, "Blocked key attestation"
 +
 +    invoke-static {v0}, Lio/mesalabs/unica/PlayIntegrityHooks;->dlog(Ljava/lang/String;)V
@@ -393,7 +386,7 @@ index 00000000..0d5593e1
 +
 +    throw v0
 +
-+    :cond_1
++    :cond_2
 +    :goto_0
 +    return-void
 +.end method
@@ -453,7 +446,7 @@ index 00000000..0d5593e1
 +    .catch Ljava/lang/NoSuchFieldException; {:try_start_0 .. :try_end_0} :catch_0
 +    .catch Ljava/lang/IllegalAccessException; {:try_start_0 .. :try_end_0} :catch_0
 +
-+    goto :goto_0
++    return-void
 +
 +    :catch_0
 +    move-exception p1
@@ -476,7 +469,6 @@ index 00000000..0d5593e1
 +
 +    invoke-static {v0, p0, p1}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I
 +
-+    :goto_0
 +    return-void
 +.end method
 +
@@ -512,22 +504,22 @@ index 00000000..0d5593e1
 +
 +    if-nez v0, :cond_1
 +
-+    return-void
++    goto :goto_0
 +
 +    :cond_1
 +    const-string v0, "com.google.android.gms"
 +
 +    invoke-virtual {p0, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
 +
-+    move-result p0
++    move-result v0
 +
-+    if-eqz p0, :cond_3
++    if-eqz v0, :cond_2
 +
 +    invoke-static {}, Lio/mesalabs/unica/PlayIntegrityHooks;->shouldTryToCertifyDevice()Z
 +
 +    move-result p0
 +
-+    if-eqz p0, :cond_2
++    if-eqz p0, :cond_3
 +
 +    const-string p0, "Spoofing build for GMS to pass CTS/Play Integrity API"
 +
@@ -535,18 +527,18 @@ index 00000000..0d5593e1
 +
 +    invoke-static {}, Lio/mesalabs/unica/PlayIntegrityHooks;->spoofBuildGms()V
 +
++    return-void
++
 +    :cond_2
-+    invoke-static {}, Ljava/lang/System;->currentTimeMillis()J
++    const-string v0, "com.android.vending"
 +
-+    move-result-wide v0
++    invoke-virtual {p0, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
 +
-+    invoke-static {v0, v1}, Ljava/lang/Long;->valueOf(J)Ljava/lang/Long;
++    move-result p0
 +
-+    move-result-object p0
++    if-eqz p0, :cond_3
 +
-+    const-string v0, "TIME"
-+
-+    invoke-static {v0, p0}, Lio/mesalabs/unica/PlayIntegrityHooks;->setPropValue(Ljava/lang/String;Ljava/lang/Object;)V
++    invoke-static {}, Lio/mesalabs/unica/PlayIntegrityHooks;->spoofBuildGms()V
 +
 +    :cond_3
 +    :goto_0
@@ -582,7 +574,7 @@ index 00000000..0d5593e1
 +    .catch Ljava/lang/NoSuchFieldException; {:try_start_0 .. :try_end_0} :catch_0
 +    .catch Ljava/lang/IllegalAccessException; {:try_start_0 .. :try_end_0} :catch_0
 +
-+    goto :goto_0
++    return-void
 +
 +    :catch_0
 +    move-exception p1
@@ -605,7 +597,6 @@ index 00000000..0d5593e1
 +
 +    invoke-static {v0, p0, p1}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I
 +
-+    :goto_0
 +    return-void
 +.end method
 +
@@ -634,7 +625,7 @@ index 00000000..0d5593e1
 +    .catch Ljava/lang/NoSuchFieldException; {:try_start_0 .. :try_end_0} :catch_0
 +    .catch Ljava/lang/IllegalAccessException; {:try_start_0 .. :try_end_0} :catch_0
 +
-+    goto :goto_0
++    return-void
 +
 +    :catch_0
 +    move-exception p1
@@ -657,8 +648,34 @@ index 00000000..0d5593e1
 +
 +    invoke-static {v0, p0, p1}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I
 +
-+    :goto_0
 +    return-void
++.end method
++
++.method private static blacklist shouldBlockKeyAttestation()Z
++    .locals 2
++
++    const-string v0, "persist.sys.unica.pif.block_attest_key"
++
++    const/4 v1, 0x0
++
++    invoke-static {v0, v1}, Landroid/os/SemSystemProperties;->getBoolean(Ljava/lang/String;Z)Z
++
++    move-result v0
++
++    if-nez v0, :cond_0
++
++    invoke-static {}, Lio/mesalabs/unica/KeyProviderManager;->isKeyboxAvailable()Z
++
++    move-result v0
++
++    if-eqz v0, :cond_0
++
++    const/4 v0, 0x1
++
++    return v0
++
++    :cond_0
++    return v1
 +.end method
 +
 +.method public static blacklist shouldBypassTaskPermission(Landroid/content/Context;)Z
@@ -713,7 +730,9 @@ index 00000000..0d5593e1
 +
 +    if-ne p0, v1, :cond_0
 +
-+    const/4 v2, 0x1
++    const/4 p0, 0x1
++
++    return p0
 +
 +    :cond_0
 +    return v2
@@ -799,64 +818,19 @@ index 00000000..0d5593e1
 +.method private static blacklist spoofBuildGms()V
 +    .locals 4
 +
-+    const-string v0, "persist.sys.pif.version"
-+
-+    const-string v1, "0"
-+
-+    invoke-static {v0, v1}, Landroid/os/SystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
-+
-+    move-result-object v0
-+
-+    invoke-static {v0}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
-+
-+    move-result v1
-+
-+    const-string v2, "20250406"
-+
-+    invoke-static {v2}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
-+
-+    move-result v2
-+
-+    if-ge v1, v2, :cond_0
-+
-+    new-instance v1, Ljava/lang/StringBuilder;
-+
-+    const-string v2, "PIF is outdated. Current version: "
-+
-+    invoke-direct {v1, v2}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
-+
-+    invoke-virtual {v1, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-+
-+    move-result-object v0
-+
-+    const-string v1, ", Frameworks version: 20250406"
-+
-+    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-+
-+    move-result-object v0
-+
-+    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
-+
-+    move-result-object v0
-+
-+    invoke-static {v0}, Lio/mesalabs/unica/PlayIntegrityHooks;->dlog(Ljava/lang/String;)V
-+
-+    :cond_0
 +    const-string v0, "persist.sys.pif.product"
 +
-+    const-string v1, "shiba_beta"
++    const-string v1, "null"
 +
-+    invoke-static {v0, v1}, Landroid/os/SystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
++    invoke-static {v0, v1}, Landroid/os/SemSystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 +
 +    move-result-object v0
-+
-+    const-string v1, "null"
 +
 +    invoke-virtual {v0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
 +
 +    move-result v2
 +
-+    if-nez v2, :cond_1
++    if-nez v2, :cond_0
 +
 +    new-instance v2, Ljava/lang/StringBuilder;
 +
@@ -878,12 +852,10 @@ index 00000000..0d5593e1
 +
 +    invoke-static {v2, v0}, Lio/mesalabs/unica/PlayIntegrityHooks;->setPropValue(Ljava/lang/String;Ljava/lang/Object;)V
 +
-+    :cond_1
++    :cond_0
 +    const-string v0, "persist.sys.pif.device"
 +
-+    const-string v2, "shiba"
-+
-+    invoke-static {v0, v2}, Landroid/os/SystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
++    invoke-static {v0, v1}, Landroid/os/SemSystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 +
 +    move-result-object v0
 +
@@ -891,7 +863,7 @@ index 00000000..0d5593e1
 +
 +    move-result v2
 +
-+    if-nez v2, :cond_2
++    if-nez v2, :cond_1
 +
 +    new-instance v2, Ljava/lang/StringBuilder;
 +
@@ -913,12 +885,10 @@ index 00000000..0d5593e1
 +
 +    invoke-static {v2, v0}, Lio/mesalabs/unica/PlayIntegrityHooks;->setPropValue(Ljava/lang/String;Ljava/lang/Object;)V
 +
-+    :cond_2
++    :cond_1
 +    const-string v0, "persist.sys.pif.manufacturer"
 +
-+    const-string v2, "Google"
-+
-+    invoke-static {v0, v2}, Landroid/os/SystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
++    invoke-static {v0, v1}, Landroid/os/SemSystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 +
 +    move-result-object v0
 +
@@ -926,7 +896,7 @@ index 00000000..0d5593e1
 +
 +    move-result v2
 +
-+    if-nez v2, :cond_3
++    if-nez v2, :cond_2
 +
 +    new-instance v2, Ljava/lang/StringBuilder;
 +
@@ -948,12 +918,10 @@ index 00000000..0d5593e1
 +
 +    invoke-static {v2, v0}, Lio/mesalabs/unica/PlayIntegrityHooks;->setPropValue(Ljava/lang/String;Ljava/lang/Object;)V
 +
-+    :cond_3
++    :cond_2
 +    const-string v0, "persist.sys.pif.brand"
 +
-+    const-string v2, "google"
-+
-+    invoke-static {v0, v2}, Landroid/os/SystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
++    invoke-static {v0, v1}, Landroid/os/SemSystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 +
 +    move-result-object v0
 +
@@ -961,7 +929,7 @@ index 00000000..0d5593e1
 +
 +    move-result v2
 +
-+    if-nez v2, :cond_4
++    if-nez v2, :cond_3
 +
 +    new-instance v2, Ljava/lang/StringBuilder;
 +
@@ -983,12 +951,10 @@ index 00000000..0d5593e1
 +
 +    invoke-static {v2, v0}, Lio/mesalabs/unica/PlayIntegrityHooks;->setPropValue(Ljava/lang/String;Ljava/lang/Object;)V
 +
-+    :cond_4
++    :cond_3
 +    const-string v0, "persist.sys.pif.model"
 +
-+    const-string v2, "Pixel 8"
-+
-+    invoke-static {v0, v2}, Landroid/os/SystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
++    invoke-static {v0, v1}, Landroid/os/SemSystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 +
 +    move-result-object v0
 +
@@ -996,7 +962,7 @@ index 00000000..0d5593e1
 +
 +    move-result v2
 +
-+    if-nez v2, :cond_5
++    if-nez v2, :cond_4
 +
 +    new-instance v2, Ljava/lang/StringBuilder;
 +
@@ -1018,10 +984,10 @@ index 00000000..0d5593e1
 +
 +    invoke-static {v2, v0}, Lio/mesalabs/unica/PlayIntegrityHooks;->setPropValue(Ljava/lang/String;Ljava/lang/Object;)V
 +
-+    :cond_5
++    :cond_4
 +    const-string v0, "persist.sys.pif.release"
 +
-+    invoke-static {v0, v1}, Landroid/os/SystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
++    invoke-static {v0, v1}, Landroid/os/SemSystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 +
 +    move-result-object v0
 +
@@ -1029,7 +995,7 @@ index 00000000..0d5593e1
 +
 +    move-result v2
 +
-+    if-nez v2, :cond_6
++    if-nez v2, :cond_5
 +
 +    new-instance v2, Ljava/lang/StringBuilder;
 +
@@ -1051,10 +1017,10 @@ index 00000000..0d5593e1
 +
 +    invoke-static {v2, v0}, Lio/mesalabs/unica/PlayIntegrityHooks;->setVersionFieldString(Ljava/lang/String;Ljava/lang/String;)V
 +
-+    :cond_6
++    :cond_5
 +    const-string v0, "persist.sys.pif.incremental"
 +
-+    invoke-static {v0, v1}, Landroid/os/SystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
++    invoke-static {v0, v1}, Landroid/os/SemSystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 +
 +    move-result-object v0
 +
@@ -1062,7 +1028,7 @@ index 00000000..0d5593e1
 +
 +    move-result v2
 +
-+    if-nez v2, :cond_7
++    if-nez v2, :cond_6
 +
 +    new-instance v2, Ljava/lang/StringBuilder;
 +
@@ -1084,10 +1050,10 @@ index 00000000..0d5593e1
 +
 +    invoke-static {v2, v0}, Lio/mesalabs/unica/PlayIntegrityHooks;->setVersionFieldString(Ljava/lang/String;Ljava/lang/String;)V
 +
-+    :cond_7
++    :cond_6
 +    const-string v0, "persist.sys.pif.id"
 +
-+    invoke-static {v0, v1}, Landroid/os/SystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
++    invoke-static {v0, v1}, Landroid/os/SemSystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 +
 +    move-result-object v0
 +
@@ -1095,7 +1061,7 @@ index 00000000..0d5593e1
 +
 +    move-result v2
 +
-+    if-nez v2, :cond_8
++    if-nez v2, :cond_7
 +
 +    new-instance v2, Ljava/lang/StringBuilder;
 +
@@ -1117,12 +1083,12 @@ index 00000000..0d5593e1
 +
 +    invoke-static {v2, v0}, Lio/mesalabs/unica/PlayIntegrityHooks;->setPropValue(Ljava/lang/String;Ljava/lang/Object;)V
 +
-+    :cond_8
++    :cond_7
 +    const-string v0, "persist.sys.pif.fingerprint"
 +
-+    const-string v2, "google/shiba_beta/shiba:16/BP22.250221.015/13278879:user/release-keys"
++    const-string v2, "google/shiba_beta/shiba:16/BP41.250822.010/14082742:user/release-keys"
 +
-+    invoke-static {v0, v2}, Landroid/os/SystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
++    invoke-static {v0, v2}, Landroid/os/SemSystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 +
 +    move-result-object v0
 +
@@ -1130,7 +1096,7 @@ index 00000000..0d5593e1
 +
 +    move-result v2
 +
-+    if-nez v2, :cond_9
++    if-nez v2, :cond_8
 +
 +    new-instance v2, Ljava/lang/StringBuilder;
 +
@@ -1152,10 +1118,10 @@ index 00000000..0d5593e1
 +
 +    invoke-static {v2, v0}, Lio/mesalabs/unica/PlayIntegrityHooks;->setPropValue(Ljava/lang/String;Ljava/lang/Object;)V
 +
-+    :cond_9
++    :cond_8
 +    const-string v0, "persist.sys.pif.security_patch"
 +
-+    invoke-static {v0, v1}, Landroid/os/SystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
++    invoke-static {v0, v1}, Landroid/os/SemSystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 +
 +    move-result-object v0
 +
@@ -1163,7 +1129,7 @@ index 00000000..0d5593e1
 +
 +    move-result v2
 +
-+    if-nez v2, :cond_a
++    if-nez v2, :cond_9
 +
 +    new-instance v2, Ljava/lang/StringBuilder;
 +
@@ -1185,10 +1151,10 @@ index 00000000..0d5593e1
 +
 +    invoke-static {v2, v0}, Lio/mesalabs/unica/PlayIntegrityHooks;->setVersionFieldString(Ljava/lang/String;Ljava/lang/String;)V
 +
-+    :cond_a
++    :cond_9
 +    const-string v0, "persist.sys.pif.first_api_level"
 +
-+    invoke-static {v0, v1}, Landroid/os/SystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
++    invoke-static {v0, v1}, Landroid/os/SemSystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 +
 +    move-result-object v0
 +
@@ -1196,7 +1162,7 @@ index 00000000..0d5593e1
 +
 +    move-result v1
 +
-+    if-nez v1, :cond_b
++    if-nez v1, :cond_a
 +
 +    new-instance v1, Ljava/lang/StringBuilder;
 +
@@ -1222,9 +1188,9 @@ index 00000000..0d5593e1
 +
 +    invoke-static {v1, v0}, Lio/mesalabs/unica/PlayIntegrityHooks;->setVersionFieldInt(Ljava/lang/String;I)V
 +
-+    :cond_b
++    :cond_a
 +    return-void
 +.end method
 -- 
-2.49.0
+2.51.0
 
