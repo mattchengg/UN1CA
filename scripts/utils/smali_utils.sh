@@ -106,7 +106,7 @@ SMALI_PATCH()
         return 1
     elif [[ "$OPERATION" == "remove" ]]; then
         local USED
-        USED="$(find "$FILE_PATH" ! -path "*$SMALI" -type f -exec grep -r -n -- "$(cut -d "." -f "1" <<< "${SMALI#*/}");" {} \+)"
+        USED="$(find "$FILE_PATH" ! -path "*$SMALI" -type f -exec grep -r -n -- "$(cut -d "." -f "1" <<< "${SMALI#*/}");" {} \+ || true)"
         USED="$(cut -d ":" -f 1-2 <<< "$USED")"
 
         if [ "$USED" ]; then
@@ -120,7 +120,7 @@ SMALI_PATCH()
         fi
 
         LOG "- Removing \"$SMALI\" from /$PARTITION/$FILE"
-        EVAL "LC_ALL=C rm \"$FILE_PATH/$SMALI\"" || return 1
+        EVAL "LC_ALL=C rm \"$FILE_PATH/${SMALI//$/\\$}\"" || return 1
         return 0
     fi
 
