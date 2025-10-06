@@ -32,7 +32,44 @@ sed -i \
     -e "s|PK_SIZE|$PK_SIZE|g" \
     "$WORK_DIR/system/system/bin/prophide.sh"
 
-LINES="$(sed -n "/^(allow init init_exec\b/=" "$WORK_DIR/system/system/etc/selinux/plat_sepolicy.cil")"
-for l in $LINES; do
-    sed -i "${l} s/)))/ execute_no_trans)))/" "$WORK_DIR/system/system/etc/selinux/plat_sepolicy.cil"
-done
+SEPOLICY="$WORK_DIR/system/system/etc/selinux/plat_sepolicy.cil"
+
+sed -i \
+    -e "/^(allow init init_exec\b/ s/)))/ execute_no_trans)))/" \
+    -e "/^(typeattributeset exec_type\b/ s/))/prophide_exec ))/" \
+    -e "/^(typeattributeset file_type\b/ s/))/prophide_exec ))/" \
+    -e "/^(typeattributeset system_file_type\b/ s/))/prophide_exec ))/" \
+    -e "/^(typeattributeset domain\b/ s/))/prophide ))/" \
+    "$SEPOLICY"
+
+# process (init) -> /system/bin/prophide.sh (prophide_exec) -> process (prophide)  |
+# A                                                                                V
+# | /system/bin/rezetprop (init_exec) <- /system/bin/toybox (prophide) <- /system/bin/sh (prophide)
+cat <<'EOF' >> "$SEPOLICY"
+; Added by unica/mods/prophide/customize.sh
+; types
+(type prophide)
+(roletype object_r prophide)
+(type prophide_exec)
+(roletype object_r prophide_exec)
+; init -> prophide_exec -> prophide
+(typetransition init prophide_exec process prophide)
+(allow init prophide (process (transition)))
+(allow init prophide (process (noatsecure rlimitinh siginh)))
+(allow init prophide (fd (use)))
+; prophide -> init_exec -> init
+(typetransition prophide init_exec process init)
+(allow prophide init (process (transition)))
+(allow prophide init (process (noatsecure rlimitinh siginh)))
+; block access
+(allow prophide block_device (blk_file (read open getattr ioctl)))
+(allow prophide emmcblk_device (blk_file (read open getattr ioctl)))
+; allow calling init_exec by escalating when needed
+(allow init prophide_exec (file (read open execute getattr map)))
+(allow prophide init_exec (file (read open execute getattr map)))
+; allow calling system binaries without domain change
+(allow prophide shell_exec (file (read open execute getattr map execute_no_trans)))
+(allow prophide system_file (file (read open execute getattr map execute_no_trans)))
+(allow prophide toolbox_exec (file (read open execute getattr map execute_no_trans)))
+(allow prophide prophide_exec (file (entrypoint read open execute getattr map)))
+EOF
