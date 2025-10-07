@@ -1,4 +1,4 @@
-From 2fa66e9ae944e542010509312de5c625573497ce Mon Sep 17 00:00:00 2001
+From d0f510befa2ae708dbe4091d845764cd0e7dd6d8 Mon Sep 17 00:00:00 2001
 From: Salvo Giangreco <giangrecosalvo9@gmail.com>
 Date: Mon, 6 Oct 2025 14:23:19 +0200
 Subject: [PATCH] Introduce GamesPropsUtils
@@ -11,7 +11,7 @@ UN1CA: this patch is not complete! Please check unica/mods/gamesprops/customize.
 
 diff --git a/smali_classes6/io/mesalabs/unica/GamesPropsUtils.smali b/smali_classes6/io/mesalabs/unica/GamesPropsUtils.smali
 new file mode 100644
-index 00000000..a27f364b
+index 00000000..a3dc5958
 --- /dev/null
 +++ b/smali_classes6/io/mesalabs/unica/GamesPropsUtils.smali
 @@ -0,0 +1,979 @@
@@ -774,7 +774,7 @@ index 00000000..a27f364b
 +    return-object v0
 +.end method
 +
-+.method public static blacklist dlog(Ljava/lang/String;)V
++.method private static blacklist dlog(Ljava/lang/String;)V
 +    .locals 0
 +
 +    return-void
