@@ -1,4 +1,4 @@
-From a2d3f74720689431721041a9d8f94c5e1c61f383 Mon Sep 17 00:00:00 2001
+From 50d5fb556e91bc8dcfa999dc7ad6beae21ae0660 Mon Sep 17 00:00:00 2001
 From: Salvo Giangreco <giangrecosalvo9@gmail.com>
 Date: Mon, 6 Oct 2025 15:12:32 +0200
 Subject: [PATCH] Introduce KeyboxImitationHooks
@@ -14,12 +14,12 @@ Subject: [PATCH] Introduce KeyboxImitationHooks
  .../unica/KeyProviderManager-IA.smali         |    3 +
  .../mesalabs/unica/KeyProviderManager.smali   |   91 +
  .../unica/KeyboxChainGenerator$Digest.smali   |  141 ++
- ...eyboxChainGenerator$KeyGenParameters.smali |  423 +++++
+ ...eyboxChainGenerator$KeyGenParameters.smali |  437 +++++
  .../mesalabs/unica/KeyboxChainGenerator.smali | 1565 +++++++++++++++++
  .../unica/KeyboxImitationHooks$1.smali        |  122 ++
- .../mesalabs/unica/KeyboxImitationHooks.smali | 1020 +++++++++++
+ .../mesalabs/unica/KeyboxImitationHooks.smali | 1016 +++++++++++
  .../io/mesalabs/unica/KeyboxUtils.smali       | 1027 +++++++++++
- 15 files changed, 5233 insertions(+), 12 deletions(-)
+ 15 files changed, 5243 insertions(+), 12 deletions(-)
  create mode 100644 smali_classes6/io/mesalabs/unica/IKeyboxProvider.smali
  create mode 100644 smali_classes6/io/mesalabs/unica/KeyProviderManager$DefaultKeyboxProvider$$ExternalSyntheticLambda0.smali
  create mode 100644 smali_classes6/io/mesalabs/unica/KeyProviderManager$DefaultKeyboxProvider.smali
@@ -1280,10 +1280,10 @@ index 00000000..c7a0cd3f
 +.end method
 diff --git a/smali_classes6/io/mesalabs/unica/KeyboxChainGenerator$KeyGenParameters.smali b/smali_classes6/io/mesalabs/unica/KeyboxChainGenerator$KeyGenParameters.smali
 new file mode 100644
-index 00000000..c357f65d
+index 00000000..abb4d8c0
 --- /dev/null
 +++ b/smali_classes6/io/mesalabs/unica/KeyboxChainGenerator$KeyGenParameters.smali
-@@ -0,0 +1,423 @@
+@@ -0,0 +1,437 @@
 +.class public Lio/mesalabs/unica/KeyboxChainGenerator$KeyGenParameters;
 +.super Ljava/lang/Object;
 +.source "KeyboxChainGenerator.java"
@@ -1360,6 +1360,8 @@ index 00000000..c357f65d
 +.end field
 +
 +.field public blacklist rsaPublicExponent:Ljava/math/BigInteger;
++
++.field public blacklist samsungAttestationRoot:[B
 +
 +
 +# direct methods
@@ -1538,6 +1540,15 @@ index 00000000..c357f65d
 +    goto :goto_1
 +
 +    :sswitch_9
++    invoke-virtual {v3}, Landroid/hardware/security/keymint/KeyParameterValue;->getBlob()[B
++
++    move-result-object v2
++
++    iput-object v2, p0, Lio/mesalabs/unica/KeyboxChainGenerator$KeyGenParameters;->samsungAttestationRoot:[B
++
++    goto :goto_1
++
++    :sswitch_a
 +    new-instance v2, Lcom/android/internal/org/bouncycastle/asn1/x500/X500Name;
 +
 +    new-instance v4, Ljavax/security/auth/x500/X500Principal;
@@ -1558,7 +1569,7 @@ index 00000000..c357f65d
 +
 +    goto :goto_1
 +
-+    :sswitch_a
++    :sswitch_b
 +    invoke-virtual {v3}, Landroid/hardware/security/keymint/KeyParameterValue;->getBlob()[B
 +
 +    move-result-object v2
@@ -1567,7 +1578,7 @@ index 00000000..c357f65d
 +
 +    goto :goto_1
 +
-+    :sswitch_b
++    :sswitch_c
 +    invoke-virtual {v3}, Landroid/hardware/security/keymint/KeyParameterValue;->getBlob()[B
 +
 +    move-result-object v2
@@ -1576,7 +1587,7 @@ index 00000000..c357f65d
 +
 +    goto :goto_1
 +
-+    :sswitch_c
++    :sswitch_d
 +    invoke-virtual {v3}, Landroid/hardware/security/keymint/KeyParameterValue;->getBlob()[B
 +
 +    move-result-object v2
@@ -1585,7 +1596,7 @@ index 00000000..c357f65d
 +
 +    goto :goto_1
 +
-+    :sswitch_d
++    :sswitch_e
 +    invoke-virtual {v3}, Landroid/hardware/security/keymint/KeyParameterValue;->getBlob()[B
 +
 +    move-result-object v2
@@ -1594,7 +1605,7 @@ index 00000000..c357f65d
 +
 +    goto :goto_1
 +
-+    :sswitch_e
++    :sswitch_f
 +    invoke-virtual {v3}, Landroid/hardware/security/keymint/KeyParameterValue;->getBlob()[B
 +
 +    move-result-object v2
@@ -1603,7 +1614,7 @@ index 00000000..c357f65d
 +
 +    goto :goto_1
 +
-+    :sswitch_f
++    :sswitch_10
 +    invoke-virtual {v3}, Landroid/hardware/security/keymint/KeyParameterValue;->getBlob()[B
 +
 +    move-result-object v2
@@ -1612,7 +1623,7 @@ index 00000000..c357f65d
 +
 +    goto :goto_1
 +
-+    :sswitch_10
++    :sswitch_11
 +    new-instance v2, Ljava/math/BigInteger;
 +
 +    invoke-virtual {v3}, Landroid/hardware/security/keymint/KeyParameterValue;->getBlob()[B
@@ -1631,16 +1642,19 @@ index 00000000..c357f65d
 +    :cond_1
 +    return-void
 +
++    nop
++
 +    :sswitch_data_0
 +    .sparse-switch
-+        -0x7ffffc12 -> :sswitch_10
-+        -0x6ffffd3c -> :sswitch_f
-+        -0x6ffffd3a -> :sswitch_e
-+        -0x6ffffd39 -> :sswitch_d
-+        -0x6ffffd38 -> :sswitch_c
-+        -0x6ffffd34 -> :sswitch_b
-+        -0x6ffffd33 -> :sswitch_a
-+        -0x6ffffc11 -> :sswitch_9
++        -0x7ffffc12 -> :sswitch_11
++        -0x6ffffd3c -> :sswitch_10
++        -0x6ffffd3a -> :sswitch_f
++        -0x6ffffd39 -> :sswitch_e
++        -0x6ffffd38 -> :sswitch_d
++        -0x6ffffd34 -> :sswitch_c
++        -0x6ffffd33 -> :sswitch_b
++        -0x6ffffc11 -> :sswitch_a
++        -0x6ffff7ca -> :sswitch_9
 +        0x10000002 -> :sswitch_8
 +        0x1000000a -> :sswitch_7
 +        0x20000001 -> :sswitch_6
@@ -1709,7 +1723,7 @@ index 00000000..c357f65d
 +.end method
 diff --git a/smali_classes6/io/mesalabs/unica/KeyboxChainGenerator.smali b/smali_classes6/io/mesalabs/unica/KeyboxChainGenerator.smali
 new file mode 100644
-index 00000000..91599b1c
+index 00000000..88bd1f68
 --- /dev/null
 +++ b/smali_classes6/io/mesalabs/unica/KeyboxChainGenerator.smali
 @@ -0,0 +1,1565 @@
@@ -1734,7 +1748,7 @@ index 00000000..91599b1c
 +
 +
 +# direct methods
-+.method public constructor blacklist <init>()V
++.method private constructor blacklist <init>()V
 +    .locals 0
 +
 +    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
@@ -3408,10 +3422,10 @@ index 00000000..58521d17
 +.end method
 diff --git a/smali_classes6/io/mesalabs/unica/KeyboxImitationHooks.smali b/smali_classes6/io/mesalabs/unica/KeyboxImitationHooks.smali
 new file mode 100644
-index 00000000..edbd4a29
+index 00000000..27df4278
 --- /dev/null
 +++ b/smali_classes6/io/mesalabs/unica/KeyboxImitationHooks.smali
-@@ -0,0 +1,1020 @@
+@@ -0,0 +1,1016 @@
 +.class public final Lio/mesalabs/unica/KeyboxImitationHooks;
 +.super Ljava/lang/Object;
 +.source "KeyboxImitationHooks.java"
@@ -3426,7 +3440,7 @@ index 00000000..edbd4a29
 +
 +
 +# direct methods
-+.method public blacklist constructor <init>()V
++.method private blacklist constructor <init>()V
 +    .locals 0
 +
 +    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
@@ -3999,42 +4013,49 @@ index 00000000..edbd4a29
 +
 +    invoke-direct {v0, p1}, Lio/mesalabs/unica/KeyboxChainGenerator$KeyGenParameters;-><init>([Landroid/hardware/security/keymint/KeyParameter;)V
 +
-+    iget p1, p0, Landroid/system/keystore2/KeyDescriptor;->domain:I
++    iget-object p1, v0, Lio/mesalabs/unica/KeyboxChainGenerator$KeyGenParameters;->samsungAttestationRoot:[B
 +
-+    const/4 v2, 0x4
-+
-+    if-eq p1, v2, :cond_1
++    if-eqz p1, :cond_1
 +
 +    return-object v1
 +
 +    :cond_1
++    iget p1, p0, Landroid/system/keystore2/KeyDescriptor;->domain:I
++
++    const/4 v2, 0x4
++
++    if-eq p1, v2, :cond_2
++
++    return-object v1
++
++    :cond_2
 +    iget-wide v3, p0, Landroid/system/keystore2/KeyDescriptor;->nspace:J
 +
 +    invoke-static {v3, v4}, Lio/mesalabs/unica/KeyboxUtils;->fetchKeyPair(J)Landroid/util/Pair;
 +
 +    move-result-object p1
 +
-+    if-eqz p1, :cond_9
++    if-eqz p1, :cond_a
 +
 +    iget-object v3, p1, Landroid/util/Pair;->first:Ljava/lang/Object;
 +
-+    if-nez v3, :cond_2
++    if-nez v3, :cond_3
 +
 +    goto/16 :goto_1
 +
-+    :cond_2
++    :cond_3
 +    iget-object v3, v0, Lio/mesalabs/unica/KeyboxChainGenerator$KeyGenParameters;->purpose:Ljava/util/List;
 +
 +    invoke-interface {v3}, Ljava/util/List;->iterator()Ljava/util/Iterator;
 +
 +    move-result-object v3
 +
-+    :cond_3
++    :cond_4
 +    invoke-interface {v3}, Ljava/util/Iterator;->hasNext()Z
 +
 +    move-result v4
 +
-+    if-eqz v4, :cond_5
++    if-eqz v4, :cond_6
 +
 +    invoke-interface {v3}, Ljava/util/Iterator;->next()Ljava/lang/Object;
 +
@@ -4042,7 +4063,7 @@ index 00000000..edbd4a29
 +
 +    check-cast v4, Ljava/lang/Integer;
 +
-+    if-eqz v4, :cond_4
++    if-eqz v4, :cond_5
 +
 +    invoke-virtual {v4}, Ljava/lang/Integer;->intValue()I
 +
@@ -4050,12 +4071,12 @@ index 00000000..edbd4a29
 +
 +    const/4 v5, 0x2
 +
-+    if-eq v4, v5, :cond_3
-+
-+    :cond_4
-+    return-object v1
++    if-eq v4, v5, :cond_4
 +
 +    :cond_5
++    return-object v1
++
++    :cond_6
 +    iget-object v3, v0, Lio/mesalabs/unica/KeyboxChainGenerator$KeyGenParameters;->digest:Ljava/util/List;
 +
 +    invoke-interface {v3}, Ljava/util/List;->getFirst()Ljava/lang/Object;
@@ -4064,32 +4085,32 @@ index 00000000..edbd4a29
 +
 +    check-cast v3, Ljava/lang/Integer;
 +
-+    if-eqz v3, :cond_9
++    if-eqz v3, :cond_a
 +
 +    invoke-virtual {v3}, Ljava/lang/Integer;->intValue()I
 +
 +    move-result v3
 +
-+    if-eq v3, v2, :cond_6
++    if-eq v3, v2, :cond_7
 +
 +    goto :goto_1
 +
-+    :cond_6
++    :cond_7
 +    iget v2, v0, Lio/mesalabs/unica/KeyboxChainGenerator$KeyGenParameters;->algorithm:I
 +
 +    const/4 v3, 0x3
 +
 +    const/4 v4, 0x1
 +
-+    if-eq v2, v3, :cond_7
++    if-eq v2, v3, :cond_8
 +
 +    iget v2, v0, Lio/mesalabs/unica/KeyboxChainGenerator$KeyGenParameters;->algorithm:I
 +
-+    if-eq v2, v4, :cond_7
++    if-eq v2, v4, :cond_8
 +
 +    return-object v1
 +
-+    :cond_7
++    :cond_8
 +    new-instance v2, Ljava/lang/StringBuilder;
 +
 +    const-string v3, "Called createOperation for "
@@ -4110,13 +4131,13 @@ index 00000000..edbd4a29
 +
 +    iget p0, v0, Lio/mesalabs/unica/KeyboxChainGenerator$KeyGenParameters;->algorithm:I
 +
-+    if-ne p0, v4, :cond_8
++    if-ne p0, v4, :cond_9
 +
 +    const-string p0, "RSA"
 +
 +    goto :goto_0
 +
-+    :cond_8
++    :cond_9
 +    const-string p0, "ECDSA"
 +
 +    :goto_0
@@ -4176,7 +4197,7 @@ index 00000000..edbd4a29
 +
 +    invoke-static {p1, v0, p0}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I
 +
-+    :cond_9
++    :cond_a
 +    :goto_1
 +    return-object v1
 +.end method
@@ -4227,8 +4248,8 @@ index 00000000..edbd4a29
 +    return v1
 +.end method
 +
-+.method public static onGenerateKey(Landroid/system/keystore2/IKeystoreSecurityLevel;Landroid/system/keystore2/KeyDescriptor;Landroid/system/keystore2/KeyDescriptor;[Landroid/hardware/security/keymint/KeyParameter;)Landroid/system/keystore2/KeyMetadata;
-+    .locals 5
++.method public static blacklist onGenerateKey(Landroid/system/keystore2/IKeystoreSecurityLevel;Landroid/system/keystore2/KeyDescriptor;Landroid/system/keystore2/KeyDescriptor;[Landroid/hardware/security/keymint/KeyParameter;)Landroid/system/keystore2/KeyMetadata;
++    .locals 4
 +
 +    const-string v0, "Generated key with alias \""
 +
@@ -4247,41 +4268,28 @@ index 00000000..edbd4a29
 +
 +    invoke-direct {v1, p3}, Lio/mesalabs/unica/KeyboxChainGenerator$KeyGenParameters;-><init>([Landroid/hardware/security/keymint/KeyParameter;)V
 +
++    iget-object p3, v1, Lio/mesalabs/unica/KeyboxChainGenerator$KeyGenParameters;->samsungAttestationRoot:[B
++
++    if-eqz p3, :cond_1
++
++    return-object v2
++
++    :cond_1
 +    iget p3, v1, Lio/mesalabs/unica/KeyboxChainGenerator$KeyGenParameters;->algorithm:I
 +
 +    const/4 v3, 0x3
 +
-+    const-string v4, "KeyboxImitationHooks"
-+
-+    if-eq p3, v3, :cond_1
++    if-eq p3, v3, :cond_2
 +
 +    iget p3, v1, Lio/mesalabs/unica/KeyboxChainGenerator$KeyGenParameters;->algorithm:I
 +
 +    const/4 v3, 0x1
 +
-+    if-eq p3, v3, :cond_1
-+
-+    new-instance p0, Ljava/lang/StringBuilder;
-+
-+    const-string p1, "Unsupported algorithm: "
-+
-+    invoke-direct {p0, p1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
-+
-+    iget p1, v1, Lio/mesalabs/unica/KeyboxChainGenerator$KeyGenParameters;->algorithm:I
-+
-+    invoke-virtual {p0, p1}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
-+
-+    move-result-object p0
-+
-+    invoke-virtual {p0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
-+
-+    move-result-object p0
-+
-+    invoke-static {v4, p0}, Landroid/util/Log;->w(Ljava/lang/String;Ljava/lang/String;)I
++    if-eq p3, v3, :cond_2
 +
 +    return-object v2
 +
-+    :cond_1
++    :cond_2
 +    :try_start_0
 +    sget p3, Lio/mesalabs/unica/KeyboxImitationHooks;->sSecurityLevel:I
 +
@@ -4289,28 +4297,28 @@ index 00000000..edbd4a29
 +
 +    move-result-object p2
 +
-+    if-eqz p2, :cond_4
++    if-eqz p2, :cond_5
 +
 +    invoke-interface {p2}, Ljava/util/List;->isEmpty()Z
 +
 +    move-result p3
 +
-+    if-eqz p3, :cond_2
++    if-eqz p3, :cond_3
 +
 +    goto :goto_0
 +
-+    :cond_2
++    :cond_3
 +    sget p3, Lio/mesalabs/unica/KeyboxImitationHooks;->sSecurityLevel:I
 +
 +    invoke-static {p0, p2, v1, p1, p3}, Lio/mesalabs/unica/KeyboxImitationHooks;->buildResponse(Landroid/system/keystore2/IKeystoreSecurityLevel;Ljava/util/List;Lio/mesalabs/unica/KeyboxChainGenerator$KeyGenParameters;Landroid/system/keystore2/KeyDescriptor;I)Landroid/system/keystore2/KeyEntryResponse;
 +
 +    move-result-object p0
 +
-+    if-nez p0, :cond_3
++    if-nez p0, :cond_4
 +
 +    return-object v2
 +
-+    :cond_3
++    :cond_4
 +    new-instance p2, Ljava/lang/StringBuilder;
 +
 +    invoke-direct {p2, v0}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
@@ -4351,16 +4359,18 @@ index 00000000..edbd4a29
 +
 +    return-object p0
 +
-+    :cond_4
++    :cond_5
 +    :goto_0
 +    return-object v2
 +
 +    :catch_0
 +    move-exception p0
 +
-+    const-string p1, "Failed to generate key"
++    const-string p1, "KeyboxImitationHooks"
 +
-+    invoke-static {v4, p1, p0}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I
++    const-string p2, "Failed to generate key"
++
++    invoke-static {p1, p2, p0}, Landroid/util/Log;->e(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)I
 +
 +    return-object v2
 +.end method
@@ -4434,7 +4444,7 @@ index 00000000..edbd4a29
 +.end method
 diff --git a/smali_classes6/io/mesalabs/unica/KeyboxUtils.smali b/smali_classes6/io/mesalabs/unica/KeyboxUtils.smali
 new file mode 100644
-index 00000000..6c270f29
+index 00000000..d4931f13
 --- /dev/null
 +++ b/smali_classes6/io/mesalabs/unica/KeyboxUtils.smali
 @@ -0,0 +1,1027 @@
@@ -4489,7 +4499,7 @@ index 00000000..6c270f29
 +    return-void
 +.end method
 +
-+.method public constructor blacklist <init>()V
++.method private constructor blacklist <init>()V
 +    .locals 0
 +
 +    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
