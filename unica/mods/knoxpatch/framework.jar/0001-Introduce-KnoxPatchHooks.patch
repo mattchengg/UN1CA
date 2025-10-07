@@ -1,4 +1,4 @@
-From 20913a9a0d618e5dfd16f839d495201c108a4d38 Mon Sep 17 00:00:00 2001
+From b65a17037589ebdde7708d841a1fdd86dd06ddb0 Mon Sep 17 00:00:00 2001
 From: Salvo Giangreco <giangrecosalvo9@gmail.com>
 Date: Mon, 6 Oct 2025 00:49:32 +0200
 Subject: [PATCH] Introduce KnoxPatchHooks
@@ -64,7 +64,7 @@ index 3af84b7b..09f83663 100644
  .method public static whitelist getBoolean(Ljava/lang/String;Z)Z
 diff --git a/smali_classes6/io/mesalabs/unica/KnoxPatchHooks.smali b/smali_classes6/io/mesalabs/unica/KnoxPatchHooks.smali
 new file mode 100644
-index 00000000..f4b376d4
+index 00000000..8b68148a
 --- /dev/null
 +++ b/smali_classes6/io/mesalabs/unica/KnoxPatchHooks.smali
 @@ -0,0 +1,269 @@
@@ -74,25 +74,25 @@ index 00000000..f4b376d4
 +
 +
 +# static fields
-+.field private static final DEBUG:Z = false
++.field private static final blacklist DEBUG:Z = false
 +
-+.field private static final FIND_MY_MOBILE_PACKAGE_NAME:Ljava/lang/String; = "com.samsung.android.fmm"
++.field private static final blacklist FIND_MY_MOBILE_PACKAGE_NAME:Ljava/lang/String; = "com.samsung.android.fmm"
 +
-+.field private static final SAMSUNG_CLOUD_PLATFORM_MANAGER_PACKAGE_NAME:Ljava/lang/String; = "com.samsung.android.scpm"
++.field private static final blacklist SAMSUNG_CLOUD_PLATFORM_MANAGER_PACKAGE_NAME:Ljava/lang/String; = "com.samsung.android.scpm"
 +
-+.field private static final SAMSUNG_HEALTH_PACKAGE_NAME:Ljava/lang/String; = "com.sec.android.app.shealth"
++.field private static final blacklist SAMSUNG_HEALTH_PACKAGE_NAME:Ljava/lang/String; = "com.sec.android.app.shealth"
 +
-+.field private static final SAMSUNG_TV_PLUS_PACKAGE_NAME:Ljava/lang/String; = "com.samsung.android.tvplus"
++.field private static final blacklist SAMSUNG_TV_PLUS_PACKAGE_NAME:Ljava/lang/String; = "com.samsung.android.tvplus"
 +
-+.field private static final TAG:Ljava/lang/String; = "KnoxPatchHooks"
++.field private static final blacklist TAG:Ljava/lang/String; = "KnoxPatchHooks"
 +
-+.field private static volatile sPackageName:Ljava/lang/String;
++.field private static volatile blacklist sPackageName:Ljava/lang/String;
 +
-+.field private static volatile sSpoofBuildTypeProp:Z
++.field private static volatile blacklist sSpoofBuildTypeProp:Z
 +
-+.field private static volatile sSpoofKeystoreProp:Z
++.field private static volatile blacklist sSpoofKeystoreProp:Z
 +
-+.field private static volatile sSpoofKnox:Z
++.field private static volatile blacklist sSpoofKnox:Z
 +
 +
 +# direct methods
@@ -104,7 +104,7 @@ index 00000000..f4b376d4
 +    return-void
 +.end method
 +
-+.method public static blacklist dlog(Ljava/lang/String;)V
++.method private static blacklist dlog(Ljava/lang/String;)V
 +    .locals 0
 +
 +    return-void
