@@ -1,10 +1,7 @@
 /system u:object_r:system_file:s0
 /system/etc u:object_r:system_file:s0
 /system/etc/permissions u:object_r:system_file:s0
-/system/etc/permissions/privapp-permissions-com\.samsung\.android\.applock\.xml u:object_r:system_file:s0
 /system/etc/permissions/privapp-permissions-com\.samsung\.android\.sead\.xml u:object_r:system_file:s0
-/system/etc/permissions/privapp-permissions-com\.samsung\.android\.sm\.devicesecurity\.tcm_v6\.xml u:object_r:system_file:s0
-/system/etc/permissions/privapp-permissions-com\.samsung\.android\.sm_cn\.xml u:object_r:system_file:s0
 /system/etc/permissions/privapp-permissions-com\.samsung\.android\.wallpaper\.live\.xml u:object_r:system_file:s0
 /system/etc/ringtones_count_list\.txt u:object_r:system_file:s0
 /system/hidden u:object_r:system_file:s0
@@ -239,14 +236,8 @@
 /system/media/audio/ui/Water_Protection\.ogg u:object_r:system_file:s0
 /system/media/audio/ui/WirelessChargingStarted\.ogg u:object_r:system_file:s0
 /system/priv-app u:object_r:system_file:s0
-/system/priv-app/AppLock u:object_r:system_file:s0
-/system/priv-app/AppLock/AppLock\.apk u:object_r:system_file:s0
 /system/priv-app/EnvironmentAdaptiveDisplay u:object_r:system_file:s0
 /system/priv-app/EnvironmentAdaptiveDisplay/EnvironmentAdaptiveDisplay\.apk u:object_r:system_file:s0
-/system/priv-app/SmartManagerCN u:object_r:system_file:s0
-/system/priv-app/SmartManagerCN/SmartManagerCN\.apk u:object_r:system_file:s0
-/system/priv-app/SmartManager_v6_DeviceSecurity_CN u:object_r:system_file:s0
-/system/priv-app/SmartManager_v6_DeviceSecurity_CN/SmartManager_v6_DeviceSecurity_CN\.apk u:object_r:system_file:s0
 /system/priv-app/SpriteWallpaper u:object_r:system_file:s0
 /system/priv-app/SpriteWallpaper/SpriteWallpaper\.apk u:object_r:system_file:s0
 /system/priv-app/wallpaper-res u:object_r:system_file:s0
