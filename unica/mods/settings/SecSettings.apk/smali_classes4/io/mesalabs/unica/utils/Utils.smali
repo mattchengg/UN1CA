@@ -3,6 +3,16 @@
 .source "Utils.java"
 
 
+# static fields
+.field private static final ACTION_MY_FILES_PICK_DATA:Ljava/lang/String; = "com.sec.android.app.myfiles.PICK_DATA"
+
+.field private static final EXTRA_MY_FILES_CONTENT_EXTENSION:Ljava/lang/String; = "CONTENT_EXTENSION"
+
+.field private static final EXTRA_MY_FILES_NEED_SCAN:Ljava/lang/String; = "needScan"
+
+.field private static final MY_FILES_PACKAGE_NAME:Ljava/lang/String; = "com.sec.android.app.myfiles"
+
+
 # direct methods
 .method private constructor <init>()V
     .locals 0
@@ -10,6 +20,76 @@
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
 
     return-void
+.end method
+
+.method public static getFilePickerOpenIntent(Landroid/content/Context;[Ljava/lang/String;[Ljava/lang/String;)Landroid/content/Intent;
+    .locals 2
+
+    const-string v0, "com.sec.android.app.myfiles"
+
+    invoke-static {p0, v0}, Lcom/samsung/android/settings/PkgUtils;->isPackageEnabled(Landroid/content/Context;Ljava/lang/String;)Z
+
+    move-result p0
+
+    if-eqz p0, :cond_0
+
+    new-instance p0, Landroid/content/Intent;
+
+    const-string v0, "com.sec.android.app.myfiles.PICK_DATA"
+
+    invoke-direct {p0, v0}, Landroid/content/Intent;-><init>(Ljava/lang/String;)V
+
+    const-string v0, "needScan"
+
+    const/4 v1, 0x1
+
+    invoke-virtual {p0, v0, v1}, Landroid/content/Intent;->putExtra(Ljava/lang/String;Z)Landroid/content/Intent;
+
+    move-result-object p0
+
+    if-eqz p2, :cond_1
+
+    const-string v0, ";"
+
+    invoke-static {v0, p2}, Landroid/text/TextUtils;->join(Ljava/lang/CharSequence;[Ljava/lang/Object;)Ljava/lang/String;
+
+    move-result-object p2
+
+    const-string v0, "CONTENT_EXTENSION"
+
+    invoke-virtual {p0, v0, p2}, Landroid/content/Intent;->putExtra(Ljava/lang/String;Ljava/lang/String;)Landroid/content/Intent;
+
+    goto :goto_0
+
+    :cond_0
+    new-instance p0, Landroid/content/Intent;
+
+    const-string p2, "android.intent.action.OPEN_DOCUMENT"
+
+    invoke-direct {p0, p2}, Landroid/content/Intent;-><init>(Ljava/lang/String;)V
+
+    const-string p2, "android.intent.category.OPENABLE"
+
+    invoke-virtual {p0, p2}, Landroid/content/Intent;->addCategory(Ljava/lang/String;)Landroid/content/Intent;
+
+    move-result-object p0
+
+    const-string p2, "*/*"
+
+    invoke-virtual {p0, p2}, Landroid/content/Intent;->setType(Ljava/lang/String;)Landroid/content/Intent;
+
+    move-result-object p0
+
+    :cond_1
+    :goto_0
+    if-eqz p1, :cond_2
+
+    const-string p2, "android.intent.extra.MIME_TYPES"
+
+    invoke-virtual {p0, p2, p1}, Landroid/content/Intent;->putExtra(Ljava/lang/String;[Ljava/lang/String;)Landroid/content/Intent;
+
+    :cond_2
+    return-object p0
 .end method
 
 .method public static getResourceId(Ljava/lang/String;Ljava/lang/String;)I

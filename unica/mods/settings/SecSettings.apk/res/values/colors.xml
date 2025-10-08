@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="sec_dashboard_unica_color">#95b9db</color>
+    <color name="unica_settings_ic_spoof_color">#ef1624</color>
 </resources>

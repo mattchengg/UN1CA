@@ -1,15 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="keywords_unica_settings">UN1CA Settings</string>
+    <string name="menu_key_unica_spoof_settings">unica_spoof_settings</string>
     <string name="menu_key_unica_top_settings">top_level_unica</string>
     <string name="unica_device_name_title">Device name</string>
     <string name="unica_extra_settings_title">Extra settings</string>
+    <string name="unica_keybox_clear_title">Delete keybox data</string>
+    <string name="unica_keybox_load_title">Import keybox XML file</string>
+    <string name="unica_keybox_status_checking">Checking validity…</string>
+    <string name="unica_keybox_status_loaded">Keybox loaded</string>
+    <string name="unica_keybox_status_no_data">No keybox data</string>
+    <string name="unica_keybox_status_revoked">Revoked keybox</string>
+    <string name="unica_keybox_status_valid">Valid keybox</string>
+    <string name="unica_keybox_title">Spoof hardware attestation</string>
+    <string name="unica_keybox_toast_cleared">Keybox data cleared.</string>
+    <string name="unica_keybox_toast_error">An error occurred.</string>
+    <string name="unica_keybox_toast_error_xml">Could not parse XML file.</string>
+    <string name="unica_keybox_toast_loaded">Keybox file loaded.</string>
+    <string name="unica_keybox_toast_not_gak">Keybox is not signed by Google.</string>
+    <string name="unica_keybox_toast_not_valid">Keybox file not valid.</string>
     <string name="unica_menu_item_reboot_download_title">Reboot to Download</string>
     <string name="unica_menu_item_reboot_fastboot_title">Reboot to Fastboot</string>
     <string name="unica_menu_item_reboot_recovery_title">Reboot to Recovery</string>
     <string name="unica_menu_item_reboot_title">Reboot</string>
     <string name="unica_menu_reboot_title">Reboot options</string>
+    <string name="unica_pif_attest_key_title">Block DroidGuard key attestation</string>
+    <string name="unica_pif_custom_title">Import custom PIF props from file</string>
+    <string name="unica_pif_summary">Spoof your device to pass Google Play Attestation.</string>
+    <string name="unica_pif_title">Play Integrity Fix</string>
+    <string name="unica_pif_toast_checking">Checking for updates…</string>
+    <string name="unica_pif_toast_custom">Custom props loaded.</string>
+    <string name="unica_pif_toast_error">An error occurred.</string>
+    <string name="unica_pif_toast_error_custom">Unvalid file.</string>
+    <string name="unica_pif_toast_up_to_date">"You're running the latest version."</string>
+    <string name="unica_pif_toast_updated">Update completed successfully.</string>
+    <string name="unica_pif_update_title">Update Play Integrity Fix</string>
     <string name="unica_rom_version_title">ROM version</string>
     <string name="unica_settings_title">UN1CA Settings</string>
+    <string name="unica_spoof_settings_title">Spoof settings</string>
     <string name="unica_updates_title">UN1CA Updates</string>
 </resources>
