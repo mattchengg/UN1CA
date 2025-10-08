@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="keywords_unica_settings">UN1CA Settings</string>
+    <string name="menu_key_unica_top_settings">top_level_unica</string>
+    <string name="unica_device_name_title">Device name</string>
+    <string name="unica_extra_settings_title">Extra settings</string>
+    <string name="unica_rom_version_title">ROM version</string>
+    <string name="unica_settings_title">UN1CA Settings</string>
+</resources>
