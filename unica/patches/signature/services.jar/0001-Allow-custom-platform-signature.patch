@@ -1,9 +1,11 @@
-From 381ca3e0326aa14c2aa810f086a71d90478050ce Mon Sep 17 00:00:00 2001
+From 161575434a3c32c81b32531839458f87f623bc5f Mon Sep 17 00:00:00 2001
 From: Salvo Giangreco <giangrecosalvo9@gmail.com>
 Date: Tue, 26 Aug 2025 00:06:07 +0200
 Subject: [PATCH] Allow custom platform signature
 
 Based off: https://github.com/EverestOS-AOSP/frameworks_base/commit/9d302efb52770dfb85e19c51ad31f781c7844ca3
+
+UN1CA: this patch is not complete! Please check unica/patches/signature/customize.sh for more info.
 ---
  .../server/pm/InstallPackageHelper.smali      | 78 ++++++++++++++++++-
  .../pm/PackageManagerServiceUtils.smali       | 10 +++
@@ -11,7 +13,7 @@ Based off: https://github.com/EverestOS-AOSP/frameworks_base/commit/9d302efb5277
  3 files changed, 153 insertions(+), 9 deletions(-)
 
 diff --git a/smali_classes2/com/android/server/pm/InstallPackageHelper.smali b/smali_classes2/com/android/server/pm/InstallPackageHelper.smali
-index adc9fb09..56749d2a 100644
+index d8893e3df..bedecb3c8 100644
 --- a/smali_classes2/com/android/server/pm/InstallPackageHelper.smali
 +++ b/smali_classes2/com/android/server/pm/InstallPackageHelper.smali
 @@ -12,6 +12,8 @@
@@ -142,7 +144,7 @@ index adc9fb09..56749d2a 100644
      iget-object v2, v14, Lcom/android/server/pm/InstallPackageHelper;->mPm:Lcom/android/server/pm/PackageManagerService;
  
 diff --git a/smali_classes2/com/android/server/pm/PackageManagerServiceUtils.smali b/smali_classes2/com/android/server/pm/PackageManagerServiceUtils.smali
-index 08e19f91..1a552337 100644
+index 43479f0ed..0cd434035 100644
 --- a/smali_classes2/com/android/server/pm/PackageManagerServiceUtils.smali
 +++ b/smali_classes2/com/android/server/pm/PackageManagerServiceUtils.smali
 @@ -639,6 +639,16 @@
@@ -163,7 +165,7 @@ index 08e19f91..1a552337 100644
      .locals 2
  
 diff --git a/smali_classes2/com/android/server/pm/ScanPackageUtils.smali b/smali_classes2/com/android/server/pm/ScanPackageUtils.smali
-index e5e9b90a..d0b9a257 100644
+index 5f3ff92c3..f825a535e 100644
 --- a/smali_classes2/com/android/server/pm/ScanPackageUtils.smali
 +++ b/smali_classes2/com/android/server/pm/ScanPackageUtils.smali
 @@ -179,7 +179,7 @@
