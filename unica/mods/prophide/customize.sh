@@ -1,15 +1,14 @@
 # [
 PUB_KEY_ADDR_EXTRACT() {
-    local f="$1"
-    [ -r "$f" ] || return 1
+    local FILE="$1"
 
-    local HEADER=256 AUTH_SZ=12 PK_OFF=64 PK_SIZE=72
+    local HEADER="256" AUTH_SZ="12" PK_OFF="64" PK_SIZE="72"
 
     # read 8-byte big-endian integer at offset
     READ_BE64() {
-        local OFF=$1
+        local OFF="$1"
         local HEX
-        HEX="$(dd if="$f" bs=1 skip="$OFF" count=8 2> /dev/null | xxd -p -c 8)"
+        HEX="$(dd if="$FILE" bs=1 skip="$OFF" count=8 2> /dev/null | xxd -p -c 8)"
         printf "%d" "0x$HEX"
     }
 
@@ -22,6 +21,10 @@ PUB_KEY_ADDR_EXTRACT() {
 # ]
 
 VBIMG="$FW_DIR/$(cut -d "/" -f 1 -s <<< "$TARGET_FIRMWARE")_$(cut -d "/" -f 2 -s <<< "$TARGET_FIRMWARE")/avb/vbmeta.img"
+if [ ! -f "$VBIMG" ]; then
+    ABORT "File not found: ${VBIMG//$SRC_DIR\//}"
+fi
+
 AVBINFO="$(avbtool info_image --image "$VBIMG")"
 AVBSIZE="$(awk '/Block:/ {sum+=$3} END {print sum}' <<< "$AVBINFO")"
 read PK_OFFSET PK_SIZE < <(PUB_KEY_ADDR_EXTRACT "$VBIMG")
@@ -73,3 +76,6 @@ cat <<'EOF' >> "$SEPOLICY"
 (allow prophide toolbox_exec (file (read open execute getattr map execute_no_trans)))
 (allow prophide prophide_exec (file (entrypoint read open execute getattr map)))
 EOF
+
+unset VBIMG AVBINFO AVBSIZE PK_OFFSET PK_SIZE SEPOLICY
+unset -f PUB_KEY_ADDR_EXTRACT
