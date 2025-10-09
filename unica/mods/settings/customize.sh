@@ -26,8 +26,7 @@ while IFS= read -r f; do
             PATCH_INST="$(head -n 1 "$SRC_DIR/unica/mods/settings/SecSettings.apk/$f")"
             CONTENT="$(tail -n +2 "$SRC_DIR/unica/mods/settings/SecSettings.apk/$f")"
         fi
-        CONTENT="$(sed "s/\"/\\\\\"/g" <<< "$CONTENT")"
-        CONTENT="$(sed "s/ /\\\ /g" <<< "$CONTENT")"
+        CONTENT="$(sed -e "s/\"/\\\\\"/g" -e "s/\\$/\\\\$/g" -e "s/ /\\\ /g" <<< "$CONTENT")"
         CONTENT="$(sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g' <<< "$CONTENT")"
         EVAL "sed -i \"$PATCH_INST $CONTENT\" \"$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/$f\""
     fi
