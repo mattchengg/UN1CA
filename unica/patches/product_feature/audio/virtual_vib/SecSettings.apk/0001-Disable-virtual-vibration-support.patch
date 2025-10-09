@@ -1,46 +1,76 @@
-From 78975399b896f8ae30f58a6b4b02d120a9426813 Mon Sep 17 00:00:00 2001
+From f33a536d4bf7cf2f8acbb087951c8a298cfc76da Mon Sep 17 00:00:00 2001
 From: Salvo Giangreco <giangrecosalvo9@gmail.com>
-Date: Fri, 13 Sep 2024 09:32:50 +0200
+Date: Mon, 8 Sep 2025 22:24:01 +0200
 Subject: [PATCH] Disable virtual vibration support
 
 ---
- .../asbase/audio/SoundSettings$3.smali        |    4 +
+ .../asbase/audio/SoundSettings$3.smali        |   24 +-
  .../ResetSoundSystemFeedbackSettings$1.smali  |    4 -
- ...alVibrationSoundPreferenceController.smali |   26 +-
- .../eternal/provider/items/SoundItem.smali    | 1203 ++++++++---------
- 4 files changed, 550 insertions(+), 687 deletions(-)
+ ...alVibrationSoundPreferenceController.smali |   28 +-
+ .../eternal/provider/items/SoundItem.smali    | 1070 ++++++++---------
+ 4 files changed, 509 insertions(+), 617 deletions(-)
 
 diff --git a/smali_classes4/com/samsung/android/settings/asbase/audio/SoundSettings$3.smali b/smali_classes4/com/samsung/android/settings/asbase/audio/SoundSettings$3.smali
-index f7e1e512..b3d3f0ec 100644
+index af3751efd..01d0f0ab2 100644
 --- a/smali_classes4/com/samsung/android/settings/asbase/audio/SoundSettings$3.smali
 +++ b/smali_classes4/com/samsung/android/settings/asbase/audio/SoundSettings$3.smali
-@@ -168,6 +168,10 @@
-     invoke-interface {p0, p1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
+@@ -168,28 +168,28 @@
+     invoke-virtual {v0, p1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
  
      :cond_6
-+    const-string/jumbo p1, "vibration_sound_enabled"
-+
-+    invoke-interface {p0, p1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
-+
-     const-string p1, "dnd_enabled"
+-    invoke-static {}, Landroid/app/ActivityManager;->getCurrentUser()I
++    move-object p1, p0
  
-     invoke-interface {p0, p1}, Ljava/util/List;->add(Ljava/lang/Object;)Z
+-    move-result p1
++    check-cast p1, Ljava/util/ArrayList;
+ 
+-    if-eqz p1, :cond_7
++    const-string/jumbo v0, "vibration_sound_enabled"
+ 
+-    const-string p1, "multi_sound"
++    invoke-virtual {p1, v0}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
+ 
+-    move-object v0, p0
++    invoke-static {}, Landroid/app/ActivityManager;->getCurrentUser()I
+ 
+-    check-cast v0, Ljava/util/ArrayList;
++    move-result v0
+ 
+-    invoke-virtual {v0, p1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
++    if-eqz v0, :cond_7
+ 
+-    :cond_7
+-    const-string p1, "dnd_enabled"
++    const-string v0, "multi_sound"
+ 
+-    move-object v0, p0
++    invoke-virtual {p1, v0}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
+ 
+-    check-cast v0, Ljava/util/ArrayList;
++    :cond_7
++    const-string v0, "dnd_enabled"
+ 
+-    invoke-virtual {v0, p1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
++    invoke-virtual {p1, v0}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
+ 
+     return-object p0
+ .end method
 diff --git a/smali_classes4/com/samsung/android/settings/asbase/reset/ResetSoundSystemFeedbackSettings$1.smali b/smali_classes4/com/samsung/android/settings/asbase/reset/ResetSoundSystemFeedbackSettings$1.smali
-index 67226fa0..e96f66de 100644
+index 4e283a861..88afcad0d 100644
 --- a/smali_classes4/com/samsung/android/settings/asbase/reset/ResetSoundSystemFeedbackSettings$1.smali
 +++ b/smali_classes4/com/samsung/android/settings/asbase/reset/ResetSoundSystemFeedbackSettings$1.smali
-@@ -380,9 +380,5 @@
+@@ -349,9 +349,5 @@
  
-     invoke-static {p0, p1, v5}, Landroid/provider/Settings$System;->putInt(Landroid/content/ContentResolver;Ljava/lang/String;I)Z
+     invoke-static {p0, p1, v2}, Landroid/provider/Settings$System;->putInt(Landroid/content/ContentResolver;Ljava/lang/String;I)Z
  
 -    const-string/jumbo p1, "vibration_sound_enabled"
 -
--    invoke-static {p0, p1, v5}, Landroid/provider/Settings$System;->putInt(Landroid/content/ContentResolver;Ljava/lang/String;I)Z
+-    invoke-static {p0, p1, v2}, Landroid/provider/Settings$System;->putInt(Landroid/content/ContentResolver;Ljava/lang/String;I)Z
 -
      return-void
  .end method
 diff --git a/smali_classes4/com/samsung/android/settings/asbase/vibration/VirtualVibrationSoundPreferenceController.smali b/smali_classes4/com/samsung/android/settings/asbase/vibration/VirtualVibrationSoundPreferenceController.smali
-index ac95ddb5..9b34d9c8 100644
+index b37d7eae7..137c6fff1 100644
 --- a/smali_classes4/com/samsung/android/settings/asbase/vibration/VirtualVibrationSoundPreferenceController.smali
 +++ b/smali_classes4/com/samsung/android/settings/asbase/vibration/VirtualVibrationSoundPreferenceController.smali
 @@ -131,7 +131,7 @@
@@ -52,7 +82,7 @@ index ac95ddb5..9b34d9c8 100644
  
      return p0
  .end method
-@@ -459,37 +459,31 @@
+@@ -466,38 +466,30 @@
  .end method
  
  .method public setValue(Lcom/samsung/android/settings/cube/ControlValue;)Lcom/samsung/android/settings/cube/ControlResult;
@@ -74,2316 +104,2060 @@ index ac95ddb5..9b34d9c8 100644
 -    move-result-object p1
 -
 -    invoke-static {p1}, Ljava/lang/Boolean;->parseBoolean(Ljava/lang/String;)Z
-+    move-result-object p0
- 
+-
 -    move-result p1
-+    invoke-static {p0}, Ljava/lang/Boolean;->parseBoolean(Ljava/lang/String;)Z
- 
+-
 -    iget-object p0, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
-+    sget-object p0, Lcom/samsung/android/settings/cube/ControlResult$ResultCode;->FAIL:Lcom/samsung/android/settings/cube/ControlResult$ResultCode;
- 
+-
 -    invoke-virtual {p0}, Landroid/content/Context;->getContentResolver()Landroid/content/ContentResolver;
-+    invoke-virtual {v0, p0}, Lcom/samsung/android/settings/cube/ControlResult$Builder;->setResult(Lcom/samsung/android/settings/cube/ControlResult$ResultCode;)Lcom/samsung/android/settings/cube/ControlResult$Builder;
- 
+-
      move-result-object p0
  
 -    const-string/jumbo v1, "vibration_sound_enabled"
-+    sget-object p1, Lcom/samsung/android/settings/cube/ControlResult$ErrorCode;->NOT_SUPPORT_DEVICE:Lcom/samsung/android/settings/cube/ControlResult$ErrorCode;
- 
+-
 -    invoke-static {p0, v1, p1}, Landroid/provider/Settings$System;->putInt(Landroid/content/ContentResolver;Ljava/lang/String;I)Z
--
++    invoke-static {p0}, Ljava/lang/Boolean;->parseBoolean(Ljava/lang/String;)Z
+ 
 -    sget-object p0, Lcom/samsung/android/settings/cube/ControlResult$ResultCode;->SUCCESS:Lcom/samsung/android/settings/cube/ControlResult$ResultCode;
--
--    invoke-virtual {v0, p0}, Lcom/samsung/android/settings/cube/ControlResult$Builder;->setResult(Lcom/samsung/android/settings/cube/ControlResult$ResultCode;)Lcom/samsung/android/settings/cube/ControlResult$Builder;
-+    invoke-virtual {p0, p1}, Lcom/samsung/android/settings/cube/ControlResult$Builder;->setErrorType(Lcom/samsung/android/settings/cube/ControlResult$ErrorCode;)Lcom/samsung/android/settings/cube/ControlResult$Builder;
++    sget-object p0, Lcom/samsung/android/settings/cube/ControlResult$ResultCode;->FAIL:Lcom/samsung/android/settings/cube/ControlResult$ResultCode;
  
-     move-result-object p0
+     iput-object p0, v0, Lcom/samsung/android/settings/cube/ControlResult$Builder;->mResultCode:Lcom/samsung/android/settings/cube/ControlResult$ResultCode;
  
++    sget-object p0, Lcom/samsung/android/settings/cube/ControlResult$ErrorCode;->NOT_SUPPORT_DEVICE:Lcom/samsung/android/settings/cube/ControlResult$ErrorCode;
++
++    iput-object p0, v0, Lcom/samsung/android/settings/cube/ControlResult$Builder;->mErrorCode:Lcom/samsung/android/settings/cube/ControlResult$ErrorCode;
++
+     new-instance p0, Lcom/samsung/android/settings/cube/ControlResult;
+ 
+     invoke-direct {p0, v0}, Lcom/samsung/android/settings/cube/ControlResult;-><init>(Lcom/samsung/android/settings/cube/ControlResult$Builder;)V
 diff --git a/smali_classes4/com/samsung/android/settings/eternal/provider/items/SoundItem.smali b/smali_classes4/com/samsung/android/settings/eternal/provider/items/SoundItem.smali
-index d5f617cd..1ef9ca6b 100644
+index 78b59eb5f..17707b374 100644
 --- a/smali_classes4/com/samsung/android/settings/eternal/provider/items/SoundItem.smali
 +++ b/smali_classes4/com/samsung/android/settings/eternal/provider/items/SoundItem.smali
-@@ -779,7 +779,7 @@
+@@ -937,7 +937,7 @@
+ 
+     packed-switch v1, :pswitch_data_0
+ 
+-    goto :goto_2
++    goto/16 :goto_2
+ 
+     :pswitch_0
+     invoke-static {p1}, Lcom/samsung/android/settings/asbase/utils/VibUtils;->hasSystemVibrationMenu(Landroid/content/Context;)Z
+@@ -954,10 +954,18 @@
+ 
+     sget-object v1, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
+ 
+-    invoke-static {p1, v0, v1, p0, p2}, Lcom/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0;->m(Lcom/samsung/android/lib/episode/Scene$Builder;Ljava/lang/String;Ljava/lang/Boolean;Ljava/util/ArrayList;Ljava/lang/String;)Lcom/samsung/android/lib/episode/Scene$Builder;
++    invoke-virtual {p1, v1, v0}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
++
++    invoke-virtual {p1}, Lcom/samsung/android/lib/episode/Scene$Builder;->build()Lcom/samsung/android/lib/episode/Scene;
+ 
+     move-result-object p1
+ 
++    invoke-virtual {p0, p1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
++
++    new-instance p1, Lcom/samsung/android/lib/episode/Scene$Builder;
++
++    invoke-direct {p1, p2}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
++
+     invoke-virtual {p1, v4, v3}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
+ 
+     invoke-virtual {p1, v1, v0}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
+@@ -985,10 +993,18 @@
+ 
+     sget-object v1, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
+ 
+-    invoke-static {p1, v0, v1, p0, p2}, Lcom/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0;->m(Lcom/samsung/android/lib/episode/Scene$Builder;Ljava/lang/String;Ljava/lang/Boolean;Ljava/util/ArrayList;Ljava/lang/String;)Lcom/samsung/android/lib/episode/Scene$Builder;
++    invoke-virtual {p1, v1, v0}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
++
++    invoke-virtual {p1}, Lcom/samsung/android/lib/episode/Scene$Builder;->build()Lcom/samsung/android/lib/episode/Scene;
+ 
+     move-result-object p1
+ 
++    invoke-virtual {p0, p1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
++
++    new-instance p1, Lcom/samsung/android/lib/episode/Scene$Builder;
++
++    invoke-direct {p1, p2}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
++
+     invoke-virtual {p1, v4, v3}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
+ 
+     invoke-virtual {p1, v1, v0}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
+@@ -1010,10 +1026,18 @@
+ 
+     sget-object v1, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
+ 
+-    invoke-static {p1, v0, v1, p0, p2}, Lcom/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0;->m(Lcom/samsung/android/lib/episode/Scene$Builder;Ljava/lang/String;Ljava/lang/Boolean;Ljava/util/ArrayList;Ljava/lang/String;)Lcom/samsung/android/lib/episode/Scene$Builder;
++    invoke-virtual {p1, v1, v0}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
++
++    invoke-virtual {p1}, Lcom/samsung/android/lib/episode/Scene$Builder;->build()Lcom/samsung/android/lib/episode/Scene;
+ 
+     move-result-object p1
+ 
++    invoke-virtual {p0, p1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
++
++    new-instance p1, Lcom/samsung/android/lib/episode/Scene$Builder;
++
++    invoke-direct {p1, p2}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
++
+     invoke-virtual {p1, v4, v3}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
+ 
+     invoke-virtual {p1, v1, v0}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
+@@ -1183,7 +1207,7 @@
      goto :goto_0
  
      :cond_0
--    const/16 v2, 0x2b
-+    const/16 v2, 0x2a
+-    const/16 v1, 0x2c
++    const/16 v1, 0x2b
  
      goto/16 :goto_1
  
-@@ -795,7 +795,7 @@
+@@ -1199,7 +1223,7 @@
      goto :goto_0
  
      :cond_1
--    const/16 v2, 0x2a
-+    const/16 v2, 0x29
+-    const/16 v1, 0x2b
++    const/16 v1, 0x2a
  
      goto/16 :goto_1
  
-@@ -811,7 +811,7 @@
+@@ -1215,7 +1239,7 @@
      goto :goto_0
  
      :cond_2
--    const/16 v2, 0x29
-+    const/16 v2, 0x28
+-    const/16 v1, 0x2a
++    const/16 v1, 0x29
  
      goto/16 :goto_1
  
-@@ -827,7 +827,7 @@
+@@ -1231,7 +1255,7 @@
      goto :goto_0
  
      :cond_3
--    const/16 v2, 0x28
-+    const/16 v2, 0x27
+-    const/16 v1, 0x29
++    const/16 v1, 0x28
  
      goto/16 :goto_1
  
-@@ -843,7 +843,7 @@
+@@ -1247,7 +1271,7 @@
      goto :goto_0
  
      :cond_4
--    const/16 v2, 0x27
-+    const/16 v2, 0x26
+-    const/16 v1, 0x28
++    const/16 v1, 0x27
  
      goto/16 :goto_1
  
-@@ -859,7 +859,7 @@
+@@ -1263,7 +1287,7 @@
      goto :goto_0
  
      :cond_5
--    const/16 v2, 0x26
-+    const/16 v2, 0x25
+-    const/16 v1, 0x27
++    const/16 v1, 0x26
  
      goto/16 :goto_1
  
-@@ -875,7 +875,7 @@
+@@ -1279,7 +1303,7 @@
      goto :goto_0
  
      :cond_6
--    const/16 v2, 0x25
-+    const/16 v2, 0x24
+-    const/16 v1, 0x26
++    const/16 v1, 0x25
  
      goto/16 :goto_1
  
-@@ -891,7 +891,7 @@
+@@ -1295,7 +1319,7 @@
      goto :goto_0
  
      :cond_7
--    const/16 v2, 0x24
-+    const/16 v2, 0x23
+-    const/16 v1, 0x25
++    const/16 v1, 0x24
  
      goto/16 :goto_1
  
-@@ -907,7 +907,7 @@
+@@ -1311,7 +1335,7 @@
      goto :goto_0
  
      :cond_8
--    const/16 v2, 0x23
-+    const/16 v2, 0x22
+-    const/16 v1, 0x24
++    const/16 v1, 0x23
  
      goto/16 :goto_1
  
-@@ -923,7 +923,7 @@
+@@ -1327,7 +1351,7 @@
      goto/16 :goto_0
  
      :cond_9
--    const/16 v2, 0x22
-+    const/16 v2, 0x21
+-    const/16 v1, 0x23
++    const/16 v1, 0x22
  
      goto/16 :goto_1
  
-@@ -939,7 +939,7 @@
+@@ -1343,7 +1367,7 @@
      goto/16 :goto_0
  
      :cond_a
--    const/16 v2, 0x21
-+    const/16 v2, 0x20
+-    const/16 v1, 0x22
++    const/16 v1, 0x21
  
      goto/16 :goto_1
  
-@@ -955,7 +955,7 @@
+@@ -1359,7 +1383,7 @@
      goto/16 :goto_0
  
      :cond_b
--    const/16 v2, 0x20
-+    const/16 v2, 0x1f
+-    const/16 v1, 0x21
++    const/16 v1, 0x20
  
      goto/16 :goto_1
  
-@@ -971,7 +971,7 @@
+@@ -1375,7 +1399,7 @@
      goto/16 :goto_0
  
      :cond_c
--    const/16 v2, 0x1f
-+    const/16 v2, 0x1e
+-    const/16 v1, 0x20
++    const/16 v1, 0x1f
  
      goto/16 :goto_1
  
-@@ -987,7 +987,7 @@
+@@ -1391,7 +1415,7 @@
      goto/16 :goto_0
  
      :cond_d
--    const/16 v2, 0x1e
-+    const/16 v2, 0x1d
+-    const/16 v1, 0x1f
++    const/16 v1, 0x1e
  
      goto/16 :goto_1
  
-@@ -1003,7 +1003,7 @@
+@@ -1407,7 +1431,7 @@
      goto/16 :goto_0
  
      :cond_e
--    const/16 v2, 0x1d
-+    const/16 v2, 0x1c
+-    const/16 v1, 0x1e
++    const/16 v1, 0x1d
  
      goto/16 :goto_1
  
-@@ -1019,7 +1019,7 @@
+@@ -1423,7 +1447,7 @@
      goto/16 :goto_0
  
      :cond_f
--    const/16 v2, 0x1c
-+    const/16 v2, 0x1b
+-    const/16 v1, 0x1d
++    const/16 v1, 0x1c
  
      goto/16 :goto_1
  
-@@ -1035,7 +1035,7 @@
+@@ -1439,7 +1463,7 @@
      goto/16 :goto_0
  
      :cond_10
--    const/16 v2, 0x1b
-+    const/16 v2, 0x1a
+-    const/16 v1, 0x1c
++    const/16 v1, 0x1b
  
      goto/16 :goto_1
  
-@@ -1051,7 +1051,7 @@
+@@ -1455,7 +1479,7 @@
      goto/16 :goto_0
  
      :cond_11
--    const/16 v2, 0x1a
-+    const/16 v2, 0x19
+-    const/16 v1, 0x1b
++    const/16 v1, 0x1a
  
      goto/16 :goto_1
  
-@@ -1067,7 +1067,7 @@
+@@ -1471,7 +1495,7 @@
      goto/16 :goto_0
  
      :cond_12
--    const/16 v2, 0x19
-+    const/16 v2, 0x18
+-    const/16 v1, 0x1a
++    const/16 v1, 0x19
  
      goto/16 :goto_1
  
-@@ -1083,7 +1083,7 @@
+@@ -1487,7 +1511,7 @@
      goto/16 :goto_0
  
      :cond_13
--    const/16 v2, 0x18
-+    const/16 v2, 0x17
+-    const/16 v1, 0x19
++    const/16 v1, 0x18
  
      goto/16 :goto_1
  
-@@ -1099,7 +1099,7 @@
+@@ -1503,7 +1527,7 @@
      goto/16 :goto_0
  
      :cond_14
--    const/16 v2, 0x17
-+    const/16 v2, 0x16
+-    const/16 v1, 0x18
++    const/16 v1, 0x17
  
      goto/16 :goto_1
  
-@@ -1115,7 +1115,7 @@
+@@ -1519,7 +1543,7 @@
      goto/16 :goto_0
  
      :cond_15
--    const/16 v2, 0x16
-+    const/16 v2, 0x15
+-    const/16 v1, 0x17
++    const/16 v1, 0x16
  
      goto/16 :goto_1
  
-@@ -1131,7 +1131,7 @@
+@@ -1535,7 +1559,7 @@
      goto/16 :goto_0
  
      :cond_16
--    const/16 v2, 0x15
-+    const/16 v2, 0x14
+-    const/16 v1, 0x16
++    const/16 v1, 0x15
  
      goto/16 :goto_1
  
-@@ -1147,7 +1147,7 @@
+@@ -1551,7 +1575,7 @@
      goto/16 :goto_0
  
      :cond_17
--    const/16 v2, 0x14
-+    const/16 v2, 0x13
+-    const/16 v1, 0x15
++    const/16 v1, 0x14
  
      goto/16 :goto_1
  
-@@ -1163,7 +1163,7 @@
+@@ -1567,7 +1591,7 @@
      goto/16 :goto_0
  
      :cond_18
--    const/16 v2, 0x13
-+    const/16 v2, 0x12
+-    const/16 v1, 0x14
++    const/16 v1, 0x13
  
      goto/16 :goto_1
  
-@@ -1179,7 +1179,7 @@
+@@ -1583,7 +1607,7 @@
      goto/16 :goto_0
  
      :cond_19
--    const/16 v2, 0x12
-+    const/16 v2, 0x11
+-    const/16 v1, 0x13
++    const/16 v1, 0x12
  
      goto/16 :goto_1
  
-@@ -1195,7 +1195,7 @@
+@@ -1599,7 +1623,7 @@
      goto/16 :goto_0
  
      :cond_1a
--    const/16 v2, 0x11
-+    const/16 v2, 0x10
+-    const/16 v1, 0x12
++    const/16 v1, 0x11
  
      goto/16 :goto_1
  
-@@ -1211,7 +1211,7 @@
+@@ -1615,7 +1639,7 @@
      goto/16 :goto_0
  
      :cond_1b
--    const/16 v2, 0x10
-+    const/16 v2, 0xf
+-    const/16 v1, 0x11
++    const/16 v1, 0x10
  
      goto/16 :goto_1
  
-@@ -1227,7 +1227,7 @@
+@@ -1631,7 +1655,7 @@
      goto/16 :goto_0
  
      :cond_1c
--    const/16 v2, 0xf
-+    const/16 v2, 0xe
+-    const/16 v1, 0x10
++    const/16 v1, 0xf
  
      goto/16 :goto_1
  
-@@ -1243,7 +1243,7 @@
+@@ -1647,7 +1671,7 @@
      goto/16 :goto_0
  
      :cond_1d
--    const/16 v2, 0xe
-+    const/16 v2, 0xd
+-    const/16 v1, 0xf
++    const/16 v1, 0xe
  
      goto/16 :goto_1
  
-@@ -1259,7 +1259,7 @@
+@@ -1663,7 +1687,7 @@
      goto/16 :goto_0
  
      :cond_1e
--    const/16 v2, 0xd
-+    const/16 v2, 0xc
+-    const/16 v1, 0xe
++    const/16 v1, 0xd
  
      goto/16 :goto_1
  
-@@ -1275,12 +1275,12 @@
+@@ -1679,7 +1703,7 @@
      goto/16 :goto_0
  
      :cond_1f
--    const/16 v2, 0xc
-+    move v2, v8
+-    const/16 v1, 0xd
++    const/16 v1, 0xc
  
      goto/16 :goto_1
  
-     :sswitch_20
--    const-string v5, "/Settings/Sound/VibrationSoundEnabled"
-+    const-string v5, "/Settings/Sound/DialingKeypadVibration"
- 
-     invoke-virtual {v2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
- 
-@@ -1291,12 +1291,12 @@
+@@ -1695,12 +1719,12 @@
      goto/16 :goto_0
  
      :cond_20
--    move v2, v8
-+    move v2, v9
+-    const/16 v1, 0xc
++    move/from16 v1, v20
  
      goto/16 :goto_1
  
      :sswitch_21
--    const-string v5, "/Settings/Sound/DialingKeypadVibration"
-+    const-string v5, "/Settings/Sound/CallVibrationMagnitude"
+-    const-string v5, "/Settings/Sound/VibrationSoundEnabled"
++    const-string v5, "/Settings/Sound/DialingKeypadVibration"
  
-     invoke-virtual {v2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {v1, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -1307,12 +1307,12 @@
+@@ -1711,12 +1735,12 @@
      goto/16 :goto_0
  
      :cond_21
--    move v2, v9
-+    const/16 v2, 0x9
+-    move/from16 v1, v20
++    move v1, v3
  
      goto/16 :goto_1
  
      :sswitch_22
--    const-string v5, "/Settings/Sound/CallVibrationMagnitude"
-+    const-string v5, "/Settings/Sound/DialingKeypadTone"
+-    const-string v5, "/Settings/Sound/DialingKeypadVibration"
++    const-string v5, "/Settings/Sound/CallVibrationMagnitude"
  
-     invoke-virtual {v2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {v1, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -1323,12 +1323,12 @@
+@@ -1727,12 +1751,12 @@
      goto/16 :goto_0
  
      :cond_22
--    const/16 v2, 0x9
-+    const/16 v2, 0x8
+-    move v1, v3
++    const/16 v1, 0x9
  
      goto/16 :goto_1
  
      :sswitch_23
--    const-string v5, "/Settings/Sound/DialingKeypadTone"
-+    const-string v5, "/Settings/Sound/MediaVibrationMagnitude"
+-    const-string v5, "/Settings/Sound/CallVibrationMagnitude"
++    const-string v5, "/Settings/Sound/DialingKeypadTone"
  
-     invoke-virtual {v2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {v1, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -1339,12 +1339,12 @@
+@@ -1743,12 +1767,12 @@
      goto/16 :goto_0
  
      :cond_23
--    const/16 v2, 0x8
-+    const/4 v2, 0x7
+-    const/16 v1, 0x9
++    move/from16 v1, p2
+ 
+     goto/16 :goto_1
+ 
+     :sswitch_24
+-    const-string v5, "/Settings/Sound/DialingKeypadTone"
++    const-string v5, "/Settings/Sound/MediaVibrationMagnitude"
+ 
+     invoke-virtual {v1, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+ 
+@@ -1759,12 +1783,12 @@
+     goto/16 :goto_0
+ 
+     :cond_24
+-    move/from16 v1, p2
++    const/4 v1, 0x7
  
 -    goto/16 :goto_1
 +    goto :goto_1
  
-     :sswitch_24
+     :sswitch_25
 -    const-string v5, "/Settings/Sound/MediaVibrationMagnitude"
 +    const-string v5, "/Settings/Sound/ChargingVibration"
  
-     invoke-virtual {v2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {v1, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -1355,12 +1355,12 @@
-     goto/16 :goto_0
- 
-     :cond_24
--    const/4 v2, 0x7
-+    const/4 v2, 0x6
- 
-     goto :goto_1
- 
-     :sswitch_25
--    const-string v5, "/Settings/Sound/ChargingVibration"
-+    const-string v5, "/Settings/Sound/RingerMode"
- 
-     invoke-virtual {v2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
- 
-@@ -1371,12 +1371,12 @@
+@@ -1775,12 +1799,12 @@
      goto/16 :goto_0
  
      :cond_25
--    const/4 v2, 0x6
-+    const/4 v2, 0x5
+-    const/4 v1, 0x7
++    const/4 v1, 0x6
  
      goto :goto_1
  
      :sswitch_26
--    const-string v5, "/Settings/Sound/RingerMode"
-+    const-string v5, "/Settings/Sound/SeparateMultiAppsSoundName"
+-    const-string v5, "/Settings/Sound/ChargingVibration"
++    const-string v5, "/Settings/Sound/RingerMode"
  
-     invoke-virtual {v2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {v1, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -1387,12 +1387,12 @@
+@@ -1791,12 +1815,12 @@
      goto/16 :goto_0
  
      :cond_26
--    const/4 v2, 0x5
-+    const/4 v2, 0x4
+-    const/4 v1, 0x6
++    move/from16 v1, v18
  
      goto :goto_1
  
      :sswitch_27
--    const-string v5, "/Settings/Sound/SeparateMultiAppsSoundName"
-+    const-string v5, "/Settings/Sound/HardPressVibrationMagnitude"
+-    const-string v5, "/Settings/Sound/RingerMode"
++    const-string v5, "/Settings/Sound/SeparateMultiAppsSoundName"
  
-     invoke-virtual {v2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {v1, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -1403,12 +1403,12 @@
+@@ -1807,12 +1831,12 @@
      goto/16 :goto_0
  
      :cond_27
--    const/4 v2, 0x4
-+    const/4 v2, 0x3
+-    move/from16 v1, v18
++    move/from16 v1, v19
  
      goto :goto_1
  
      :sswitch_28
--    const-string v5, "/Settings/Sound/HardPressVibrationMagnitude"
-+    const-string v5, "/Settings/Sound/VibrationFeedback"
+-    const-string v5, "/Settings/Sound/SeparateMultiAppsSoundName"
++    const-string v5, "/Settings/Sound/HardPressVibrationMagnitude"
  
-     invoke-virtual {v2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {v1, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -1419,12 +1419,12 @@
+@@ -1823,12 +1847,12 @@
      goto/16 :goto_0
  
      :cond_28
--    const/4 v2, 0x3
-+    move v2, v13
+-    move/from16 v1, v19
++    move/from16 v1, v17
  
      goto :goto_1
  
      :sswitch_29
--    const-string v5, "/Settings/Sound/VibrationFeedback"
-+    const-string v5, "/Settings/Sound/VolumeLimiterLevel"
+-    const-string v5, "/Settings/Sound/HardPressVibrationMagnitude"
++    const-string v5, "/Settings/Sound/VibrationFeedback"
  
-     invoke-virtual {v2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {v1, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -1435,12 +1435,12 @@
+@@ -1839,12 +1863,12 @@
      goto/16 :goto_0
  
      :cond_29
--    move v2, v13
-+    const/4 v2, 0x1
+-    move/from16 v1, v17
++    move v1, v14
  
      goto :goto_1
  
      :sswitch_2a
--    const-string v5, "/Settings/Sound/VolumeLimiterLevel"
-+    const-string v5, "/Settings/Sound/KeyboardSound"
+-    const-string v5, "/Settings/Sound/VibrationFeedback"
++    const-string v5, "/Settings/Sound/VolumeLimiterLevel"
  
-     invoke-virtual {v2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {v1, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -1451,22 +1451,6 @@
+@@ -1855,12 +1879,12 @@
      goto/16 :goto_0
  
      :cond_2a
--    const/4 v2, 0x1
+-    move v1, v14
++    const/4 v1, 0x1
+ 
+     goto :goto_1
+ 
+     :sswitch_2b
+-    const-string v5, "/Settings/Sound/VolumeLimiterLevel"
++    const-string v5, "/Settings/Sound/KeyboardSound"
+ 
+     invoke-virtual {v1, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+ 
+@@ -1871,22 +1895,6 @@
+     goto/16 :goto_0
+ 
+     :cond_2b
+-    const/4 v1, 0x1
 -
 -    goto :goto_1
 -
--    :sswitch_2b
+-    :sswitch_2c
 -    const-string v5, "/Settings/Sound/KeyboardSound"
 -
--    invoke-virtual {v2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+-    invoke-virtual {v1, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
 -
--    move-result v2
+-    move-result v1
 -
--    if-nez v2, :cond_2b
+-    if-nez v1, :cond_2c
 -
 -    goto/16 :goto_0
 -
--    :cond_2b
-     move v2, v15
+-    :cond_2c
+     move v1, v2
  
      :goto_1
-@@ -1486,26 +1470,26 @@
- 
-     packed-switch v2, :pswitch_data_0
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
-     :pswitch_0
-     invoke-static/range {p1 .. p1}, Lcom/samsung/android/settings/asbase/utils/VibUtils;->hasSystemVibrationMenu(Landroid/content/Context;)Z
+@@ -1899,19 +1907,19 @@
  
      move-result v0
  
--    if-eqz v0, :cond_2c
-+    if-eqz v0, :cond_2b
+-    if-eqz v0, :cond_2d
++    if-eqz v0, :cond_2c
  
      invoke-static {}, Lcom/samsung/android/settings/Rune;->isJapanModel()Z
  
      move-result v0
  
--    if-nez v0, :cond_2c
-+    if-nez v0, :cond_2b
+-    if-nez v0, :cond_2d
++    if-nez v0, :cond_2c
  
      const/4 v0, 0x1
  
      goto :goto_2
  
--    :cond_2c
-+    :cond_2b
-     move v0, v15
- 
-     :goto_2
-@@ -1521,26 +1505,26 @@
- 
-     invoke-virtual {v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-ne v0, v1, :cond_2d
-+    if-ne v0, v1, :cond_2c
- 
-     const/4 v14, 0x1
- 
-     goto :goto_3
- 
 -    :cond_2d
 +    :cond_2c
-     move v14, v15
+     move v0, v2
  
-     :goto_3
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
+     :goto_2
+@@ -1927,11 +1935,11 @@
  
--    goto/16 :goto_32
-+    goto/16 :goto_31
+     invoke-virtual {v7, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
  
-     :pswitch_1
-     invoke-static {v4, v14, v13}, Landroid/provider/Settings$Global;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
+-    if-ne v0, v1, :cond_2e
++    if-ne v0, v1, :cond_2d
  
-     move-result v2
- 
--    if-ne v2, v13, :cond_64
-+    if-ne v2, v13, :cond_62
- 
-     invoke-static {v13}, Landroid/media/AudioSystem;->getDefaultStreamVolume(I)I
- 
-@@ -1556,19 +1540,19 @@
- 
-     invoke-virtual {v3, v1}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-ne v2, v0, :cond_2e
-+    if-ne v2, v0, :cond_2d
- 
-     const/4 v14, 0x1
- 
-     goto :goto_4
+     const/4 v2, 0x1
  
 -    :cond_2e
 +    :cond_2d
-     move v14, v15
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
-     :goto_4
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
+     return-object v7
+@@ -1941,7 +1949,7 @@
  
--    goto/16 :goto_32
-+    goto/16 :goto_31
+     move-result v1
  
-     :pswitch_2
-     const-class v2, Landroid/view/accessibility/AccessibilityManager;
-@@ -1583,7 +1567,7 @@
+-    if-ne v1, v14, :cond_65
++    if-ne v1, v14, :cond_63
  
-     move-result v2
+     invoke-static {v14}, Landroid/media/AudioSystem;->getDefaultStreamVolume(I)I
  
--    if-eqz v2, :cond_64
-+    if-eqz v2, :cond_62
+@@ -1957,11 +1965,11 @@
  
-     invoke-static {v9}, Landroid/media/AudioSystem;->getDefaultStreamVolume(I)I
+     invoke-virtual {v7, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
  
-@@ -1599,24 +1583,24 @@
+-    if-ne v1, v0, :cond_2f
++    if-ne v1, v0, :cond_2e
  
-     invoke-virtual {v3, v1}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-ne v2, v0, :cond_2f
-+    if-ne v2, v0, :cond_2e
- 
-     const/4 v14, 0x1
- 
-     goto :goto_5
+     const/4 v2, 0x1
  
 -    :cond_2f
 +    :cond_2e
-     move v14, v15
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
-     :goto_5
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
+     return-object v7
+@@ -1979,7 +1987,7 @@
  
--    goto/16 :goto_32
-+    goto/16 :goto_31
+     move-result v1
  
-     :pswitch_3
-     sget-boolean v0, Lcom/samsung/android/settings/asbase/rune/AudioRune;->SUPPORT_MULTI_SOUND_SELECT_MULTIPLE_APPLICATIONS:Z
+-    if-eqz v1, :cond_65
++    if-eqz v1, :cond_63
  
--    if-eqz v0, :cond_64
-+    if-eqz v0, :cond_62
+     invoke-static {v3}, Landroid/media/AudioSystem;->getDefaultStreamVolume(I)I
  
-     new-instance v0, Lcom/samsung/android/media/SemSoundAssistantManager;
+@@ -1995,11 +2003,11 @@
  
-@@ -1626,7 +1610,7 @@
+     invoke-virtual {v7, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
  
-     move-result v0
+-    if-ne v1, v0, :cond_30
++    if-ne v1, v0, :cond_2f
  
--    if-eqz v0, :cond_30
-+    if-eqz v0, :cond_2f
- 
-     const-string/jumbo v0, "multisound_devicetype"
- 
-@@ -1636,7 +1620,7 @@
- 
-     goto :goto_6
+     const/4 v2, 0x1
  
 -    :cond_30
 +    :cond_2f
-     move v0, v6
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
-     :goto_6
-@@ -1646,32 +1630,32 @@
+     return-object v7
+@@ -2007,7 +2015,7 @@
+     :pswitch_3
+     sget-boolean v1, Lcom/samsung/android/settings/asbase/rune/AudioRune;->SUPPORT_MULTI_SOUND_SELECT_MULTIPLE_APPLICATIONS:Z
  
-     invoke-virtual {v3, v1}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
+-    if-eqz v1, :cond_65
++    if-eqz v1, :cond_63
  
--    if-ne v6, v0, :cond_31
-+    if-ne v6, v0, :cond_30
+     new-instance v1, Lcom/samsung/android/media/SemSoundAssistantManager;
  
-     const/4 v14, 0x1
+@@ -2017,7 +2025,7 @@
  
-     goto :goto_7
+     move-result v0
+ 
+-    if-eqz v0, :cond_31
++    if-eqz v0, :cond_30
+ 
+     const/4 v0, -0x1
+ 
+@@ -2029,7 +2037,7 @@
+ 
+     goto :goto_3
  
 -    :cond_31
 +    :cond_30
-     move v14, v15
+     const/4 v0, -0x1
  
-     :goto_7
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
+     move v1, v0
+@@ -2041,11 +2049,11 @@
  
--    goto/16 :goto_32
-+    goto/16 :goto_31
+     invoke-virtual {v7, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
  
-     :pswitch_4
-     invoke-static {}, Lcom/samsung/android/settings/Rune;->isSupportBixby()Z
+-    if-ne v0, v1, :cond_32
++    if-ne v0, v1, :cond_31
  
-     move-result v2
- 
--    if-eqz v2, :cond_64
-+    if-eqz v2, :cond_62
- 
-     invoke-static/range {p1 .. p1}, Lcom/samsung/android/settings/asbase/utils/SoundUtils;->isBixbyVoiceEnable(Landroid/content/Context;)Z
- 
-     move-result v2
- 
--    if-eqz v2, :cond_64
-+    if-eqz v2, :cond_62
- 
-     invoke-static {v8}, Landroid/media/AudioSystem;->getDefaultStreamVolume(I)I
- 
-@@ -1687,24 +1671,24 @@
- 
-     invoke-virtual {v3, v1}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-ne v2, v0, :cond_32
-+    if-ne v2, v0, :cond_31
- 
-     const/4 v14, 0x1
- 
-     goto :goto_8
+     const/4 v2, 0x1
  
 -    :cond_32
 +    :cond_31
-     move v14, v15
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
-     :goto_8
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
+     return-object v7
+@@ -2067,11 +2075,11 @@
  
--    goto/16 :goto_32
-+    goto/16 :goto_31
+     invoke-virtual {v7, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
  
-     :pswitch_5
-     sget-boolean v0, Lcom/samsung/android/settings/asbase/rune/VibRune;->SUPPORT_SYNC_WITH_HAPTIC:Z
+-    if-ne v1, v0, :cond_33
++    if-ne v1, v0, :cond_32
  
--    if-eqz v0, :cond_64
-+    if-eqz v0, :cond_62
- 
-     const-string/jumbo v0, "sync_vibration_with_notification"
- 
-@@ -1718,13 +1702,13 @@
- 
-     invoke-virtual {v3, v1}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-nez v0, :cond_33
-+    if-nez v0, :cond_32
- 
-     const/4 v14, 0x1
- 
-     goto :goto_9
+     const/4 v2, 0x1
  
 -    :cond_33
 +    :cond_32
-     move v14, v15
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
-     :goto_9
-@@ -1746,7 +1730,7 @@
+     return-object v7
+@@ -2079,7 +2087,7 @@
+     :pswitch_5
+     sget-boolean v0, Lcom/samsung/android/settings/asbase/rune/VibRune;->SUPPORT_SYNC_WITH_HAPTIC:Z
  
-     invoke-static {v11, v0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
+-    if-eqz v0, :cond_65
++    if-eqz v0, :cond_63
  
--    goto/16 :goto_32
-+    goto/16 :goto_31
+     const-string/jumbo v0, "sync_vibration_with_notification"
  
-     :pswitch_6
-     const-string/jumbo v0, "ringtone_vibration_sep_index_2"
-@@ -1755,24 +1739,24 @@
+@@ -2093,11 +2101,11 @@
  
-     move-result v0
+     invoke-virtual {v7, v1, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
  
 -    if-nez v0, :cond_34
 +    if-nez v0, :cond_33
  
-     invoke-static {v11, v10}, Landroid/util/Log;->w(Ljava/lang/String;Ljava/lang/String;)I
+     const/4 v2, 0x1
  
 -    :cond_34
 +    :cond_33
-     invoke-static {v0}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
-     move-result-object v1
- 
-     invoke-virtual {v3, v1}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-ne v12, v0, :cond_35
-+    if-ne v12, v0, :cond_34
- 
-     const/4 v14, 0x1
- 
-     goto :goto_a
- 
--    :cond_35
-+    :cond_34
-     move v14, v15
- 
-     :goto_a
-@@ -1794,7 +1778,7 @@
- 
-     invoke-static {v11, v0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
-     :pswitch_7
-     const-string/jumbo v0, "voip_extra_volume"
-@@ -1809,13 +1793,13 @@
- 
-     invoke-virtual {v3, v1}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-nez v0, :cond_36
-+    if-nez v0, :cond_35
- 
-     const/4 v14, 0x1
- 
-     goto :goto_b
- 
--    :cond_36
-+    :cond_35
-     move v14, v15
- 
-     :goto_b
-@@ -1837,12 +1821,12 @@
- 
-     invoke-static {v11, v0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
-     :pswitch_8
-     sget-boolean v0, Lcom/samsung/android/settings/asbase/rune/VibRune;->SUPPORT_SYNC_WITH_HAPTIC:Z
- 
--    if-eqz v0, :cond_64
-+    if-eqz v0, :cond_62
- 
-     const-string/jumbo v0, "sync_vibration_with_ringtone"
- 
-@@ -1856,13 +1840,13 @@
- 
-     invoke-virtual {v3, v1}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-nez v0, :cond_37
-+    if-nez v0, :cond_36
- 
-     const/4 v14, 0x1
- 
-     goto :goto_c
- 
--    :cond_37
-+    :cond_36
-     move v14, v15
- 
-     :goto_c
-@@ -1884,7 +1868,7 @@
- 
-     invoke-static {v11, v0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
-     :pswitch_9
-     const/4 v2, 0x3
-@@ -1903,24 +1887,24 @@
- 
-     invoke-virtual {v3, v1}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-ne v4, v0, :cond_38
-+    if-ne v4, v0, :cond_37
- 
-     const/4 v14, 0x1
- 
-     goto :goto_d
- 
--    :cond_38
-+    :cond_37
-     move v14, v15
- 
-     :goto_d
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
-     :pswitch_a
-     sget-boolean v0, Lcom/samsung/android/settings/asbase/rune/AudioRune;->SUPPORT_MULTI_SOUND_SELECT_MULTIPLE_APPLICATIONS:Z
- 
--    if-nez v0, :cond_64
-+    if-nez v0, :cond_62
- 
-     new-instance v0, Lcom/samsung/android/media/SemSoundAssistantManager;
- 
-@@ -1930,7 +1914,7 @@
+     new-instance v1, Ljava/lang/StringBuilder;
+@@ -2123,11 +2131,11 @@
  
      move-result v0
  
--    if-eqz v0, :cond_39
-+    if-eqz v0, :cond_38
+-    if-nez v0, :cond_35
++    if-nez v0, :cond_34
  
-     const-string/jumbo v0, "multisound_app"
+     invoke-static {v4, v13}, Landroid/util/Log;->w(Ljava/lang/String;Ljava/lang/String;)I
  
-@@ -1938,24 +1922,24 @@
+-    :cond_35
++    :cond_34
+     invoke-static {v0}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
  
-     move-result-object v16
+     move-result-object v1
+@@ -2136,11 +2144,11 @@
  
--    :cond_39
-+    :cond_38
-     move-object/from16 v0, v16
+     const v1, 0xc373
  
-     invoke-virtual {v3, v0}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
+-    if-ne v1, v0, :cond_36
++    if-ne v1, v0, :cond_35
  
--    if-nez v0, :cond_3a
-+    if-nez v0, :cond_39
+     const/4 v2, 0x1
  
-     const/4 v14, 0x1
+-    :cond_36
++    :cond_35
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
-     goto :goto_e
- 
--    :cond_3a
-+    :cond_39
-     move v14, v15
- 
-     :goto_e
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
-     :pswitch_b
-     invoke-static {}, Lcom/samsung/android/settings/asbase/utils/VibUtils;->isVibrateWhileRingingActivatedAsDefault()Z
-@@ -1974,19 +1958,19 @@
- 
-     invoke-virtual {v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-ne v0, v1, :cond_3b
-+    if-ne v0, v1, :cond_3a
- 
-     const/4 v14, 0x1
- 
-     goto :goto_f
- 
--    :cond_3b
-+    :cond_3a
-     move v14, v15
- 
-     :goto_f
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
-     :pswitch_c
-     const-string v0, "charging_sounds_enabled"
-@@ -2003,19 +1987,19 @@
- 
-     invoke-virtual {v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-ne v1, v0, :cond_3c
-+    if-ne v1, v0, :cond_3b
- 
-     move v14, v1
- 
-     goto :goto_10
- 
--    :cond_3c
-+    :cond_3b
-     move v14, v15
- 
-     :goto_10
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
-     :pswitch_d
-     const/4 v1, 0x1
-@@ -2032,19 +2016,19 @@
- 
-     invoke-virtual {v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-ne v1, v0, :cond_3d
-+    if-ne v1, v0, :cond_3c
- 
-     const/4 v14, 0x1
- 
-     goto :goto_11
- 
--    :cond_3d
-+    :cond_3c
-     move v14, v15
- 
-     :goto_11
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
-     :pswitch_e
-     invoke-static/range {p1 .. p1}, Lcom/samsung/android/settings/asbase/utils/VibUtils;->hasSystemVibrationMenu(Landroid/content/Context;)Z
-@@ -2063,24 +2047,24 @@
- 
-     invoke-virtual {v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-ne v0, v1, :cond_3e
-+    if-ne v0, v1, :cond_3d
- 
-     const/4 v14, 0x1
- 
-     goto :goto_12
- 
--    :cond_3e
-+    :cond_3d
-     move v14, v15
- 
-     :goto_12
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
-     :pswitch_f
-     sget-boolean v0, Lcom/samsung/android/settings/asbase/rune/VibRune;->SUPPORT_SYNC_WITH_HAPTIC:Z
- 
--    if-eqz v0, :cond_64
-+    if-eqz v0, :cond_62
- 
-     const-string/jumbo v0, "sync_vibration_with_ringtone_2"
- 
-@@ -2094,13 +2078,13 @@
- 
-     invoke-virtual {v3, v1}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-nez v0, :cond_3f
-+    if-nez v0, :cond_3e
- 
-     const/4 v14, 0x1
- 
-     goto :goto_13
- 
--    :cond_3f
-+    :cond_3e
-     move v14, v15
- 
-     :goto_13
-@@ -2122,14 +2106,14 @@
- 
-     invoke-static {v11, v0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
-     :pswitch_10
-     invoke-static {v4, v14, v13}, Landroid/provider/Settings$Global;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
- 
-     move-result v2
- 
--    if-ne v2, v13, :cond_64
-+    if-ne v2, v13, :cond_62
- 
-     const/4 v2, 0x5
- 
-@@ -2147,19 +2131,19 @@
- 
-     invoke-virtual {v3, v1}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-ne v4, v0, :cond_40
-+    if-ne v4, v0, :cond_3f
- 
-     const/4 v14, 0x1
- 
-     goto :goto_14
- 
--    :cond_40
-+    :cond_3f
-     move v14, v15
- 
-     :goto_14
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
-     :pswitch_11
-     const-string/jumbo v0, "wifispeaker_chromecast_mode_enabled"
-@@ -2174,19 +2158,19 @@
- 
-     invoke-virtual {v3, v1}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-nez v0, :cond_41
-+    if-nez v0, :cond_40
- 
-     const/4 v14, 0x1
- 
-     goto :goto_15
- 
--    :cond_41
-+    :cond_40
-     move v14, v15
- 
-     :goto_15
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
-     :pswitch_12
-     invoke-virtual/range {p1 .. p1}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
-@@ -2209,7 +2193,7 @@
- 
-     const-string v8, "content://com.android.settings.personalvibration.PersonalVibrationProvider/"
- 
--    if-eqz v2, :cond_45
-+    if-eqz v2, :cond_44
- 
-     const-string/jumbo v1, "ringtone_vibration_sep_index"
- 
-@@ -2217,16 +2201,16 @@
+     new-instance v1, Ljava/lang/StringBuilder;
+@@ -2164,13 +2172,13 @@
  
      move-result v1
  
--    if-nez v1, :cond_42
-+    if-nez v1, :cond_41
+-    if-eqz v1, :cond_65
++    if-eqz v1, :cond_63
  
-     invoke-static {v11, v10}, Landroid/util/Log;->w(Ljava/lang/String;Ljava/lang/String;)I
+     invoke-static {v0}, Lcom/samsung/android/settings/asbase/utils/SoundUtils;->isUseGlobalAlarmVolume(Landroid/content/Context;)Z
+ 
+     move-result v1
+ 
+-    if-eqz v1, :cond_65
++    if-eqz v1, :cond_63
+ 
+     invoke-static/range {v19 .. v19}, Landroid/media/AudioSystem;->getDefaultStreamVolume(I)I
+ 
+@@ -2188,11 +2196,11 @@
+ 
+     invoke-virtual {v7, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
+ 
+-    if-ne v1, v0, :cond_37
++    if-ne v1, v0, :cond_36
+ 
+     const/4 v2, 0x1
+ 
+-    :cond_37
++    :cond_36
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
+ 
+     return-object v7
+@@ -2210,11 +2218,11 @@
+ 
+     invoke-virtual {v7, v1, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
+ 
+-    if-nez v0, :cond_38
++    if-nez v0, :cond_37
+ 
+     const/4 v2, 0x1
+ 
+-    :cond_38
++    :cond_37
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
+ 
+     new-instance v1, Ljava/lang/StringBuilder;
+@@ -2236,7 +2244,7 @@
+     :pswitch_9
+     sget-boolean v0, Lcom/samsung/android/settings/asbase/rune/VibRune;->SUPPORT_SYNC_WITH_HAPTIC:Z
+ 
+-    if-eqz v0, :cond_65
++    if-eqz v0, :cond_63
+ 
+     const-string/jumbo v0, "sync_vibration_with_ringtone"
+ 
+@@ -2250,11 +2258,11 @@
+ 
+     invoke-virtual {v7, v1, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
+ 
+-    if-nez v0, :cond_39
++    if-nez v0, :cond_38
+ 
+     const/4 v2, 0x1
+ 
+-    :cond_39
++    :cond_38
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
+ 
+     new-instance v1, Ljava/lang/StringBuilder;
+@@ -2290,11 +2298,11 @@
+ 
+     invoke-virtual {v7, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
+ 
+-    if-ne v1, v0, :cond_3a
++    if-ne v1, v0, :cond_39
+ 
+     const/4 v2, 0x1
+ 
+-    :cond_3a
++    :cond_39
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
+ 
+     return-object v7
+@@ -2302,7 +2310,7 @@
+     :pswitch_b
+     sget-boolean v1, Lcom/samsung/android/settings/asbase/rune/AudioRune;->SUPPORT_MULTI_SOUND_SELECT_MULTIPLE_APPLICATIONS:Z
+ 
+-    if-nez v1, :cond_65
++    if-nez v1, :cond_63
+ 
+     new-instance v1, Lcom/samsung/android/media/SemSoundAssistantManager;
+ 
+@@ -2312,22 +2320,22 @@
+ 
+     move-result v0
+ 
+-    if-eqz v0, :cond_3b
++    if-eqz v0, :cond_3a
+ 
+     invoke-static {v8, v12}, Landroid/provider/Settings$System;->getString(Landroid/content/ContentResolver;Ljava/lang/String;)Ljava/lang/String;
+ 
+     move-result-object v16
+ 
+-    :cond_3b
++    :cond_3a
+     move-object/from16 v0, v16
+ 
+     invoke-virtual {v7, v0, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
+ 
+-    if-nez v0, :cond_3c
++    if-nez v0, :cond_3b
+ 
+     const/4 v2, 0x1
+ 
+-    :cond_3c
++    :cond_3b
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
+ 
+     return-object v7
+@@ -2337,7 +2345,7 @@
+ 
+     move-result v0
+ 
+-    if-nez v0, :cond_3e
++    if-nez v0, :cond_3d
+ 
+     invoke-static {}, Lcom/android/settings/Utils;->getSalesCode()Ljava/lang/String;
+ 
+@@ -2349,16 +2357,16 @@
+ 
+     move-result v0
+ 
+-    if-eqz v0, :cond_3d
++    if-eqz v0, :cond_3c
+ 
+     goto :goto_4
+ 
+-    :cond_3d
++    :cond_3c
+     move v0, v2
+ 
+     goto :goto_5
+ 
+-    :cond_3e
++    :cond_3d
+     :goto_4
+     const/4 v0, 0x1
+ 
+@@ -2375,11 +2383,11 @@
+ 
+     invoke-virtual {v7, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
+ 
+-    if-ne v0, v1, :cond_3f
++    if-ne v0, v1, :cond_3e
+ 
+     const/4 v2, 0x1
+ 
+-    :cond_3f
++    :cond_3e
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
+ 
+     return-object v7
+@@ -2399,11 +2407,11 @@
+ 
+     invoke-virtual {v7, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
+ 
+-    if-ne v1, v0, :cond_40
++    if-ne v1, v0, :cond_3f
+ 
+     move v2, v1
+ 
+-    :cond_40
++    :cond_3f
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
+ 
+     return-object v7
+@@ -2423,11 +2431,11 @@
+ 
+     invoke-virtual {v7, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
+ 
+-    if-ne v1, v0, :cond_41
++    if-ne v1, v0, :cond_40
+ 
+     const/4 v2, 0x1
+ 
+-    :cond_41
++    :cond_40
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
+ 
+     return-object v7
+@@ -2449,11 +2457,11 @@
+ 
+     invoke-virtual {v7, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
+ 
+-    if-ne v0, v1, :cond_42
++    if-ne v0, v1, :cond_41
+ 
+     const/4 v2, 0x1
  
 -    :cond_42
 +    :cond_41
-     invoke-static {v1}, Lcom/samsung/android/settings/asbase/vibration/PatternRestoreHelper;->getLegacyIdBySepIndex(I)I
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
-     move-result v2
+     return-object v7
+@@ -2461,7 +2469,7 @@
+     :pswitch_10
+     sget-boolean v0, Lcom/samsung/android/settings/asbase/rune/VibRune;->SUPPORT_SYNC_WITH_HAPTIC:Z
  
--    if-ne v2, v6, :cond_43
-+    if-ne v2, v6, :cond_42
+-    if-eqz v0, :cond_65
++    if-eqz v0, :cond_63
  
-     new-instance v2, Ljava/lang/StringBuilder;
+     const-string/jumbo v0, "sync_vibration_with_ringtone_2"
  
-@@ -2250,7 +2234,7 @@
+@@ -2475,11 +2483,11 @@
+ 
+     invoke-virtual {v7, v1, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
+ 
+-    if-nez v0, :cond_43
++    if-nez v0, :cond_42
  
      const/4 v2, 0x1
  
 -    :cond_43
 +    :cond_42
-     new-instance v4, Ljava/lang/StringBuilder;
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
-     invoke-direct {v4}, Ljava/lang/StringBuilder;-><init>()V
-@@ -2283,15 +2267,15 @@
- 
-     move-result v0
- 
--    if-eqz v0, :cond_44
-+    if-eqz v0, :cond_43
- 
--    if-ne v12, v1, :cond_44
-+    if-ne v12, v1, :cond_43
- 
-     const/4 v14, 0x1
- 
-     goto :goto_16
- 
--    :cond_44
-+    :cond_43
-     move v14, v15
- 
-     :goto_16
-@@ -2319,9 +2303,9 @@
- 
-     invoke-static {v11, v0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
--    :cond_45
-+    :cond_44
-     const/16 v2, 0x2f
- 
-     invoke-virtual {v1, v2}, Ljava/lang/String;->lastIndexOf(I)I
-@@ -2376,7 +2360,7 @@
- 
-     invoke-static {v11, v0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
-     :pswitch_13
-     const/16 v2, 0x100
-@@ -2397,26 +2381,26 @@
- 
-     invoke-virtual {v3, v0}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
-     :pswitch_14
-     invoke-static {v4, v14, v13}, Landroid/provider/Settings$Global;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
- 
-     move-result v2
- 
--    if-ne v2, v13, :cond_64
-+    if-ne v2, v13, :cond_62
- 
-     invoke-static/range {p1 .. p1}, Lcom/android/settings/Utils;->isVoiceCapable(Landroid/content/Context;)Z
- 
-     move-result v2
- 
--    if-eqz v2, :cond_64
-+    if-eqz v2, :cond_62
- 
-     invoke-static {}, Lcom/samsung/android/settings/Rune;->isDomesticModel()Z
- 
-     move-result v2
- 
--    if-eqz v2, :cond_64
-+    if-eqz v2, :cond_62
- 
-     const/16 v2, 0x8
- 
-@@ -2434,24 +2418,24 @@
- 
-     invoke-virtual {v3, v1}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-ne v4, v0, :cond_46
-+    if-ne v4, v0, :cond_45
- 
-     const/4 v14, 0x1
- 
-     goto :goto_17
- 
--    :cond_46
-+    :cond_45
-     move v14, v15
- 
-     :goto_17
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
-     :pswitch_15
-     sget-boolean v0, Lcom/samsung/android/settings/asbase/rune/VibRune;->SUPPORT_SEC_VIBRATION_PICKER:Z
- 
--    if-eqz v0, :cond_64
-+    if-eqz v0, :cond_62
- 
-     invoke-virtual/range {p1 .. p1}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
- 
-@@ -2497,15 +2481,15 @@
- 
-     move-result v0
- 
--    if-eqz v0, :cond_47
-+    if-eqz v0, :cond_46
- 
--    if-ne v6, v2, :cond_47
-+    if-ne v6, v2, :cond_46
- 
-     const/4 v14, 0x1
- 
-     goto :goto_18
- 
--    :cond_47
-+    :cond_46
-     move v14, v15
- 
-     :goto_18
-@@ -2533,7 +2517,7 @@
- 
-     invoke-static {v11, v0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
-     :pswitch_16
-     invoke-virtual/range {p1 .. p1}, Landroid/content/Context;->getContentResolver()Landroid/content/ContentResolver;
-@@ -2552,18 +2536,18 @@
- 
-     const-string v2, "Galaxy"
- 
--    if-eqz v1, :cond_48
-+    if-eqz v1, :cond_47
- 
-     move-object v0, v2
- 
--    :cond_48
-+    :cond_47
-     const-string v1, "Open_theme"
- 
-     invoke-static {v0, v1}, Landroid/text/TextUtils;->equals(Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Z
+     new-instance v1, Ljava/lang/StringBuilder;
+@@ -2503,7 +2511,7 @@
  
      move-result v1
  
--    if-nez v1, :cond_64
-+    if-nez v1, :cond_62
+-    if-ne v1, v14, :cond_65
++    if-ne v1, v14, :cond_63
  
-     const-string v1, "Custom"
+     invoke-static/range {v18 .. v18}, Landroid/media/AudioSystem;->getDefaultStreamVolume(I)I
  
-@@ -2571,7 +2555,7 @@
+@@ -2521,11 +2529,11 @@
  
-     move-result v1
+     invoke-virtual {v7, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
  
--    if-nez v1, :cond_64
-+    if-nez v1, :cond_62
- 
-     invoke-virtual {v3, v0}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
-@@ -2581,14 +2565,14 @@
- 
-     invoke-virtual {v3, v0}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
-     :pswitch_17
-     invoke-static {v4, v14, v13}, Landroid/provider/Settings$Global;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
- 
-     move-result v2
- 
--    if-ne v2, v13, :cond_64
-+    if-ne v2, v13, :cond_62
+-    if-ne v1, v0, :cond_44
++    if-ne v1, v0, :cond_43
  
      const/4 v2, 0x1
  
-@@ -2606,19 +2590,19 @@
+-    :cond_44
++    :cond_43
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
-     invoke-virtual {v3, v1}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
+     return-object v7
+@@ -2543,11 +2551,11 @@
  
--    if-ne v4, v0, :cond_49
-+    if-ne v4, v0, :cond_48
+     invoke-virtual {v7, v1, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
  
-     const/4 v14, 0x1
+-    if-nez v0, :cond_45
++    if-nez v0, :cond_44
  
-     goto :goto_19
+     const/4 v2, 0x1
+ 
+-    :cond_45
++    :cond_44
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
+ 
+     return-object v7
+@@ -2573,7 +2581,7 @@
+ 
+     const-string v5, "content://com.android.settings.personalvibration.PersonalVibrationProvider/"
+ 
+-    if-eqz v3, :cond_4b
++    if-eqz v3, :cond_4a
+ 
+     const-string/jumbo v1, "ringtone_vibration_sep_index"
+ 
+@@ -2581,11 +2589,11 @@
+ 
+     move-result v1
+ 
+-    if-nez v1, :cond_46
++    if-nez v1, :cond_45
+ 
+     invoke-static {v4, v13}, Landroid/util/Log;->w(Ljava/lang/String;Ljava/lang/String;)I
+ 
+-    :cond_46
++    :cond_45
+     sget-object v3, Lcom/samsung/android/settings/asbase/vibration/PatternRestoreHelper;->sPatternLookupTable:Ljava/util/HashMap;
+ 
+     invoke-virtual {v3}, Ljava/util/HashMap;->keySet()Ljava/util/Set;
+@@ -2596,12 +2604,12 @@
+ 
+     move-result-object v3
+ 
+-    :cond_47
++    :cond_46
+     invoke-interface {v3}, Ljava/util/Iterator;->hasNext()Z
+ 
+     move-result v6
+ 
+-    if-eqz v6, :cond_48
++    if-eqz v6, :cond_47
+ 
+     invoke-interface {v3}, Ljava/util/Iterator;->next()Ljava/lang/Object;
+ 
+@@ -2619,7 +2627,7 @@
+ 
+     iget v8, v8, Lcom/samsung/android/settings/asbase/vibration/PatternRestoreHelper$PatternLookupInfo;->mSepIndex:I
+ 
+-    if-ne v1, v8, :cond_47
++    if-ne v1, v8, :cond_46
+ 
+     invoke-virtual {v6}, Ljava/lang/Integer;->intValue()I
+ 
+@@ -2630,13 +2638,13 @@
+ 
+     goto :goto_7
+ 
+-    :cond_48
++    :cond_47
+     const/4 v3, -0x1
+ 
+     goto :goto_6
+ 
+     :goto_7
+-    if-ne v3, v6, :cond_49
++    if-ne v3, v6, :cond_48
+ 
+     new-instance v3, Ljava/lang/StringBuilder;
+ 
+@@ -2658,7 +2666,7 @@
+ 
+     const/4 v3, 0x1
  
 -    :cond_49
 +    :cond_48
-     move v14, v15
+     new-instance v6, Ljava/lang/StringBuilder;
  
-     :goto_19
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
-     :pswitch_18
-     const-string/jumbo v0, "volumelimit_set_password"
-@@ -2627,7 +2611,7 @@
+     invoke-direct {v6, v5}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+@@ -2689,15 +2697,15 @@
  
      move-result v0
  
 -    if-eqz v0, :cond_4a
 +    if-eqz v0, :cond_49
  
-     const-string/jumbo v0, "volumelimit_secure_password"
+     const v0, 0xc373
  
-@@ -2635,24 +2619,24 @@
+-    if-ne v0, v1, :cond_4a
++    if-ne v0, v1, :cond_49
  
-     move-result-object v16
+     const/4 v2, 0x1
  
 -    :cond_4a
 +    :cond_49
-     move-object/from16 v0, v16
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
-     invoke-virtual {v3, v0}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
+     new-instance v0, Ljava/lang/StringBuilder;
+@@ -2714,7 +2722,7 @@
  
--    if-nez v0, :cond_4b
-+    if-nez v0, :cond_4a
- 
-     const/4 v14, 0x1
- 
-     goto :goto_1a
+     return-object v7
  
 -    :cond_4b
 +    :cond_4a
-     move v14, v15
+     const/16 v3, 0x2f
  
-     :goto_1a
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
-     :pswitch_19
-     invoke-static/range {p1 .. p1}, Lcom/samsung/android/settings/asbase/utils/VibUtils;->isSupportDcHaptic(Landroid/content/Context;)Z
-@@ -2661,7 +2645,7 @@
- 
-     const-string/jumbo v1, "supportDC"
- 
--    if-eqz v0, :cond_4c
-+    if-eqz v0, :cond_4b
- 
-     sget-object v0, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
- 
-@@ -2671,7 +2655,7 @@
- 
-     goto :goto_1b
- 
--    :cond_4c
-+    :cond_4b
-     sget-object v0, Ljava/lang/Boolean;->FALSE:Ljava/lang/Boolean;
- 
-     invoke-virtual {v3, v1, v0}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/String;Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
-@@ -2689,19 +2673,19 @@
- 
-     invoke-virtual {v3, v1}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-ne v13, v0, :cond_4d
-+    if-ne v13, v0, :cond_4c
- 
-     const/4 v14, 0x1
- 
-     goto :goto_1c
- 
--    :cond_4d
-+    :cond_4c
-     move v14, v15
- 
-     :goto_1c
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
-     :pswitch_1a
-     invoke-static {}, Lcom/samsung/android/settings/Rune;->getSalesCode()Ljava/lang/String;
-@@ -2714,7 +2698,7 @@
+     invoke-virtual {v1, v3}, Ljava/lang/String;->lastIndexOf(I)I
+@@ -2793,19 +2801,19 @@
  
      move-result v1
  
--    if-nez v1, :cond_4f
-+    if-nez v1, :cond_4e
+-    if-ne v1, v14, :cond_65
++    if-ne v1, v14, :cond_63
  
-     const-string v1, "AIO"
+     invoke-static {v0}, Lcom/android/settings/Utils;->isVoiceCapable(Landroid/content/Context;)Z
  
-@@ -2722,16 +2706,16 @@
+     move-result v1
+ 
+-    if-eqz v1, :cond_65
++    if-eqz v1, :cond_63
+ 
+     invoke-static {}, Lcom/samsung/android/settings/Rune;->isDomesticModel()Z
+ 
+     move-result v1
+ 
+-    if-eqz v1, :cond_65
++    if-eqz v1, :cond_63
+ 
+     invoke-static/range {p2 .. p2}, Landroid/media/AudioSystem;->getDefaultStreamVolume(I)I
+ 
+@@ -2823,11 +2831,11 @@
+ 
+     invoke-virtual {v7, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
+ 
+-    if-ne v1, v0, :cond_4c
++    if-ne v1, v0, :cond_4b
+ 
+     const/4 v2, 0x1
+ 
+-    :cond_4c
++    :cond_4b
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
+ 
+     return-object v7
+@@ -2835,7 +2843,7 @@
+     :pswitch_16
+     sget-boolean v1, Lcom/samsung/android/settings/asbase/rune/VibRune;->SUPPORT_SEC_VIBRATION_PICKER:Z
+ 
+-    if-eqz v1, :cond_65
++    if-eqz v1, :cond_63
+ 
+     invoke-virtual {v0}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
+ 
+@@ -2881,13 +2889,13 @@
  
      move-result v0
  
--    if-eqz v0, :cond_4e
-+    if-eqz v0, :cond_4d
+-    if-eqz v0, :cond_4d
++    if-eqz v0, :cond_4c
  
-     goto :goto_1d
+-    if-ne v5, v3, :cond_4d
++    if-ne v5, v3, :cond_4c
+ 
+     const/4 v2, 0x1
+ 
+-    :cond_4d
++    :cond_4c
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
+ 
+     new-instance v0, Ljava/lang/StringBuilder;
+@@ -2921,18 +2929,18 @@
+ 
+     const-string v3, "Galaxy"
+ 
+-    if-eqz v1, :cond_4e
++    if-eqz v1, :cond_4d
+ 
+     move-object v0, v3
  
 -    :cond_4e
 +    :cond_4d
-     const/4 v0, 0x1
+     const-string v1, "Open_theme"
  
-     goto :goto_1e
+     invoke-static {v0, v1}, Landroid/text/TextUtils;->equals(Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Z
+ 
+     move-result v1
+ 
+-    if-nez v1, :cond_65
++    if-nez v1, :cond_63
+ 
+     const-string v1, "Custom"
+ 
+@@ -2940,7 +2948,7 @@
+ 
+     move-result v1
+ 
+-    if-nez v1, :cond_65
++    if-nez v1, :cond_63
+ 
+     invoke-virtual {v7, v0, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
+ 
+@@ -2957,7 +2965,7 @@
+ 
+     move-result v1
+ 
+-    if-ne v1, v14, :cond_65
++    if-ne v1, v14, :cond_63
+ 
+     const/4 v1, 0x1
+ 
+@@ -2975,11 +2983,11 @@
+ 
+     invoke-virtual {v7, v1, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
+ 
+-    if-ne v3, v0, :cond_4f
++    if-ne v3, v0, :cond_4e
+ 
+     const/4 v2, 0x1
  
 -    :cond_4f
 +    :cond_4e
-     :goto_1d
-     move v0, v15
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
-@@ -2748,19 +2732,19 @@
+     return-object v7
+@@ -2991,7 +2999,7 @@
  
-     invoke-virtual {v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
+     move-result v0
  
--    if-ne v0, v1, :cond_50
-+    if-ne v0, v1, :cond_4f
+-    if-eqz v0, :cond_50
++    if-eqz v0, :cond_4f
  
-     const/4 v14, 0x1
+     const-string/jumbo v0, "volumelimit_secure_password"
  
-     goto :goto_1f
+@@ -2999,16 +3007,16 @@
+ 
+     move-result-object v16
  
 -    :cond_50
 +    :cond_4f
-     move v14, v15
+     move-object/from16 v0, v16
  
-     :goto_1f
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
-     :pswitch_1b
-     const-string/jumbo v0, "sound_effects_enabled"
-@@ -2775,19 +2759,19 @@
- 
-     invoke-virtual {v3, v1}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
+     invoke-virtual {v7, v0, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
  
 -    if-nez v0, :cond_51
 +    if-nez v0, :cond_50
  
-     const/4 v14, 0x1
- 
-     goto :goto_20
+     const/4 v2, 0x1
  
 -    :cond_51
 +    :cond_50
-     move v14, v15
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
-     :goto_20
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
+     return-object v7
+@@ -3020,7 +3028,7 @@
  
--    goto/16 :goto_32
-+    goto/16 :goto_31
+     const-string/jumbo v1, "supportDC"
  
-     :pswitch_1c
-     const-string v0, "SEM_VIBRATION_NOTIFICATION_INTENSITY"
-@@ -2804,19 +2788,19 @@
+-    if-eqz v0, :cond_52
++    if-eqz v0, :cond_51
  
-     invoke-virtual {v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
+     sget-object v0, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
  
--    if-ne v1, v0, :cond_52
-+    if-ne v1, v0, :cond_51
+@@ -3030,7 +3038,7 @@
  
-     const/4 v14, 0x1
- 
-     goto :goto_21
+     goto :goto_8
  
 -    :cond_52
 +    :cond_51
-     move v14, v15
+     sget-object v0, Ljava/lang/Boolean;->FALSE:Ljava/lang/Boolean;
  
-     :goto_21
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
+     invoke-virtual {v7, v0, v1}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
+@@ -3048,11 +3056,11 @@
  
--    goto/16 :goto_32
-+    goto/16 :goto_31
+     invoke-virtual {v7, v1, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
  
-     :pswitch_1d
-     invoke-virtual {v0, v13}, Lcom/samsung/android/settings/eternal/provider/items/SoundItem;->getDefaultNotificationTitle(I)Ljava/lang/String;
-@@ -2835,7 +2819,7 @@
+-    if-ne v14, v0, :cond_53
++    if-ne v14, v0, :cond_52
  
-     invoke-virtual {v3, v0}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
-     :pswitch_1e
-     invoke-static/range {p1 .. p1}, Lcom/samsung/android/settings/asbase/utils/VibUtils;->hasSystemVibrationMenu(Landroid/content/Context;)Z
-@@ -2854,24 +2838,24 @@
- 
-     invoke-virtual {v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-ne v0, v1, :cond_53
-+    if-ne v0, v1, :cond_52
- 
-     const/4 v14, 0x1
- 
-     goto :goto_22
+     const/4 v2, 0x1
  
 -    :cond_53
 +    :cond_52
-     move v14, v15
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
-     :goto_22
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
+     return-object v7
+@@ -3070,7 +3078,7 @@
  
--    goto/16 :goto_32
-+    goto/16 :goto_31
+     move-result v1
  
-     :pswitch_1f
-     sget-boolean v0, Lcom/samsung/android/settings/asbase/rune/AudioRune;->SUPPORT_MULTI_SOUND_SELECT_MULTIPLE_APPLICATIONS:Z
+-    if-nez v1, :cond_55
++    if-nez v1, :cond_54
  
--    if-nez v0, :cond_64
-+    if-nez v0, :cond_62
+     const-string v1, "AIO"
  
-     new-instance v0, Lcom/samsung/android/media/SemSoundAssistantManager;
- 
-@@ -2881,7 +2865,7 @@
+@@ -3078,16 +3086,16 @@
  
      move-result v0
  
 -    if-eqz v0, :cond_54
 +    if-eqz v0, :cond_53
  
-     const-string/jumbo v0, "multisound_devicetype"
- 
-@@ -2891,7 +2875,7 @@
- 
-     goto :goto_23
+     goto :goto_9
  
 -    :cond_54
 +    :cond_53
-     move v0, v6
+     const/4 v0, 0x1
  
-     :goto_23
-@@ -2901,98 +2885,84 @@
- 
-     invoke-virtual {v3, v1}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-ne v6, v0, :cond_55
-+    if-ne v6, v0, :cond_54
- 
-     const/4 v14, 0x1
- 
-     goto :goto_24
+     goto :goto_a
  
 -    :cond_55
 +    :cond_54
-     move v14, v15
+     :goto_9
+     move v0, v2
  
-     :goto_24
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
+@@ -3104,11 +3112,11 @@
  
--    goto/16 :goto_32
-+    goto/16 :goto_31
+     invoke-virtual {v7, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
  
-     :pswitch_20
--    const-string/jumbo v0, "vibration_sound_enabled"
--
--    invoke-static {v4, v0, v15}, Landroid/provider/Settings$System;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
-+    invoke-static/range {p1 .. p1}, Lcom/samsung/android/settings/asbase/utils/VibUtils;->hasSystemVibrationMenu(Landroid/content/Context;)Z
- 
-     move-result v0
- 
--    invoke-static {v0}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
-+    const-string v1, "dialing_keypad_vibrate"
- 
--    move-result-object v1
-+    invoke-static {v4, v1, v0}, Landroid/provider/Settings$System;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
- 
--    invoke-virtual {v3, v1}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
-+    move-result v1
-+
-+    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
-+
-+    move-result-object v2
-+
-+    invoke-virtual {v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-nez v0, :cond_56
+-    if-ne v0, v1, :cond_56
 +    if-ne v0, v1, :cond_55
  
-     const/4 v14, 0x1
- 
-     goto :goto_25
+     const/4 v2, 0x1
  
 -    :cond_56
 +    :cond_55
-     move v14, v15
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
-     :goto_25
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
+     return-object v7
+@@ -3126,11 +3134,11 @@
  
--    new-instance v1, Ljava/lang/StringBuilder;
--
--    invoke-direct {v1}, Ljava/lang/StringBuilder;-><init>()V
-+    goto/16 :goto_31
+     invoke-virtual {v7, v1, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
  
--    const-string v2, "backup vibration sound enabled value="
-+    :pswitch_21
-+    const-string v0, "VIB_RECVCALL_MAGNITUDE"
+-    if-nez v0, :cond_57
++    if-nez v0, :cond_56
  
--    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-+    const/4 v1, 0x5
+     const/4 v2, 0x1
  
--    invoke-virtual {v1, v0}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
-+    invoke-static {v4, v0, v1}, Landroid/provider/Settings$System;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
- 
--    invoke-virtual {v1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
-+    move-result v0
- 
--    move-result-object v0
-+    invoke-static {v0}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
- 
--    invoke-static {v11, v0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
-+    move-result-object v2
- 
--    goto/16 :goto_32
-+    invoke-virtual {v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    :pswitch_21
--    invoke-static/range {p1 .. p1}, Lcom/samsung/android/settings/asbase/utils/VibUtils;->hasSystemVibrationMenu(Landroid/content/Context;)Z
-+    if-ne v1, v0, :cond_56
- 
--    move-result v0
-+    const/4 v14, 0x1
- 
--    const-string v1, "dialing_keypad_vibrate"
-+    goto :goto_26
- 
--    invoke-static {v4, v1, v0}, Landroid/provider/Settings$System;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
--
--    move-result v1
--
--    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
--
--    move-result-object v2
--
--    invoke-virtual {v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
--
--    if-ne v0, v1, :cond_57
--
--    const/4 v14, 0x1
--
--    goto :goto_26
--
 -    :cond_57
 +    :cond_56
-     move v14, v15
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
-     :goto_26
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
+     return-object v7
+@@ -3150,11 +3158,11 @@
  
--    goto/16 :goto_32
-+    goto/16 :goto_31
+     invoke-virtual {v7, v1, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
  
-     :pswitch_22
--    const-string v0, "VIB_RECVCALL_MAGNITUDE"
-+    const-string v0, "dtmf_tone"
+-    if-ne v3, v0, :cond_58
++    if-ne v3, v0, :cond_57
  
--    const/4 v1, 0x5
-+    const/4 v1, 0x1
- 
-     invoke-static {v4, v0, v1}, Landroid/provider/Settings$System;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
- 
-@@ -3004,24 +2974,24 @@
- 
-     invoke-virtual {v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-ne v1, v0, :cond_58
-+    if-ne v1, v0, :cond_57
- 
-     const/4 v14, 0x1
- 
-     goto :goto_27
+     const/4 v2, 0x1
  
 -    :cond_58
 +    :cond_57
-     move v14, v15
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
-     :goto_27
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
+     return-object v7
+@@ -3195,11 +3203,11 @@
  
--    goto/16 :goto_32
-+    goto/16 :goto_31
+     invoke-virtual {v7, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
  
-     :pswitch_23
--    const-string v0, "dtmf_tone"
-+    const-string/jumbo v0, "media_vibration_intensity"
+-    if-ne v0, v1, :cond_59
++    if-ne v0, v1, :cond_58
  
--    const/4 v1, 0x1
-+    const/4 v1, 0x5
- 
-     invoke-static {v4, v0, v1}, Landroid/provider/Settings$System;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
- 
-@@ -3033,50 +3003,21 @@
- 
-     invoke-virtual {v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-ne v1, v0, :cond_59
-+    if-ne v1, v0, :cond_58
- 
-     const/4 v14, 0x1
- 
-     goto :goto_28
+     const/4 v2, 0x1
  
 -    :cond_59
 +    :cond_58
-     move v14, v15
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
-     :goto_28
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
+     return-object v7
+@@ -3207,7 +3215,7 @@
+     :pswitch_20
+     sget-boolean v1, Lcom/samsung/android/settings/asbase/rune/AudioRune;->SUPPORT_MULTI_SOUND_SELECT_MULTIPLE_APPLICATIONS:Z
  
--    goto/16 :goto_32
-+    goto/16 :goto_31
+-    if-nez v1, :cond_65
++    if-nez v1, :cond_63
  
-     :pswitch_24
--    const-string/jumbo v0, "media_vibration_intensity"
+     new-instance v1, Lcom/samsung/android/media/SemSoundAssistantManager;
+ 
+@@ -3217,7 +3225,7 @@
+ 
+     move-result v0
+ 
+-    if-eqz v0, :cond_5a
++    if-eqz v0, :cond_59
+ 
+     const/4 v0, -0x1
+ 
+@@ -3227,7 +3235,7 @@
+ 
+     goto :goto_b
+ 
+-    :cond_5a
++    :cond_59
+     const/4 v0, -0x1
+ 
+     move v1, v0
+@@ -3239,52 +3247,16 @@
+ 
+     invoke-virtual {v7, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
+ 
+-    if-ne v0, v1, :cond_5b
++    if-ne v0, v1, :cond_5a
+ 
+     const/4 v2, 0x1
+ 
+-    :cond_5b
++    :cond_5a
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
+ 
+     return-object v7
+ 
+     :pswitch_21
+-    const-string/jumbo v0, "vibration_sound_enabled"
 -
--    const/4 v1, 0x5
--
--    invoke-static {v4, v0, v1}, Landroid/provider/Settings$System;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
+-    invoke-static {v8, v0, v2}, Landroid/provider/Settings$System;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
 -
 -    move-result v0
 -
 -    invoke-static {v0}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
 -
--    move-result-object v2
+-    move-result-object v1
 -
--    invoke-virtual {v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
+-    invoke-virtual {v7, v1, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
 -
--    if-ne v1, v0, :cond_5a
+-    if-nez v0, :cond_5c
 -
--    const/4 v14, 0x1
+-    const/4 v2, 0x1
 -
--    goto :goto_29
--
--    :cond_5a
--    move v14, v15
--
--    :goto_29
--    invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
--
--    goto/16 :goto_32
--
--    :pswitch_25
-     invoke-static/range {p1 .. p1}, Lcom/samsung/android/settings/asbase/utils/VibUtils;->hasSystemVibrationMenu(Landroid/content/Context;)Z
- 
-     move-result v0
-@@ -3093,21 +3034,21 @@
- 
-     invoke-virtual {v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-ne v0, v1, :cond_5b
-+    if-ne v0, v1, :cond_59
- 
-     const/4 v14, 0x1
- 
--    goto :goto_2a
-+    goto :goto_29
- 
--    :cond_5b
-+    :cond_59
-     move v14, v15
- 
--    :goto_2a
-+    :goto_29
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
--    :pswitch_26
-+    :pswitch_25
-     invoke-static {v4, v14, v13}, Landroid/provider/Settings$Global;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
- 
-     move-result v0
-@@ -3118,24 +3059,24 @@
- 
-     invoke-virtual {v3, v1}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    if-ne v13, v0, :cond_5c
-+    if-ne v13, v0, :cond_5a
- 
-     const/4 v14, 0x1
- 
--    goto :goto_2b
-+    goto :goto_2a
- 
 -    :cond_5c
-+    :cond_5a
-     move v14, v15
- 
--    :goto_2b
-+    :goto_2a
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
- 
--    goto/16 :goto_32
-+    goto/16 :goto_31
- 
--    :pswitch_27
-+    :pswitch_26
-     sget-boolean v0, Lcom/samsung/android/settings/asbase/rune/AudioRune;->SUPPORT_MULTI_SOUND_SELECT_MULTIPLE_APPLICATIONS:Z
- 
--    if-eqz v0, :cond_64
-+    if-eqz v0, :cond_62
- 
-     new-instance v0, Lcom/samsung/android/media/SemSoundAssistantManager;
- 
-@@ -3145,7 +3086,7 @@
+-    invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
+-
+-    new-instance v1, Ljava/lang/StringBuilder;
+-
+-    const-string v2, "backup vibration sound enabled value="
+-
+-    invoke-direct {v1, v2}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
+-
+-    invoke-virtual {v1, v0}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
+-
+-    invoke-virtual {v1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+-
+-    move-result-object v0
+-
+-    invoke-static {v4, v0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
+-
+-    return-object v7
+-
+-    :pswitch_22
+     invoke-static {v0}, Lcom/samsung/android/settings/asbase/utils/VibUtils;->hasSystemVibrationMenu(Landroid/content/Context;)Z
  
      move-result v0
+@@ -3301,16 +3273,16 @@
  
--    if-eqz v0, :cond_5d
-+    if-eqz v0, :cond_5b
+     invoke-virtual {v7, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
  
-     const-string/jumbo v0, "multisound_app"
+-    if-ne v0, v1, :cond_5d
++    if-ne v0, v1, :cond_5b
  
-@@ -3153,26 +3094,26 @@
- 
-     move-result-object v16
+     const/4 v2, 0x1
  
 -    :cond_5d
 +    :cond_5b
-     move-object/from16 v0, v16
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
-     invoke-virtual {v3, v0}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
+     return-object v7
  
--    if-nez v0, :cond_5e
-+    if-nez v0, :cond_5c
+-    :pswitch_23
++    :pswitch_22
+     const-string v0, "VIB_RECVCALL_MAGNITUDE"
  
-     const/4 v14, 0x1
+     const/4 v3, 0x5
+@@ -3325,16 +3297,16 @@
  
--    goto :goto_2c
-+    goto :goto_2b
+     invoke-virtual {v7, v1, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
+ 
+-    if-ne v3, v0, :cond_5e
++    if-ne v3, v0, :cond_5c
+ 
+     const/4 v2, 0x1
  
 -    :cond_5e
 +    :cond_5c
-     move v14, v15
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
--    :goto_2c
-+    :goto_2b
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
+     return-object v7
  
--    goto/16 :goto_32
-+    goto/16 :goto_31
+-    :pswitch_24
++    :pswitch_23
+     const-string v0, "dtmf_tone"
  
--    :pswitch_28
-+    :pswitch_27
-     const-string v0, "SEM_VIBRATION_FORCE_TOUCH_INTENSITY"
+     const/4 v1, 0x1
+@@ -3349,16 +3321,16 @@
  
-     const/4 v1, 0x4
-@@ -3187,21 +3128,21 @@
- 
-     invoke-virtual {v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
+     invoke-virtual {v7, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
  
 -    if-ne v1, v0, :cond_5f
 +    if-ne v1, v0, :cond_5d
  
-     const/4 v14, 0x1
- 
--    goto :goto_2d
-+    goto :goto_2c
+     const/4 v2, 0x1
  
 -    :cond_5f
 +    :cond_5d
-     move v14, v15
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
--    :goto_2d
-+    :goto_2c
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
+     return-object v7
  
--    goto :goto_32
-+    goto :goto_31
+-    :pswitch_25
++    :pswitch_24
+     const-string v0, "media_vibration_intensity"
  
--    :pswitch_29
-+    :pswitch_28
-     invoke-static/range {p1 .. p1}, Lcom/samsung/android/settings/asbase/utils/VibUtils;->hasSystemVibrationMenu(Landroid/content/Context;)Z
+     const/4 v3, 0x5
+@@ -3373,16 +3345,16 @@
  
-     move-result v0
-@@ -3218,28 +3159,28 @@
+     invoke-virtual {v7, v1, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
  
-     invoke-virtual {v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
+-    if-ne v3, v0, :cond_60
++    if-ne v3, v0, :cond_5e
  
--    if-ne v0, v1, :cond_60
-+    if-ne v0, v1, :cond_5e
- 
-     const/4 v14, 0x1
- 
--    goto :goto_2e
-+    goto :goto_2d
+     const/4 v2, 0x1
  
 -    :cond_60
 +    :cond_5e
-     move v14, v15
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
--    :goto_2e
-+    :goto_2d
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
+     return-object v7
  
--    goto :goto_32
-+    goto :goto_31
- 
--    :pswitch_2a
-+    :pswitch_29
-     const-string/jumbo v0, "volumelimit_on"
- 
-     invoke-static {v4, v0, v15}, Landroid/provider/Settings$System;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
+-    :pswitch_26
++    :pswitch_25
+     invoke-static {v0}, Lcom/samsung/android/settings/asbase/utils/VibUtils;->hasSystemVibrationMenu(Landroid/content/Context;)Z
  
      move-result v0
+@@ -3399,16 +3371,16 @@
  
--    if-eqz v0, :cond_61
-+    if-eqz v0, :cond_5f
+     invoke-virtual {v7, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
  
-     const-string/jumbo v0, "volume_limiter_value"
+-    if-ne v0, v1, :cond_61
++    if-ne v0, v1, :cond_5f
  
-@@ -3249,33 +3190,33 @@
- 
-     move-result v0
- 
--    goto :goto_2f
-+    goto :goto_2e
+     const/4 v2, 0x1
  
 -    :cond_61
 +    :cond_5f
-     move v0, v15
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
--    :goto_2f
-+    :goto_2e
-     invoke-static {v0}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+     return-object v7
  
-     move-result-object v1
+-    :pswitch_27
++    :pswitch_26
+     invoke-static {v8, v6, v14}, Landroid/provider/Settings$Global;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
  
-     invoke-virtual {v3, v1}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
+     move-result v0
+@@ -3419,19 +3391,19 @@
  
--    if-nez v0, :cond_62
-+    if-nez v0, :cond_60
+     invoke-virtual {v7, v1, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
  
-     const/4 v14, 0x1
+-    if-ne v14, v0, :cond_62
++    if-ne v14, v0, :cond_60
  
--    goto :goto_30
-+    goto :goto_2f
+     const/4 v2, 0x1
  
 -    :cond_62
 +    :cond_60
-     move v14, v15
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
  
--    :goto_30
-+    :goto_2f
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
+     return-object v7
  
--    goto :goto_32
-+    goto :goto_31
+-    :pswitch_28
++    :pswitch_27
+     sget-boolean v1, Lcom/samsung/android/settings/asbase/rune/AudioRune;->SUPPORT_MULTI_SOUND_SELECT_MULTIPLE_APPLICATIONS:Z
  
--    :pswitch_2b
-+    :pswitch_2a
-     const-string/jumbo v0, "sip_key_feedback_sound"
+-    if-eqz v1, :cond_65
++    if-eqz v1, :cond_63
  
-     const/4 v1, 0x1
-@@ -3290,36 +3231,35 @@
+     new-instance v1, Lcom/samsung/android/media/SemSoundAssistantManager;
  
-     invoke-virtual {v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;)Lcom/samsung/android/lib/episode/Scene$Builder;
+@@ -3441,29 +3413,29 @@
  
--    if-ne v1, v0, :cond_63
-+    if-ne v1, v0, :cond_61
+     move-result v0
  
-     move v14, v1
+-    if-eqz v0, :cond_63
++    if-eqz v0, :cond_61
  
--    goto :goto_31
-+    goto :goto_30
+     invoke-static {v8, v12}, Landroid/provider/Settings$System;->getString(Landroid/content/ContentResolver;Ljava/lang/String;)Ljava/lang/String;
+ 
+     move-result-object v16
  
 -    :cond_63
 +    :cond_61
-     move v14, v15
+     move-object/from16 v0, v16
  
--    :goto_31
-+    :goto_30
-     invoke-virtual {v3, v14}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)Lcom/samsung/android/lib/episode/Scene$Builder;
+     invoke-virtual {v7, v0, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
+ 
+-    if-nez v0, :cond_64
++    if-nez v0, :cond_62
+ 
+     const/4 v2, 0x1
  
 -    :cond_64
--    :goto_32
 +    :cond_62
-+    :goto_31
-     return-object v3
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
+ 
+-    :cond_65
++    :cond_63
+     :goto_c
+     return-object v7
+ 
+-    :pswitch_29
++    :pswitch_28
+     const-string v0, "SEM_VIBRATION_FORCE_TOUCH_INTENSITY"
+ 
+     const/4 v3, 0x4
+@@ -3478,16 +3450,16 @@
+ 
+     invoke-virtual {v7, v1, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
+ 
+-    if-ne v3, v0, :cond_66
++    if-ne v3, v0, :cond_64
+ 
+     const/4 v2, 0x1
+ 
+-    :cond_66
++    :cond_64
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
+ 
+     return-object v7
+ 
+-    :pswitch_2a
++    :pswitch_29
+     invoke-static {v0}, Lcom/samsung/android/settings/asbase/utils/VibUtils;->hasSystemVibrationMenu(Landroid/content/Context;)Z
+ 
+     move-result v0
+@@ -3504,23 +3476,23 @@
+ 
+     invoke-virtual {v7, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
+ 
+-    if-ne v0, v1, :cond_67
++    if-ne v0, v1, :cond_65
+ 
+     const/4 v2, 0x1
+ 
+-    :cond_67
++    :cond_65
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
+ 
+     return-object v7
+ 
+-    :pswitch_2b
++    :pswitch_2a
+     const-string/jumbo v0, "volumelimit_on"
+ 
+     invoke-static {v8, v0, v2}, Landroid/provider/Settings$System;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
+ 
+     move-result v0
+ 
+-    if-eqz v0, :cond_68
++    if-eqz v0, :cond_66
+ 
+     const-string/jumbo v0, "volume_limiter_value"
+ 
+@@ -3532,7 +3504,7 @@
+ 
+     goto :goto_d
+ 
+-    :cond_68
++    :cond_66
+     move v0, v2
+ 
+     :goto_d
+@@ -3542,16 +3514,16 @@
+ 
+     invoke-virtual {v7, v1, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
+ 
+-    if-nez v0, :cond_69
++    if-nez v0, :cond_67
+ 
+     const/4 v2, 0x1
+ 
+-    :cond_69
++    :cond_67
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
+ 
+     return-object v7
+ 
+-    :pswitch_2c
++    :pswitch_2b
+     const-string/jumbo v0, "sip_key_feedback_sound"
+ 
+     const/4 v1, 0x1
+@@ -3566,11 +3538,11 @@
+ 
+     invoke-virtual {v7, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
+ 
+-    if-ne v1, v0, :cond_6a
++    if-ne v1, v0, :cond_68
+ 
+     move v2, v1
+ 
+-    :cond_6a
++    :cond_68
+     invoke-virtual {v7, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setDefault(Z)V
+ 
+     return-object v7
+@@ -3579,18 +3551,17 @@
  
      :sswitch_data_0
      .sparse-switch
--        -0x792f53f5 -> :sswitch_2b
--        -0x782a3dcd -> :sswitch_2a
--        -0x73578aa6 -> :sswitch_29
--        -0x6bf572c7 -> :sswitch_28
--        -0x6b6f0411 -> :sswitch_27
--        -0x6afc11a3 -> :sswitch_26
--        -0x5e0b3bbc -> :sswitch_25
--        -0x499d027b -> :sswitch_24
--        -0x48073965 -> :sswitch_23
--        -0x3d7b48a7 -> :sswitch_22
--        -0x3aba98f7 -> :sswitch_21
--        -0x34738d79 -> :sswitch_20
-+        -0x792f53f5 -> :sswitch_2a
-+        -0x782a3dcd -> :sswitch_29
-+        -0x73578aa6 -> :sswitch_28
-+        -0x6bf572c7 -> :sswitch_27
-+        -0x6b6f0411 -> :sswitch_26
-+        -0x6afc11a3 -> :sswitch_25
-+        -0x5e0b3bbc -> :sswitch_24
-+        -0x499d027b -> :sswitch_23
-+        -0x48073965 -> :sswitch_22
-+        -0x3d7b48a7 -> :sswitch_21
-+        -0x3aba98f7 -> :sswitch_20
-         -0x1ddcc5dc -> :sswitch_1f
-         -0x1047e935 -> :sswitch_1e
-         -0x738eff9 -> :sswitch_1d
-@@ -3356,7 +3296,6 @@
+-        -0x792f53f5 -> :sswitch_2c
+-        -0x782a3dcd -> :sswitch_2b
+-        -0x73578aa6 -> :sswitch_2a
+-        -0x6bf572c7 -> :sswitch_29
+-        -0x6b6f0411 -> :sswitch_28
+-        -0x6afc11a3 -> :sswitch_27
+-        -0x5e0b3bbc -> :sswitch_26
+-        -0x499d027b -> :sswitch_25
+-        -0x48073965 -> :sswitch_24
+-        -0x3d7b48a7 -> :sswitch_23
+-        -0x3aba98f7 -> :sswitch_22
+-        -0x34738d79 -> :sswitch_21
++        -0x792f53f5 -> :sswitch_2b
++        -0x782a3dcd -> :sswitch_2a
++        -0x73578aa6 -> :sswitch_29
++        -0x6bf572c7 -> :sswitch_28
++        -0x6b6f0411 -> :sswitch_27
++        -0x6afc11a3 -> :sswitch_26
++        -0x5e0b3bbc -> :sswitch_25
++        -0x499d027b -> :sswitch_24
++        -0x48073965 -> :sswitch_23
++        -0x3d7b48a7 -> :sswitch_22
++        -0x3aba98f7 -> :sswitch_21
+         -0x1ddcc5dc -> :sswitch_20
+         -0x1047e935 -> :sswitch_1f
+         -0x738eff9 -> :sswitch_1e
+@@ -3628,7 +3599,6 @@
  
      :pswitch_data_0
      .packed-switch 0x0
--        :pswitch_2b
+-        :pswitch_2c
+         :pswitch_2b
          :pswitch_2a
          :pswitch_29
-         :pswitch_28
-@@ -4073,10 +4012,16 @@
+@@ -4336,7 +4306,11 @@
      goto :goto_1
  
      :pswitch_3
--    sget-object p1, Lcom/samsung/android/lib/episode/SceneResult$ResultType;->RESULT_OK:Lcom/samsung/android/lib/episode/SceneResult$ResultType;
-+    sget-object p1, Lcom/samsung/android/lib/episode/SceneResult$ResultType;->RESULT_FAIL:Lcom/samsung/android/lib/episode/SceneResult$ResultType;
+-    iput-object v1, p0, Lcom/samsung/android/lib/episode/SceneResult$Builder;->mResultType:Lcom/samsung/android/lib/episode/SceneResult$ResultType;
++    iput-object v0, p0, Lcom/samsung/android/lib/episode/SceneResult$Builder;->mResultType:Lcom/samsung/android/lib/episode/SceneResult$ResultType;
++
++    sget-object p1, Lcom/samsung/android/lib/episode/SceneResult$ErrorType;->NOT_SUPPORTED:Lcom/samsung/android/lib/episode/SceneResult$ErrorType;
++
++    iput-object p1, p0, Lcom/samsung/android/lib/episode/SceneResult$Builder;->mErrorType:Lcom/samsung/android/lib/episode/SceneResult$ErrorType;
  
-     invoke-virtual {p0, p1}, Lcom/samsung/android/lib/episode/SceneResult$Builder;->setResult(Lcom/samsung/android/lib/episode/SceneResult$ResultType;)Lcom/samsung/android/lib/episode/SceneResult$Builder;
- 
-+    move-result-object p1
-+
-+    sget-object p2, Lcom/samsung/android/lib/episode/SceneResult$ErrorType;->NOT_SUPPORTED:Lcom/samsung/android/lib/episode/SceneResult$ErrorType;
-+
-+    invoke-virtual {p1, p2}, Lcom/samsung/android/lib/episode/SceneResult$Builder;->setErrorType(Lcom/samsung/android/lib/episode/SceneResult$ErrorType;)Lcom/samsung/android/lib/episode/SceneResult$Builder;
-+
      goto :goto_1
  
-     :pswitch_4
-@@ -4296,7 +4241,7 @@
+@@ -4507,9 +4481,9 @@
+ 
+     invoke-virtual {p2}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+ 
+-    const-string v0, "com.android.settings.Settings$SecSoundSystemSoundSettingsActivity"
++    const-string v0, "com.android.settings.Settings$VibrationSystemIntensitySettingsActivity"
+ 
+-    const-string v1, "com.android.settings.Settings$VibrationSystemIntensitySettingsActivity"
++    const-string v1, "com.android.settings.Settings$SecSoundSystemSoundSettingsActivity"
+ 
+     const-string v2, "com.android.settings.Settings$SoundSettingsActivity"
+ 
+@@ -4537,7 +4511,7 @@
      goto/16 :goto_0
  
      :cond_0
--    const/16 v1, 0x23
-+    const/16 v1, 0x22
+-    const/16 v4, 0x23
++    const/16 v4, 0x22
  
      goto/16 :goto_0
  
-@@ -4312,7 +4257,7 @@
+@@ -4553,7 +4527,7 @@
      goto/16 :goto_0
  
      :cond_1
--    const/16 v1, 0x22
-+    const/16 v1, 0x21
+-    const/16 v4, 0x22
++    const/16 v4, 0x21
  
      goto/16 :goto_0
  
-@@ -4328,7 +4273,7 @@
+@@ -4569,7 +4543,7 @@
      goto/16 :goto_0
  
      :cond_2
--    const/16 v1, 0x21
-+    const/16 v1, 0x20
+-    const/16 v4, 0x21
++    const/16 v4, 0x20
  
      goto/16 :goto_0
  
-@@ -4344,7 +4289,7 @@
+@@ -4585,7 +4559,7 @@
      goto/16 :goto_0
  
      :cond_3
--    const/16 v1, 0x20
-+    const/16 v1, 0x1f
+-    const/16 v4, 0x20
++    const/16 v4, 0x1f
  
      goto/16 :goto_0
  
-@@ -4360,7 +4305,7 @@
+@@ -4601,7 +4575,7 @@
      goto/16 :goto_0
  
      :cond_4
--    const/16 v1, 0x1f
-+    const/16 v1, 0x1e
+-    const/16 v4, 0x1f
++    const/16 v4, 0x1e
  
      goto/16 :goto_0
  
-@@ -4376,7 +4321,7 @@
+@@ -4617,7 +4591,7 @@
      goto/16 :goto_0
  
      :cond_5
--    const/16 v1, 0x1e
-+    const/16 v1, 0x1d
+-    const/16 v4, 0x1e
++    const/16 v4, 0x1d
  
      goto/16 :goto_0
  
-@@ -4392,7 +4337,7 @@
+@@ -4633,7 +4607,7 @@
      goto/16 :goto_0
  
      :cond_6
--    const/16 v1, 0x1d
-+    const/16 v1, 0x1c
+-    const/16 v4, 0x1d
++    const/16 v4, 0x1c
  
      goto/16 :goto_0
  
-@@ -4408,7 +4353,7 @@
+@@ -4649,7 +4623,7 @@
      goto/16 :goto_0
  
      :cond_7
--    const/16 v1, 0x1c
-+    const/16 v1, 0x1b
+-    const/16 v4, 0x1c
++    const/16 v4, 0x1b
  
      goto/16 :goto_0
  
-@@ -4424,7 +4369,7 @@
+@@ -4665,7 +4639,7 @@
      goto/16 :goto_0
  
      :cond_8
--    const/16 v1, 0x1b
-+    const/16 v1, 0x1a
+-    const/16 v4, 0x1b
++    const/16 v4, 0x1a
  
      goto/16 :goto_0
  
-@@ -4440,7 +4385,7 @@
+@@ -4681,7 +4655,7 @@
      goto/16 :goto_0
  
      :cond_9
--    const/16 v1, 0x1a
-+    const/16 v1, 0x19
+-    const/16 v4, 0x1a
++    const/16 v4, 0x19
  
      goto/16 :goto_0
  
-@@ -4456,7 +4401,7 @@
+@@ -4697,7 +4671,7 @@
      goto/16 :goto_0
  
      :cond_a
--    const/16 v1, 0x19
-+    const/16 v1, 0x18
+-    const/16 v4, 0x19
++    const/16 v4, 0x18
  
      goto/16 :goto_0
  
-@@ -4472,7 +4417,7 @@
+@@ -4713,7 +4687,7 @@
      goto/16 :goto_0
  
      :cond_b
--    const/16 v1, 0x18
-+    const/16 v1, 0x17
+-    const/16 v4, 0x18
++    const/16 v4, 0x17
  
      goto/16 :goto_0
  
-@@ -4488,7 +4433,7 @@
+@@ -4729,7 +4703,7 @@
      goto/16 :goto_0
  
      :cond_c
--    const/16 v1, 0x17
-+    const/16 v1, 0x16
+-    const/16 v4, 0x17
++    const/16 v4, 0x16
  
      goto/16 :goto_0
  
-@@ -4504,7 +4449,7 @@
+@@ -4745,7 +4719,7 @@
      goto/16 :goto_0
  
      :cond_d
--    const/16 v1, 0x16
-+    const/16 v1, 0x15
+-    const/16 v4, 0x16
++    const/16 v4, 0x15
  
      goto/16 :goto_0
  
-@@ -4520,7 +4465,7 @@
+@@ -4761,7 +4735,7 @@
      goto/16 :goto_0
  
      :cond_e
--    const/16 v1, 0x15
-+    const/16 v1, 0x14
+-    const/16 v4, 0x15
++    const/16 v4, 0x14
  
      goto/16 :goto_0
  
-@@ -4536,7 +4481,7 @@
+@@ -4777,7 +4751,7 @@
      goto/16 :goto_0
  
      :cond_f
--    const/16 v1, 0x14
-+    const/16 v1, 0x13
+-    const/16 v4, 0x14
++    const/16 v4, 0x13
  
      goto/16 :goto_0
  
-@@ -4552,7 +4497,7 @@
+@@ -4793,7 +4767,7 @@
      goto/16 :goto_0
  
      :cond_10
--    const/16 v1, 0x13
-+    const/16 v1, 0x12
+-    const/16 v4, 0x13
++    const/16 v4, 0x12
  
      goto/16 :goto_0
  
-@@ -4568,7 +4513,7 @@
+@@ -4809,7 +4783,7 @@
      goto/16 :goto_0
  
      :cond_11
--    const/16 v1, 0x12
-+    const/16 v1, 0x11
+-    const/16 v4, 0x12
++    const/16 v4, 0x11
  
      goto/16 :goto_0
  
-@@ -4584,7 +4529,7 @@
+@@ -4825,7 +4799,7 @@
      goto/16 :goto_0
  
      :cond_12
--    const/16 v1, 0x11
-+    const/16 v1, 0x10
+-    const/16 v4, 0x11
++    const/16 v4, 0x10
  
      goto/16 :goto_0
  
-@@ -4600,7 +4545,7 @@
+@@ -4841,7 +4815,7 @@
      goto/16 :goto_0
  
      :cond_13
--    const/16 v1, 0x10
-+    const/16 v1, 0xf
+-    const/16 v4, 0x10
++    const/16 v4, 0xf
  
      goto/16 :goto_0
  
-@@ -4616,7 +4561,7 @@
+@@ -4857,7 +4831,7 @@
      goto/16 :goto_0
  
      :cond_14
--    const/16 v1, 0xf
-+    const/16 v1, 0xe
+-    const/16 v4, 0xf
++    const/16 v4, 0xe
  
      goto/16 :goto_0
  
-@@ -4632,7 +4577,7 @@
+@@ -4873,7 +4847,7 @@
      goto/16 :goto_0
  
      :cond_15
--    const/16 v1, 0xe
-+    const/16 v1, 0xd
+-    const/16 v4, 0xe
++    const/16 v4, 0xd
  
      goto/16 :goto_0
  
-@@ -4648,7 +4593,7 @@
+@@ -4889,7 +4863,7 @@
      goto/16 :goto_0
  
      :cond_16
--    const/16 v1, 0xd
-+    const/16 v1, 0xc
+-    const/16 v4, 0xd
++    const/16 v4, 0xc
  
      goto/16 :goto_0
  
-@@ -4664,12 +4609,12 @@
+@@ -4905,12 +4879,12 @@
      goto/16 :goto_0
  
      :cond_17
--    const/16 v1, 0xc
-+    const/16 v1, 0xb
+-    const/16 v4, 0xc
++    const/16 v4, 0xb
  
      goto/16 :goto_0
  
      :sswitch_18
--    const-string v0, "/Settings/Sound/VibrationSoundEnabled"
-+    const-string v0, "/Settings/Sound/DialingKeypadVibration"
+-    const-string v5, "/Settings/Sound/VibrationSoundEnabled"
++    const-string v5, "/Settings/Sound/DialingKeypadVibration"
  
-     invoke-virtual {p2, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {p2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -4680,12 +4625,12 @@
+@@ -4921,12 +4895,12 @@
      goto/16 :goto_0
  
      :cond_18
--    const/16 v1, 0xb
-+    const/16 v1, 0xa
+-    const/16 v4, 0xb
++    const/16 v4, 0xa
  
      goto/16 :goto_0
  
      :sswitch_19
--    const-string v0, "/Settings/Sound/DialingKeypadVibration"
-+    const-string v0, "/Settings/Sound/CallVibrationMagnitude"
+-    const-string v5, "/Settings/Sound/DialingKeypadVibration"
++    const-string v5, "/Settings/Sound/CallVibrationMagnitude"
  
-     invoke-virtual {p2, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {p2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -4696,12 +4641,12 @@
+@@ -4937,12 +4911,12 @@
      goto/16 :goto_0
  
      :cond_19
--    const/16 v1, 0xa
-+    const/16 v1, 0x9
+-    const/16 v4, 0xa
++    const/16 v4, 0x9
  
      goto/16 :goto_0
  
      :sswitch_1a
--    const-string v0, "/Settings/Sound/CallVibrationMagnitude"
-+    const-string v0, "/Settings/Sound/DialingKeypadTone"
+-    const-string v5, "/Settings/Sound/CallVibrationMagnitude"
++    const-string v5, "/Settings/Sound/DialingKeypadTone"
  
-     invoke-virtual {p2, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {p2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -4712,12 +4657,12 @@
+@@ -4953,12 +4927,12 @@
      goto/16 :goto_0
  
      :cond_1a
--    const/16 v1, 0x9
-+    const/16 v1, 0x8
+-    const/16 v4, 0x9
++    const/16 v4, 0x8
  
      goto/16 :goto_0
  
      :sswitch_1b
--    const-string v0, "/Settings/Sound/DialingKeypadTone"
-+    const-string v0, "/Settings/Sound/MediaVibrationMagnitude"
+-    const-string v5, "/Settings/Sound/DialingKeypadTone"
++    const-string v5, "/Settings/Sound/MediaVibrationMagnitude"
  
-     invoke-virtual {p2, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {p2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -4725,15 +4670,15 @@
+@@ -4966,15 +4940,15 @@
  
      if-nez p2, :cond_1b
  
@@ -2391,120 +2165,120 @@ index d5f617cd..1ef9ca6b 100644
 +    goto :goto_0
  
      :cond_1b
--    const/16 v1, 0x8
-+    const/4 v1, 0x7
+-    const/16 v4, 0x8
++    const/4 v4, 0x7
  
 -    goto/16 :goto_0
 +    goto :goto_0
  
      :sswitch_1c
--    const-string v0, "/Settings/Sound/MediaVibrationMagnitude"
-+    const-string v0, "/Settings/Sound/ChargingVibration"
+-    const-string v5, "/Settings/Sound/MediaVibrationMagnitude"
++    const-string v5, "/Settings/Sound/ChargingVibration"
  
-     invoke-virtual {p2, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {p2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -4744,12 +4689,12 @@
+@@ -4985,12 +4959,12 @@
      goto :goto_0
  
      :cond_1c
--    const/4 v1, 0x7
-+    const/4 v1, 0x6
+-    const/4 v4, 0x7
++    const/4 v4, 0x6
  
      goto :goto_0
  
      :sswitch_1d
--    const-string v0, "/Settings/Sound/ChargingVibration"
-+    const-string v0, "/Settings/Sound/RingerMode"
+-    const-string v5, "/Settings/Sound/ChargingVibration"
++    const-string v5, "/Settings/Sound/RingerMode"
  
-     invoke-virtual {p2, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {p2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -4760,12 +4705,12 @@
+@@ -5001,12 +4975,12 @@
      goto :goto_0
  
      :cond_1d
--    const/4 v1, 0x6
-+    const/4 v1, 0x5
+-    const/4 v4, 0x6
++    const/4 v4, 0x5
  
      goto :goto_0
  
      :sswitch_1e
--    const-string v0, "/Settings/Sound/RingerMode"
-+    const-string v0, "/Settings/Sound/SeparateMultiAppsSoundName"
+-    const-string v5, "/Settings/Sound/RingerMode"
++    const-string v5, "/Settings/Sound/SeparateMultiAppsSoundName"
  
-     invoke-virtual {p2, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {p2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -4776,12 +4721,12 @@
+@@ -5017,12 +4991,12 @@
      goto :goto_0
  
      :cond_1e
--    const/4 v1, 0x5
-+    const/4 v1, 0x4
+-    const/4 v4, 0x5
++    const/4 v4, 0x4
  
      goto :goto_0
  
      :sswitch_1f
--    const-string v0, "/Settings/Sound/SeparateMultiAppsSoundName"
-+    const-string v0, "/Settings/Sound/HardPressVibrationMagnitude"
+-    const-string v5, "/Settings/Sound/SeparateMultiAppsSoundName"
++    const-string v5, "/Settings/Sound/HardPressVibrationMagnitude"
  
-     invoke-virtual {p2, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {p2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -4792,12 +4737,12 @@
+@@ -5033,12 +5007,12 @@
      goto :goto_0
  
      :cond_1f
--    const/4 v1, 0x4
-+    const/4 v1, 0x3
+-    const/4 v4, 0x4
++    const/4 v4, 0x3
  
      goto :goto_0
  
      :sswitch_20
--    const-string v0, "/Settings/Sound/HardPressVibrationMagnitude"
-+    const-string v0, "/Settings/Sound/VibrationFeedback"
+-    const-string v5, "/Settings/Sound/HardPressVibrationMagnitude"
++    const-string v5, "/Settings/Sound/VibrationFeedback"
  
-     invoke-virtual {p2, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {p2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -4808,12 +4753,12 @@
+@@ -5049,12 +5023,12 @@
      goto :goto_0
  
      :cond_20
--    const/4 v1, 0x3
-+    const/4 v1, 0x2
+-    const/4 v4, 0x3
++    const/4 v4, 0x2
  
      goto :goto_0
  
      :sswitch_21
--    const-string v0, "/Settings/Sound/VibrationFeedback"
-+    const-string v0, "/Settings/Sound/VolumeLimiterLevel"
+-    const-string v5, "/Settings/Sound/VibrationFeedback"
++    const-string v5, "/Settings/Sound/VolumeLimiterLevel"
  
-     invoke-virtual {p2, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {p2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -4824,12 +4769,12 @@
+@@ -5065,12 +5039,12 @@
      goto :goto_0
  
      :cond_21
--    const/4 v1, 0x2
-+    const/4 v1, 0x1
+-    const/4 v4, 0x2
++    const/4 v4, 0x1
  
      goto :goto_0
  
      :sswitch_22
--    const-string v0, "/Settings/Sound/VolumeLimiterLevel"
-+    const-string v0, "/Settings/Sound/KeyboardSound"
+-    const-string v5, "/Settings/Sound/VolumeLimiterLevel"
++    const-string v5, "/Settings/Sound/KeyboardSound"
  
-     invoke-virtual {p2, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {p2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -4840,28 +4785,12 @@
+@@ -5081,22 +5055,6 @@
      goto :goto_0
  
      :cond_22
--    const/4 v1, 0x1
+-    const/4 v4, 0x1
 -
 -    goto :goto_0
 -
 -    :sswitch_23
--    const-string v0, "/Settings/Sound/KeyboardSound"
+-    const-string v5, "/Settings/Sound/KeyboardSound"
 -
--    invoke-virtual {p2, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+-    invoke-virtual {p2, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
 -
 -    move-result p2
 -
@@ -2513,107 +2287,82 @@ index d5f617cd..1ef9ca6b 100644
 -    goto :goto_0
 -
 -    :cond_23
-     const/4 v1, 0x0
+     const/4 v4, 0x0
  
      :goto_0
--    const-string p2, "com.android.settings.Settings$SecSoundSystemSoundSettingsActivity"
-+    const-string p2, "com.android.settings.Settings$VibrationSystemIntensitySettingsActivity"
- 
--    const-string v0, "com.android.settings.Settings$VibrationSystemIntensitySettingsActivity"
-+    const-string v0, "com.android.settings.Settings$SecSoundSystemSoundSettingsActivity"
- 
-     const-string v2, "com.android.settings.Settings$SoundSettingsActivity"
- 
-@@ -4874,15 +4803,15 @@
-     :pswitch_0
-     invoke-static {p1}, Lcom/samsung/android/settings/asbase/utils/VibUtils;->isSupportVibrateWhenRing(Landroid/content/Context;)Z
- 
--    move-result v0
-+    move-result p2
- 
--    if-eqz v0, :cond_24
-+    if-eqz p2, :cond_23
- 
--    new-instance v0, Landroid/content/ComponentName;
-+    new-instance p2, Landroid/content/ComponentName;
- 
--    invoke-direct {v0, v3, p2}, Landroid/content/ComponentName;-><init>(Ljava/lang/String;Ljava/lang/String;)V
-+    invoke-direct {p2, v3, v0}, Landroid/content/ComponentName;-><init>(Ljava/lang/String;Ljava/lang/String;)V
- 
--    invoke-virtual {p0, v0}, Landroid/content/Intent;->setComponent(Landroid/content/ComponentName;)Landroid/content/Intent;
-+    invoke-virtual {p0, p2}, Landroid/content/Intent;->setComponent(Landroid/content/ComponentName;)Landroid/content/Intent;
- 
-     goto/16 :goto_1
- 
-@@ -4911,7 +4840,7 @@
+@@ -5109,9 +5067,9 @@
  
      move-result p2
  
--    if-eqz p2, :cond_24
-+    if-eqz p2, :cond_23
+-    if-eqz p2, :cond_25
++    if-eqz p2, :cond_24
  
-     new-instance p2, Landroid/content/ComponentName;
+-    invoke-static {v3, v0, p0}, Lcom/android/settings/DefaultRingtonePreference$$ExternalSyntheticOutline0;->m(Ljava/lang/String;Ljava/lang/String;Landroid/content/Intent;)V
++    invoke-static {v3, v1, p0}, Lcom/android/settings/DefaultRingtonePreference$$ExternalSyntheticOutline0;->m(Ljava/lang/String;Ljava/lang/String;Landroid/content/Intent;)V
  
-@@ -4926,13 +4855,13 @@
+     goto :goto_1
+ 
+@@ -5132,7 +5090,7 @@
  
      move-result p2
  
--    if-eqz p2, :cond_24
-+    if-eqz p2, :cond_23
+-    if-eqz p2, :cond_25
++    if-eqz p2, :cond_24
+ 
+     invoke-static {v3, v2, p0}, Lcom/android/settings/DefaultRingtonePreference$$ExternalSyntheticOutline0;->m(Ljava/lang/String;Ljava/lang/String;Landroid/content/Intent;)V
+ 
+@@ -5143,38 +5101,33 @@
+ 
+     move-result p2
+ 
+-    if-eqz p2, :cond_25
++    if-eqz p2, :cond_24
  
      invoke-static {p1}, Lcom/android/settings/Utils;->isVoiceCapable(Landroid/content/Context;)Z
  
      move-result p2
  
--    if-eqz p2, :cond_24
-+    if-eqz p2, :cond_23
+-    if-eqz p2, :cond_25
++    if-eqz p2, :cond_24
  
-     new-instance p2, Landroid/content/ComponentName;
+     invoke-static {v3, v2, p0}, Lcom/android/settings/DefaultRingtonePreference$$ExternalSyntheticOutline0;->m(Ljava/lang/String;Ljava/lang/String;Landroid/content/Intent;)V
  
-@@ -4945,27 +4874,18 @@
+     goto :goto_1
+ 
      :pswitch_5
-     new-instance p2, Landroid/content/ComponentName;
- 
--    invoke-direct {p2, v3, v0}, Landroid/content/ComponentName;-><init>(Ljava/lang/String;Ljava/lang/String;)V
--
--    invoke-virtual {p0, p2}, Landroid/content/Intent;->setComponent(Landroid/content/ComponentName;)Landroid/content/Intent;
+-    invoke-static {v3, v1, p0}, Lcom/android/settings/DefaultRingtonePreference$$ExternalSyntheticOutline0;->m(Ljava/lang/String;Ljava/lang/String;Landroid/content/Intent;)V
 -
 -    goto :goto_1
 -
 -    :pswitch_6
--    new-instance p2, Landroid/content/ComponentName;
--
-     invoke-direct {p2, v3, v2}, Landroid/content/ComponentName;-><init>(Ljava/lang/String;Ljava/lang/String;)V
- 
-     invoke-virtual {p0, p2}, Landroid/content/Intent;->setComponent(Landroid/content/ComponentName;)Landroid/content/Intent;
+     invoke-static {v3, v2, p0}, Lcom/android/settings/DefaultRingtonePreference$$ExternalSyntheticOutline0;->m(Ljava/lang/String;Ljava/lang/String;Landroid/content/Intent;)V
  
      goto :goto_1
  
 -    :pswitch_7
 +    :pswitch_6
-     invoke-static {p1}, Lcom/samsung/android/settings/asbase/utils/SoundUtils;->isMultiSoundSupported(Landroid/content/Context;)Z
+     invoke-static {}, Landroid/app/ActivityManager;->getCurrentUser()I
  
      move-result p2
  
 -    if-eqz p2, :cond_24
 +    if-eqz p2, :cond_23
  
-     new-instance p2, Landroid/content/ComponentName;
+     goto :goto_1
  
-@@ -4979,31 +4899,31 @@
+-    :cond_24
++    :cond_23
+     const-string p2, "com.samsung.android.setting.multisound"
+ 
+     const-string v0, "com.samsung.android.setting.multisound.MultiSoundSettingsActivity"
+@@ -5183,33 +5136,33 @@
  
      goto :goto_1
  
 -    :pswitch_8
--    new-instance p2, Landroid/content/ComponentName;
+-    invoke-static {v3, v1, p0}, Lcom/android/settings/DefaultRingtonePreference$$ExternalSyntheticOutline0;->m(Ljava/lang/String;Ljava/lang/String;Landroid/content/Intent;)V
 +    :pswitch_7
-+    new-instance v0, Landroid/content/ComponentName;
- 
--    invoke-direct {p2, v3, v0}, Landroid/content/ComponentName;-><init>(Ljava/lang/String;Ljava/lang/String;)V
-+    invoke-direct {v0, v3, p2}, Landroid/content/ComponentName;-><init>(Ljava/lang/String;Ljava/lang/String;)V
- 
--    invoke-virtual {p0, p2}, Landroid/content/Intent;->setComponent(Landroid/content/ComponentName;)Landroid/content/Intent;
-+    invoke-virtual {p0, v0}, Landroid/content/Intent;->setComponent(Landroid/content/ComponentName;)Landroid/content/Intent;
++    invoke-static {v3, v0, p0}, Lcom/android/settings/DefaultRingtonePreference$$ExternalSyntheticOutline0;->m(Ljava/lang/String;Ljava/lang/String;Landroid/content/Intent;)V
  
      goto :goto_1
  
@@ -2621,54 +2370,36 @@ index d5f617cd..1ef9ca6b 100644
 +    :pswitch_8
      invoke-static {p1}, Lcom/samsung/android/settings/asbase/utils/VibUtils;->hasSystemVibrationMenu(Landroid/content/Context;)Z
  
--    move-result p2
-+    move-result v0
+     move-result p2
  
--    if-eqz p2, :cond_24
-+    if-eqz v0, :cond_23
+-    if-eqz p2, :cond_25
++    if-eqz p2, :cond_24
  
--    new-instance p2, Landroid/content/ComponentName;
-+    new-instance v0, Landroid/content/ComponentName;
- 
--    invoke-direct {p2, v3, v0}, Landroid/content/ComponentName;-><init>(Ljava/lang/String;Ljava/lang/String;)V
-+    invoke-direct {v0, v3, p2}, Landroid/content/ComponentName;-><init>(Ljava/lang/String;Ljava/lang/String;)V
- 
--    invoke-virtual {p0, p2}, Landroid/content/Intent;->setComponent(Landroid/content/ComponentName;)Landroid/content/Intent;
-+    invoke-virtual {p0, v0}, Landroid/content/Intent;->setComponent(Landroid/content/ComponentName;)Landroid/content/Intent;
+-    invoke-static {v3, v1, p0}, Lcom/android/settings/DefaultRingtonePreference$$ExternalSyntheticOutline0;->m(Ljava/lang/String;Ljava/lang/String;Landroid/content/Intent;)V
++    invoke-static {v3, v0, p0}, Lcom/android/settings/DefaultRingtonePreference$$ExternalSyntheticOutline0;->m(Ljava/lang/String;Ljava/lang/String;Landroid/content/Intent;)V
  
      goto :goto_1
  
 -    :pswitch_a
 +    :pswitch_9
-     new-instance p2, Landroid/content/ComponentName;
+     const-string p2, "com.android.settings.Settings$SecVolumeLimiterSettingsActivity"
  
-     const-string v0, "com.android.settings.Settings$SecVolumeLimiterSettingsActivity"
-@@ -5014,14 +4934,14 @@
+     invoke-static {v3, p2, p0}, Lcom/android/settings/DefaultRingtonePreference$$ExternalSyntheticOutline0;->m(Ljava/lang/String;Ljava/lang/String;Landroid/content/Intent;)V
  
      goto :goto_1
  
 -    :pswitch_b
--    new-instance v0, Landroid/content/ComponentName;
+-    invoke-static {v3, v0, p0}, Lcom/android/settings/DefaultRingtonePreference$$ExternalSyntheticOutline0;->m(Ljava/lang/String;Ljava/lang/String;Landroid/content/Intent;)V
 +    :pswitch_a
-+    new-instance p2, Landroid/content/ComponentName;
++    invoke-static {v3, v1, p0}, Lcom/android/settings/DefaultRingtonePreference$$ExternalSyntheticOutline0;->m(Ljava/lang/String;Ljava/lang/String;Landroid/content/Intent;)V
  
--    invoke-direct {v0, v3, p2}, Landroid/content/ComponentName;-><init>(Ljava/lang/String;Ljava/lang/String;)V
-+    invoke-direct {p2, v3, v0}, Landroid/content/ComponentName;-><init>(Ljava/lang/String;Ljava/lang/String;)V
- 
--    invoke-virtual {p0, v0}, Landroid/content/Intent;->setComponent(Landroid/content/ComponentName;)Landroid/content/Intent;
-+    invoke-virtual {p0, p2}, Landroid/content/Intent;->setComponent(Landroid/content/ComponentName;)Landroid/content/Intent;
- 
--    :cond_24
-+    :cond_23
+-    :cond_25
++    :cond_24
      :goto_1
      :try_start_0
      invoke-virtual {p1, p0}, Landroid/content/Context;->startActivity(Landroid/content/Intent;)V
-@@ -5038,20 +4958,21 @@
-     :goto_2
-     return-void
+@@ -5229,18 +5182,17 @@
  
-+    nop
-+
      :sswitch_data_0
      .sparse-switch
 -        -0x792f53f5 -> :sswitch_23
@@ -2697,7 +2428,7 @@ index d5f617cd..1ef9ca6b 100644
          -0x1ddcc5dc -> :sswitch_17
          -0x1047e935 -> :sswitch_16
          -0x738eff9 -> :sswitch_15
-@@ -5080,42 +5001,41 @@
+@@ -5269,42 +5221,41 @@
  
      :pswitch_data_0
      .packed-switch 0x0
@@ -2708,24 +2439,25 @@ index d5f617cd..1ef9ca6b 100644
          :pswitch_7
          :pswitch_6
 -        :pswitch_9
-+        :pswitch_5
-+        :pswitch_8
+-        :pswitch_8
+-        :pswitch_b
+-        :pswitch_8
+-        :pswitch_9
+         :pswitch_5
+-        :pswitch_7
+-        :pswitch_9
+-        :pswitch_6
+         :pswitch_8
+-        :pswitch_b
+-        :pswitch_b
 +        :pswitch_7
 +        :pswitch_a
 +        :pswitch_7
          :pswitch_8
--        :pswitch_b
 +        :pswitch_6
-         :pswitch_8
--        :pswitch_9
-         :pswitch_5
-         :pswitch_7
--        :pswitch_9
--        :pswitch_6
--        :pswitch_8
--        :pswitch_b
--        :pswitch_b
--        :pswitch_8
++        :pswitch_8
++        :pswitch_5
++        :pswitch_7
          :pswitch_a
 +        :pswitch_a
 +        :pswitch_7
@@ -2754,595 +2486,631 @@ index d5f617cd..1ef9ca6b 100644
      .end packed-switch
  .end method
  
-@@ -5650,7 +5570,7 @@
-     goto :goto_0
+@@ -5409,7 +5360,7 @@
+     goto/16 :goto_1
  
      :cond_1
--    const/16 v2, 0x2b
-+    const/16 v2, 0x2a
+-    const/16 v1, 0x2c
++    const/16 v1, 0x2b
  
+     goto/16 :goto_2
+ 
+@@ -5427,7 +5378,7 @@
      goto/16 :goto_1
- 
-@@ -5666,7 +5586,7 @@
-     goto :goto_0
  
      :cond_2
--    const/16 v2, 0x2a
-+    const/16 v2, 0x29
+-    const/16 v1, 0x2b
++    const/16 v1, 0x2a
  
+     goto/16 :goto_2
+ 
+@@ -5445,7 +5396,7 @@
      goto/16 :goto_1
- 
-@@ -5682,7 +5602,7 @@
-     goto :goto_0
  
      :cond_3
--    const/16 v2, 0x29
-+    const/16 v2, 0x28
+-    const/16 v1, 0x2a
++    const/16 v1, 0x29
  
+     goto/16 :goto_2
+ 
+@@ -5463,7 +5414,7 @@
      goto/16 :goto_1
- 
-@@ -5698,7 +5618,7 @@
-     goto :goto_0
  
      :cond_4
--    const/16 v2, 0x28
-+    const/16 v2, 0x27
+-    const/16 v1, 0x29
++    const/16 v1, 0x28
  
+     goto/16 :goto_2
+ 
+@@ -5481,7 +5432,7 @@
      goto/16 :goto_1
- 
-@@ -5714,7 +5634,7 @@
-     goto :goto_0
  
      :cond_5
--    const/16 v2, 0x27
-+    const/16 v2, 0x26
+-    const/16 v1, 0x28
++    const/16 v1, 0x27
  
+     goto/16 :goto_2
+ 
+@@ -5499,7 +5450,7 @@
      goto/16 :goto_1
- 
-@@ -5730,7 +5650,7 @@
-     goto :goto_0
  
      :cond_6
--    const/16 v2, 0x26
-+    const/16 v2, 0x25
+-    const/16 v1, 0x27
++    const/16 v1, 0x26
  
+     goto/16 :goto_2
+ 
+@@ -5517,7 +5468,7 @@
      goto/16 :goto_1
- 
-@@ -5746,7 +5666,7 @@
-     goto :goto_0
  
      :cond_7
--    const/16 v2, 0x25
-+    const/16 v2, 0x24
+-    const/16 v1, 0x26
++    const/16 v1, 0x25
  
+     goto/16 :goto_2
+ 
+@@ -5535,7 +5486,7 @@
      goto/16 :goto_1
- 
-@@ -5762,7 +5682,7 @@
-     goto :goto_0
  
      :cond_8
--    const/16 v2, 0x24
-+    const/16 v2, 0x23
+-    const/16 v1, 0x25
++    const/16 v1, 0x24
  
+     goto/16 :goto_2
+ 
+@@ -5553,7 +5504,7 @@
      goto/16 :goto_1
- 
-@@ -5778,7 +5698,7 @@
-     goto :goto_0
  
      :cond_9
--    const/16 v2, 0x23
-+    const/16 v2, 0x22
+-    const/16 v1, 0x24
++    const/16 v1, 0x23
  
+     goto/16 :goto_2
+ 
+@@ -5571,7 +5522,7 @@
      goto/16 :goto_1
- 
-@@ -5794,7 +5714,7 @@
-     goto/16 :goto_0
  
      :cond_a
--    const/16 v2, 0x22
-+    const/16 v2, 0x21
+-    const/16 v1, 0x23
++    const/16 v1, 0x22
  
+     goto/16 :goto_2
+ 
+@@ -5589,7 +5540,7 @@
      goto/16 :goto_1
- 
-@@ -5810,7 +5730,7 @@
-     goto/16 :goto_0
  
      :cond_b
--    const/16 v2, 0x21
-+    const/16 v2, 0x20
+-    const/16 v1, 0x22
++    const/16 v1, 0x21
  
+     goto/16 :goto_2
+ 
+@@ -5607,7 +5558,7 @@
      goto/16 :goto_1
- 
-@@ -5826,7 +5746,7 @@
-     goto/16 :goto_0
  
      :cond_c
--    const/16 v2, 0x20
-+    const/16 v2, 0x1f
+-    const/16 v1, 0x21
++    const/16 v1, 0x20
  
+     goto/16 :goto_2
+ 
+@@ -5625,7 +5576,7 @@
      goto/16 :goto_1
- 
-@@ -5842,7 +5762,7 @@
-     goto/16 :goto_0
  
      :cond_d
--    const/16 v2, 0x1f
-+    const/16 v2, 0x1e
+-    const/16 v1, 0x20
++    const/16 v1, 0x1f
  
+     goto/16 :goto_2
+ 
+@@ -5643,7 +5594,7 @@
      goto/16 :goto_1
- 
-@@ -5858,7 +5778,7 @@
-     goto/16 :goto_0
  
      :cond_e
--    const/16 v2, 0x1e
-+    const/16 v2, 0x1d
+-    const/16 v1, 0x1f
++    const/16 v1, 0x1e
  
+     goto/16 :goto_2
+ 
+@@ -5661,7 +5612,7 @@
      goto/16 :goto_1
- 
-@@ -5874,7 +5794,7 @@
-     goto/16 :goto_0
  
      :cond_f
--    const/16 v2, 0x1d
-+    const/16 v2, 0x1c
+-    const/16 v1, 0x1e
++    const/16 v1, 0x1d
  
+     goto/16 :goto_2
+ 
+@@ -5679,7 +5630,7 @@
      goto/16 :goto_1
- 
-@@ -5890,7 +5810,7 @@
-     goto/16 :goto_0
  
      :cond_10
--    const/16 v2, 0x1c
-+    const/16 v2, 0x1b
+-    const/16 v1, 0x1d
++    const/16 v1, 0x1c
  
+     goto/16 :goto_2
+ 
+@@ -5697,7 +5648,7 @@
      goto/16 :goto_1
- 
-@@ -5906,7 +5826,7 @@
-     goto/16 :goto_0
  
      :cond_11
--    const/16 v2, 0x1b
-+    const/16 v2, 0x1a
+-    const/16 v1, 0x1c
++    const/16 v1, 0x1b
  
+     goto/16 :goto_2
+ 
+@@ -5715,7 +5666,7 @@
      goto/16 :goto_1
- 
-@@ -5922,7 +5842,7 @@
-     goto/16 :goto_0
  
      :cond_12
--    const/16 v2, 0x1a
-+    const/16 v2, 0x19
+-    const/16 v1, 0x1b
++    const/16 v1, 0x1a
  
+     goto/16 :goto_2
+ 
+@@ -5733,7 +5684,7 @@
      goto/16 :goto_1
- 
-@@ -5938,7 +5858,7 @@
-     goto/16 :goto_0
  
      :cond_13
--    const/16 v2, 0x19
-+    const/16 v2, 0x18
+-    const/16 v1, 0x1a
++    const/16 v1, 0x19
  
+     goto/16 :goto_2
+ 
+@@ -5751,7 +5702,7 @@
      goto/16 :goto_1
- 
-@@ -5954,7 +5874,7 @@
-     goto/16 :goto_0
  
      :cond_14
--    const/16 v2, 0x18
-+    const/16 v2, 0x17
+-    const/16 v1, 0x19
++    const/16 v1, 0x18
  
+     goto/16 :goto_2
+ 
+@@ -5769,7 +5720,7 @@
      goto/16 :goto_1
- 
-@@ -5970,7 +5890,7 @@
-     goto/16 :goto_0
  
      :cond_15
--    const/16 v2, 0x17
-+    const/16 v2, 0x16
+-    const/16 v1, 0x18
++    const/16 v1, 0x17
  
+     goto/16 :goto_2
+ 
+@@ -5787,7 +5738,7 @@
      goto/16 :goto_1
- 
-@@ -5986,7 +5906,7 @@
-     goto/16 :goto_0
  
      :cond_16
--    const/16 v2, 0x16
-+    const/16 v2, 0x15
+-    const/16 v1, 0x17
++    const/16 v1, 0x16
  
+     goto/16 :goto_2
+ 
+@@ -5805,7 +5756,7 @@
      goto/16 :goto_1
- 
-@@ -6002,7 +5922,7 @@
-     goto/16 :goto_0
  
      :cond_17
--    const/16 v2, 0x15
-+    const/16 v2, 0x14
+-    const/16 v1, 0x16
++    const/16 v1, 0x15
  
+     goto/16 :goto_2
+ 
+@@ -5823,7 +5774,7 @@
      goto/16 :goto_1
- 
-@@ -6018,7 +5938,7 @@
-     goto/16 :goto_0
  
      :cond_18
--    const/16 v2, 0x14
-+    const/16 v2, 0x13
+-    const/16 v1, 0x15
++    const/16 v1, 0x14
  
+     goto/16 :goto_2
+ 
+@@ -5841,7 +5792,7 @@
      goto/16 :goto_1
- 
-@@ -6034,7 +5954,7 @@
-     goto/16 :goto_0
  
      :cond_19
--    const/16 v2, 0x13
-+    const/16 v2, 0x12
+-    const/16 v1, 0x14
++    const/16 v1, 0x13
  
+     goto/16 :goto_2
+ 
+@@ -5859,7 +5810,7 @@
      goto/16 :goto_1
- 
-@@ -6050,7 +5970,7 @@
-     goto/16 :goto_0
  
      :cond_1a
--    const/16 v2, 0x12
-+    const/16 v2, 0x11
+-    const/16 v1, 0x13
++    const/16 v1, 0x12
  
+     goto/16 :goto_2
+ 
+@@ -5877,7 +5828,7 @@
      goto/16 :goto_1
- 
-@@ -6066,7 +5986,7 @@
-     goto/16 :goto_0
  
      :cond_1b
--    const/16 v2, 0x11
-+    const/16 v2, 0x10
+-    const/16 v1, 0x12
++    const/16 v1, 0x11
  
+     goto/16 :goto_2
+ 
+@@ -5895,7 +5846,7 @@
      goto/16 :goto_1
- 
-@@ -6082,7 +6002,7 @@
-     goto/16 :goto_0
  
      :cond_1c
--    const/16 v2, 0x10
-+    const/16 v2, 0xf
+-    const/16 v1, 0x11
++    const/16 v1, 0x10
  
+     goto/16 :goto_2
+ 
+@@ -5913,7 +5864,7 @@
      goto/16 :goto_1
- 
-@@ -6098,7 +6018,7 @@
-     goto/16 :goto_0
  
      :cond_1d
--    const/16 v2, 0xf
-+    const/16 v2, 0xe
+-    const/16 v1, 0x10
++    const/16 v1, 0xf
  
+     goto/16 :goto_2
+ 
+@@ -5931,7 +5882,7 @@
      goto/16 :goto_1
- 
-@@ -6114,7 +6034,7 @@
-     goto/16 :goto_0
  
      :cond_1e
--    const/16 v2, 0xe
-+    const/16 v2, 0xd
+-    const/16 v1, 0xf
++    const/16 v1, 0xe
  
+     goto/16 :goto_2
+ 
+@@ -5949,7 +5900,7 @@
      goto/16 :goto_1
- 
-@@ -6130,7 +6050,7 @@
-     goto/16 :goto_0
  
      :cond_1f
--    const/16 v2, 0xd
-+    const/16 v2, 0xc
+-    const/16 v1, 0xe
++    const/16 v1, 0xd
  
+     goto/16 :goto_2
+ 
+@@ -5967,7 +5918,7 @@
      goto/16 :goto_1
- 
-@@ -6146,12 +6066,12 @@
-     goto/16 :goto_0
  
      :cond_20
--    const/16 v2, 0xc
-+    const/16 v2, 0xb
+-    const/16 v1, 0xd
++    const/16 v1, 0xc
  
+     goto/16 :goto_2
+ 
+@@ -5985,14 +5936,14 @@
      goto/16 :goto_1
  
-     :sswitch_20
+     :cond_21
+-    const/16 v1, 0xc
++    const/16 v1, 0xb
+ 
+     goto/16 :goto_2
+ 
+     :sswitch_21
+     move-object/from16 v21, v8
+ 
 -    const-string v8, "/Settings/Sound/VibrationSoundEnabled"
 +    const-string v8, "/Settings/Sound/DialingKeypadVibration"
  
-     invoke-virtual {v2, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {v1, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -6162,12 +6082,12 @@
-     goto/16 :goto_0
- 
-     :cond_21
--    const/16 v2, 0xb
-+    const/16 v2, 0xa
- 
+@@ -6003,14 +5954,14 @@
      goto/16 :goto_1
  
-     :sswitch_21
+     :cond_22
+-    const/16 v1, 0xb
++    const/16 v1, 0xa
+ 
+     goto/16 :goto_2
+ 
+     :sswitch_22
+     move-object/from16 v21, v8
+ 
 -    const-string v8, "/Settings/Sound/DialingKeypadVibration"
 +    const-string v8, "/Settings/Sound/CallVibrationMagnitude"
  
-     invoke-virtual {v2, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {v1, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -6178,12 +6098,12 @@
-     goto/16 :goto_0
- 
-     :cond_22
--    const/16 v2, 0xa
-+    const/16 v2, 0x9
- 
+@@ -6021,14 +5972,14 @@
      goto/16 :goto_1
  
-     :sswitch_22
+     :cond_23
+-    const/16 v1, 0xa
++    const/16 v1, 0x9
+ 
+     goto/16 :goto_2
+ 
+     :sswitch_23
+     move-object/from16 v21, v8
+ 
 -    const-string v8, "/Settings/Sound/CallVibrationMagnitude"
 +    const-string v8, "/Settings/Sound/DialingKeypadTone"
  
-     invoke-virtual {v2, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {v1, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -6194,12 +6114,12 @@
-     goto/16 :goto_0
- 
-     :cond_23
--    const/16 v2, 0x9
-+    const/16 v2, 0x8
- 
+@@ -6039,14 +5990,14 @@
      goto/16 :goto_1
  
-     :sswitch_23
+     :cond_24
+-    const/16 v1, 0x9
++    const/16 v1, 0x8
+ 
+     goto/16 :goto_2
+ 
+     :sswitch_24
+     move-object/from16 v21, v8
+ 
 -    const-string v8, "/Settings/Sound/DialingKeypadTone"
 +    const-string v8, "/Settings/Sound/MediaVibrationMagnitude"
  
-     invoke-virtual {v2, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {v1, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -6210,12 +6130,12 @@
-     goto/16 :goto_0
+@@ -6057,14 +6008,14 @@
+     goto/16 :goto_1
  
-     :cond_24
--    const/16 v2, 0x8
-+    const/4 v2, 0x7
+     :cond_25
+-    const/16 v1, 0x8
++    const/4 v1, 0x7
+ 
+     goto/16 :goto_2
+ 
+     :sswitch_25
+     move-object/from16 v21, v8
+ 
+-    const-string v8, "/Settings/Sound/MediaVibrationMagnitude"
++    const-string v8, "/Settings/Sound/ChargingVibration"
+ 
+     invoke-virtual {v1, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+ 
+@@ -6072,17 +6023,17 @@
+ 
+     if-nez v1, :cond_26
  
 -    goto/16 :goto_1
 +    goto :goto_1
  
-     :sswitch_24
--    const-string v8, "/Settings/Sound/MediaVibrationMagnitude"
-+    const-string v8, "/Settings/Sound/ChargingVibration"
+     :cond_26
+-    const/4 v1, 0x7
++    const/4 v1, 0x6
  
-     invoke-virtual {v2, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+-    goto/16 :goto_2
++    goto :goto_2
  
-@@ -6226,12 +6146,12 @@
-     goto/16 :goto_0
+     :sswitch_26
+     move-object/from16 v21, v8
  
-     :cond_25
--    const/4 v2, 0x7
-+    const/4 v2, 0x6
- 
-     goto :goto_1
- 
-     :sswitch_25
 -    const-string v8, "/Settings/Sound/ChargingVibration"
 +    const-string v8, "/Settings/Sound/RingerMode"
  
-     invoke-virtual {v2, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {v1, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -6242,12 +6162,12 @@
-     goto/16 :goto_0
- 
-     :cond_26
--    const/4 v2, 0x6
-+    const/4 v2, 0x5
- 
+@@ -6093,14 +6044,14 @@
      goto :goto_1
  
-     :sswitch_26
+     :cond_27
+-    const/4 v1, 0x6
++    const/4 v1, 0x5
+ 
+     goto :goto_2
+ 
+     :sswitch_27
+     move-object/from16 v21, v8
+ 
 -    const-string v8, "/Settings/Sound/RingerMode"
 +    const-string v8, "/Settings/Sound/SeparateMultiAppsSoundName"
  
-     invoke-virtual {v2, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {v1, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -6258,12 +6178,12 @@
-     goto/16 :goto_0
- 
-     :cond_27
--    const/4 v2, 0x5
-+    const/4 v2, 0x4
- 
+@@ -6111,14 +6062,14 @@
      goto :goto_1
  
-     :sswitch_27
+     :cond_28
+-    const/4 v1, 0x5
++    const/4 v1, 0x4
+ 
+     goto :goto_2
+ 
+     :sswitch_28
+     move-object/from16 v21, v8
+ 
 -    const-string v8, "/Settings/Sound/SeparateMultiAppsSoundName"
 +    const-string v8, "/Settings/Sound/HardPressVibrationMagnitude"
  
-     invoke-virtual {v2, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {v1, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -6274,12 +6194,12 @@
-     goto/16 :goto_0
- 
-     :cond_28
--    const/4 v2, 0x4
-+    const/4 v2, 0x3
- 
+@@ -6129,14 +6080,14 @@
      goto :goto_1
  
-     :sswitch_28
+     :cond_29
+-    const/4 v1, 0x4
++    const/4 v1, 0x3
+ 
+     goto :goto_2
+ 
+     :sswitch_29
+     move-object/from16 v21, v8
+ 
 -    const-string v8, "/Settings/Sound/HardPressVibrationMagnitude"
 +    const-string v8, "/Settings/Sound/VibrationFeedback"
  
-     invoke-virtual {v2, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {v1, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -6290,12 +6210,12 @@
-     goto/16 :goto_0
- 
-     :cond_29
--    const/4 v2, 0x3
-+    const/4 v2, 0x2
- 
+@@ -6147,14 +6098,14 @@
      goto :goto_1
  
-     :sswitch_29
+     :cond_2a
+-    const/4 v1, 0x3
++    const/4 v1, 0x2
+ 
+     goto :goto_2
+ 
+     :sswitch_2a
+     move-object/from16 v21, v8
+ 
 -    const-string v8, "/Settings/Sound/VibrationFeedback"
 +    const-string v8, "/Settings/Sound/VolumeLimiterLevel"
  
-     invoke-virtual {v2, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+     invoke-virtual {v1, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -6306,12 +6226,12 @@
-     goto/16 :goto_0
- 
-     :cond_2a
--    const/4 v2, 0x2
-+    const/4 v2, 0x1
- 
+@@ -6165,29 +6116,11 @@
      goto :goto_1
  
-     :sswitch_2a
--    const-string v8, "/Settings/Sound/VolumeLimiterLevel"
-+    const-string v8, "/Settings/Sound/KeyboardSound"
- 
-     invoke-virtual {v2, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
- 
-@@ -6322,22 +6242,6 @@
-     goto/16 :goto_0
- 
      :cond_2b
--    const/4 v2, 0x1
+-    const/4 v1, 0x2
+-
+-    goto :goto_2
+-
+-    :sswitch_2b
+-    move-object/from16 v21, v8
+-
+-    const-string v8, "/Settings/Sound/VolumeLimiterLevel"
+-
+-    invoke-virtual {v1, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+-
+-    move-result v1
+-
+-    if-nez v1, :cond_2c
 -
 -    goto :goto_1
 -
--    :sswitch_2b
--    const-string v8, "/Settings/Sound/KeyboardSound"
--
--    invoke-virtual {v2, v8}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
--
--    move-result v2
--
--    if-nez v2, :cond_2c
--
--    goto/16 :goto_0
--
 -    :cond_2c
-     const/4 v2, 0x0
+     const/4 v1, 0x1
+ 
+     goto :goto_2
+ 
+-    :sswitch_2c
++    :sswitch_2b
+     move-object/from16 v21, v8
+ 
+     const-string v8, "/Settings/Sound/KeyboardSound"
+@@ -6196,12 +6129,12 @@
+ 
+     move-result v1
+ 
+-    if-nez v1, :cond_2d
++    if-nez v1, :cond_2c
  
      :goto_1
-@@ -6361,7 +6265,7 @@
- 
-     packed-switch v2, :pswitch_data_0
+     goto/16 :goto_0
  
 -    :cond_2d
 +    :cond_2c
-     :goto_2
-     const/4 v0, 0x0
+     const/4 v1, 0x0
  
-@@ -6414,7 +6318,7 @@
+     :goto_2
+@@ -6256,7 +6189,7 @@
      :pswitch_4
      sget-boolean v0, Lcom/samsung/android/settings/asbase/rune/VibRune;->SUPPORT_SYNC_WITH_HAPTIC:Z
  
--    if-eqz v0, :cond_2d
-+    if-eqz v0, :cond_2c
+-    if-eqz v0, :cond_3e
++    if-eqz v0, :cond_3d
  
-     invoke-static {v5}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
+     invoke-static {v6}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
  
-@@ -6509,7 +6413,7 @@
-     :pswitch_7
+@@ -6356,7 +6289,7 @@
+     :pswitch_8
      sget-boolean v0, Lcom/samsung/android/settings/asbase/rune/VibRune;->SUPPORT_SYNC_WITH_HAPTIC:Z
  
--    if-eqz v0, :cond_2d
-+    if-eqz v0, :cond_2c
+-    if-eqz v0, :cond_3e
++    if-eqz v0, :cond_3d
  
-     invoke-static {v5}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
+     invoke-static {v6}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
  
-@@ -6603,7 +6507,7 @@
-     :pswitch_d
+@@ -6448,7 +6381,7 @@
+     :pswitch_e
      sget-boolean v0, Lcom/samsung/android/settings/asbase/rune/VibRune;->SUPPORT_SYNC_WITH_HAPTIC:Z
  
--    if-eqz v0, :cond_2d
-+    if-eqz v0, :cond_2c
+-    if-eqz v0, :cond_3e
++    if-eqz v0, :cond_3d
  
      const-string/jumbo v0, "sync_vibration_with_ringtone_2"
  
-@@ -6666,7 +6570,7 @@
+@@ -6509,7 +6442,7 @@
  
-     const-string v2, "default_vibration_pattern"
+     const-string v8, "default_vibration_pattern"
  
--    if-eqz v0, :cond_35
-+    if-eqz v0, :cond_34
+-    if-eqz v1, :cond_35
++    if-eqz v1, :cond_34
  
-     const/4 v0, -0x1
+     const/4 v1, -0x1
  
-@@ -6674,7 +6578,7 @@
+@@ -6517,7 +6450,7 @@
  
-     move-result v6
+     move-result v4
  
--    if-ne v6, v0, :cond_2f
-+    if-ne v6, v0, :cond_2e
+-    if-ne v4, v1, :cond_2f
++    if-ne v4, v1, :cond_2e
  
-     const/16 v9, 0x2f
+     const/16 v10, 0x2f
  
-@@ -6700,7 +6604,7 @@
+@@ -6543,7 +6476,7 @@
  
-     move-result v9
+     move-result v10
  
--    if-ne v9, v0, :cond_2e
-+    if-ne v9, v0, :cond_2d
+-    if-ne v10, v1, :cond_2e
++    if-ne v10, v1, :cond_2d
  
      const-string/jumbo v0, "skip restoration ringtone pattern by legacyId"
  
-@@ -6708,7 +6612,7 @@
+@@ -6551,7 +6484,7 @@
  
-     goto/16 :goto_2
+     return-object v16
  
 -    :cond_2e
 +    :cond_2d
-     invoke-static {v1, v6, v9}, Lcom/samsung/android/settings/asbase/vibration/PatternRestoreHelper;->getSepIndexById(Landroid/content/Context;II)I
+     invoke-static {v0, v6, v10}, Lcom/samsung/android/settings/asbase/vibration/PatternRestoreHelper;->getSepIndexById(Landroid/content/Context;II)I
  
-     move-result v0
-@@ -6739,7 +6643,7 @@
+     move-result v1
+@@ -6566,14 +6499,14 @@
  
      goto :goto_3
  
 -    :cond_2f
 +    :cond_2e
-     const/4 v0, 0x0
+     const/4 v6, 0x0
  
-     invoke-static {v1, v0, v6}, Lcom/samsung/android/settings/asbase/vibration/PatternRestoreHelper;->getIdBySepIndex(Landroid/content/Context;II)I
-@@ -6748,7 +6652,7 @@
+     invoke-static {v0, v6, v4}, Lcom/samsung/android/settings/asbase/vibration/PatternRestoreHelper;->findIdByQuery(Landroid/content/Context;II)I
  
-     const/4 v0, -0x1
+     move-result v10
  
--    if-ne v9, v0, :cond_30
-+    if-ne v9, v0, :cond_2f
+-    if-ne v10, v1, :cond_30
++    if-ne v10, v1, :cond_2f
  
      const-string/jumbo v0, "skip restoration ringtone pattern by sepIndex"
  
-@@ -6756,39 +6660,39 @@
+@@ -6581,7 +6514,7 @@
  
-     goto/16 :goto_2
+     return-object v16
  
 -    :cond_30
 +    :cond_2f
      :goto_3
-     invoke-static {}, Lcom/samsung/android/settings/asbase/vibration/VibPickerConstants;->getRingtoneLiveStartId()I
+     sget-object v1, Lcom/samsung/android/settings/asbase/vibration/VibPickerConstants;->SIMPLE_RINGTONE_PATTERN:Ljava/util/List;
  
-     move-result v0
+@@ -6607,15 +6540,15 @@
  
--    if-lt v9, v0, :cond_31
-+    if-lt v9, v0, :cond_30
+     add-int/2addr v7, v6
  
-     invoke-static/range {p1 .. p1}, Lcom/samsung/android/settings/asbase/vibration/PatternRestoreHelper;->supportsLivePattern(Landroid/content/Context;)Z
+-    if-lt v10, v7, :cond_31
++    if-lt v10, v7, :cond_30
  
-     move-result v0
+     invoke-static {v0}, Lcom/samsung/android/settings/asbase/vibration/PatternRestoreHelper;->supportsLivePattern(Landroid/content/Context;)Z
  
--    if-eqz v0, :cond_32
-+    if-eqz v0, :cond_31
+     move-result v6
+ 
+-    if-eqz v6, :cond_32
++    if-eqz v6, :cond_31
  
 -    :cond_31
 +    :cond_30
-     invoke-static {}, Lcom/samsung/android/settings/asbase/vibration/VibPickerConstants;->getRingtoneColorfulStartId()I
+     check-cast v1, Ljava/util/ArrayList;
  
-     move-result v0
+     invoke-virtual {v1}, Ljava/util/ArrayList;->size()I
+@@ -6626,20 +6559,20 @@
  
--    if-lt v9, v0, :cond_33
-+    if-lt v9, v0, :cond_32
+     add-int/lit8 v1, v1, 0x1
  
-     invoke-static/range {p1 .. p1}, Lcom/samsung/android/settings/asbase/vibration/PatternRestoreHelper;->supportsColorfulPattern(Landroid/content/Context;)Z
+-    if-lt v10, v1, :cond_33
++    if-lt v10, v1, :cond_32
+ 
+     invoke-static {v0}, Lcom/samsung/android/settings/asbase/vibration/PatternRestoreHelper;->supportsColorfulPattern(Landroid/content/Context;)Z
  
      move-result v0
  
@@ -3351,25 +3119,25 @@ index d5f617cd..1ef9ca6b 100644
  
 -    :cond_32
 +    :cond_31
-     invoke-static {v13, v10}, Landroid/util/Log;->w(Ljava/lang/String;Ljava/lang/String;)I
+     invoke-static {v13, v15}, Landroid/util/Log;->w(Ljava/lang/String;Ljava/lang/String;)I
  
-     goto/16 :goto_2
+     return-object v16
  
 -    :cond_33
 +    :cond_32
      new-instance v0, Ljava/lang/StringBuilder;
  
-     invoke-direct {v0}, Ljava/lang/StringBuilder;-><init>()V
-@@ -6833,7 +6737,7 @@
+     const-string v1, "content://com.android.settings.personalvibration.PersonalVibrationProvider/registerinfo/"
+@@ -6670,7 +6603,7 @@
  
      sget-boolean v0, Lcom/samsung/android/settings/asbase/rune/VibRune;->SUPPORT_SYNC_WITH_HAPTIC:Z
  
--    if-eqz v0, :cond_2d
-+    if-eqz v0, :cond_2c
+-    if-eqz v0, :cond_3e
++    if-eqz v0, :cond_3d
  
-     invoke-virtual/range {p4 .. p4}, Lcom/samsung/android/lib/episode/SourceInfo;->getOneUIVersion()Ljava/lang/String;
+     iget-object v0, v3, Lcom/samsung/android/lib/episode/SourceInfo;->mOneUIVersion:Ljava/lang/String;
  
-@@ -6847,7 +6751,7 @@
+@@ -6680,7 +6613,7 @@
  
      move-result v1
  
@@ -3378,9 +3146,9 @@ index d5f617cd..1ef9ca6b 100644
  
      invoke-static {v0}, Ljava/lang/Float;->parseFloat(Ljava/lang/String;)F
  
-@@ -6857,17 +6761,17 @@
+@@ -6688,15 +6621,15 @@
  
-     cmpg-float v0, v0, v2
+     cmpg-float v0, v0, v17
  
 -    if-lez v0, :cond_34
 +    if-lez v0, :cond_33
@@ -3388,135 +3156,137 @@ index d5f617cd..1ef9ca6b 100644
 -    if-eqz v1, :cond_34
 +    if-eqz v1, :cond_33
  
-     invoke-static {}, Lcom/samsung/android/settings/knox/KnoxUtils;->isApplicationRestricted()Z
+     sget-boolean v0, Lcom/samsung/android/settings/knox/KnoxUtils;->appRestrictionState:Z
  
-     move-result v0
- 
--    if-eqz v0, :cond_2d
-+    if-eqz v0, :cond_2c
+-    if-eqz v0, :cond_3e
++    if-eqz v0, :cond_3d
  
 -    :cond_34
 +    :cond_33
-     const/4 v0, 0x0
+     const/4 v6, 0x0
  
-     invoke-static {v4, v11, v0}, Landroid/provider/Settings$System;->putInt(Landroid/content/ContentResolver;Ljava/lang/String;I)Z
-@@ -6878,7 +6782,7 @@
+     invoke-static {v14, v5, v6}, Landroid/provider/Settings$System;->putInt(Landroid/content/ContentResolver;Ljava/lang/String;I)Z
+@@ -6707,7 +6640,7 @@
  
-     goto/16 :goto_2
+     return-object v16
  
 -    :cond_35
 +    :cond_34
-     const/16 v0, 0x2f
+     const/16 v10, 0x2f
  
-     invoke-virtual {v5, v0}, Ljava/lang/String;->lastIndexOf(I)I
-@@ -6901,19 +6805,19 @@
+     invoke-virtual {v6, v10}, Ljava/lang/String;->lastIndexOf(I)I
+@@ -6736,19 +6669,19 @@
  
-     move-result v3
+     add-int/lit8 v2, v2, 0x1
  
--    if-lt v0, v3, :cond_36
-+    if-lt v0, v3, :cond_35
+-    if-lt v1, v2, :cond_36
++    if-lt v1, v2, :cond_35
  
-     invoke-static/range {p1 .. p1}, Lcom/samsung/android/settings/asbase/vibration/PatternRestoreHelper;->supportsColorfulPattern(Landroid/content/Context;)Z
+     invoke-static {v0}, Lcom/samsung/android/settings/asbase/vibration/PatternRestoreHelper;->supportsColorfulPattern(Landroid/content/Context;)Z
  
      move-result v0
  
 -    if-nez v0, :cond_36
 +    if-nez v0, :cond_35
  
-     invoke-static {v13, v10}, Landroid/util/Log;->w(Ljava/lang/String;Ljava/lang/String;)I
+     invoke-static {v13, v15}, Landroid/util/Log;->w(Ljava/lang/String;Ljava/lang/String;)I
  
-     goto/16 :goto_2
+     return-object v16
  
 -    :cond_36
 +    :cond_35
-     invoke-static {v4, v2, v5}, Landroid/provider/Settings$System;->putString(Landroid/content/ContentResolver;Ljava/lang/String;Ljava/lang/String;)Z
+     invoke-static {v14, v8, v6}, Landroid/provider/Settings$System;->putString(Landroid/content/ContentResolver;Ljava/lang/String;Ljava/lang/String;)Z
  
-     new-instance v0, Ljava/lang/StringBuilder;
-@@ -6959,7 +6863,7 @@
+     const-string/jumbo v0, "restore ringtone pattern uri="
+@@ -6788,7 +6721,7 @@
  
-     sget-boolean v0, Lcom/samsung/android/settings/asbase/rune/VibRune;->SUPPORT_SEC_VIBRATION_PICKER:Z
+     sget-boolean v5, Lcom/samsung/android/settings/asbase/rune/VibRune;->SUPPORT_SEC_VIBRATION_PICKER:Z
  
--    if-eqz v0, :cond_2d
-+    if-eqz v0, :cond_2c
+-    if-eqz v5, :cond_3e
++    if-eqz v5, :cond_3d
  
-     const/4 v0, -0x1
+     const/4 v5, -0x1
  
-@@ -6967,7 +6871,7 @@
+@@ -6796,7 +6729,7 @@
  
-     move-result v2
+     move-result v4
  
--    if-ne v2, v0, :cond_38
-+    if-ne v2, v0, :cond_37
+-    if-ne v4, v5, :cond_38
++    if-ne v4, v5, :cond_37
  
-     const/16 v6, 0x2f
+     const/16 v8, 0x2f
  
-@@ -6991,7 +6895,7 @@
+@@ -6820,7 +6753,7 @@
  
-     move-result v5
+     move-result v6
  
--    if-ne v5, v0, :cond_37
-+    if-ne v5, v0, :cond_36
+-    if-ne v6, v5, :cond_37
++    if-ne v6, v5, :cond_36
  
      const-string/jumbo v0, "skip restoration notification pattern by legacyId"
  
-@@ -6999,7 +6903,7 @@
+@@ -6828,7 +6761,7 @@
  
-     goto/16 :goto_2
+     return-object v16
  
 -    :cond_37
 +    :cond_36
-     invoke-static {v1, v6, v5}, Lcom/samsung/android/settings/asbase/vibration/PatternRestoreHelper;->getSepIndexById(Landroid/content/Context;II)I
+     invoke-static {v0, v8, v6}, Lcom/samsung/android/settings/asbase/vibration/PatternRestoreHelper;->getSepIndexById(Landroid/content/Context;II)I
  
-     move-result v0
-@@ -7030,7 +6934,7 @@
+     move-result v5
+@@ -6843,14 +6776,14 @@
  
      goto :goto_4
  
 -    :cond_38
 +    :cond_37
-     const/4 v0, 0x1
+     const/4 v8, 0x1
  
-     invoke-static {v1, v0, v2}, Lcom/samsung/android/settings/asbase/vibration/PatternRestoreHelper;->getIdBySepIndex(Landroid/content/Context;II)I
-@@ -7039,7 +6943,7 @@
+     invoke-static {v0, v8, v4}, Lcom/samsung/android/settings/asbase/vibration/PatternRestoreHelper;->findIdByQuery(Landroid/content/Context;II)I
  
-     const/4 v0, -0x1
+     move-result v6
  
--    if-ne v5, v0, :cond_39
-+    if-ne v5, v0, :cond_38
+-    if-ne v6, v5, :cond_39
++    if-ne v6, v5, :cond_38
  
      const-string/jumbo v0, "skip restoration notification pattern by sepIndex"
  
-@@ -7047,39 +6951,39 @@
+@@ -6858,7 +6791,7 @@
  
-     goto/16 :goto_2
+     return-object v16
  
 -    :cond_39
 +    :cond_38
      :goto_4
-     invoke-static {}, Lcom/samsung/android/settings/asbase/vibration/VibPickerConstants;->getNotificationLiveStartId()I
+     sget-object v5, Lcom/samsung/android/settings/asbase/vibration/VibPickerConstants;->SIMPLE_NOTIFICATION_PATTERN:Ljava/util/List;
  
-     move-result v0
+@@ -6882,15 +6815,15 @@
  
--    if-lt v5, v0, :cond_3a
-+    if-lt v5, v0, :cond_39
+     add-int/2addr v8, v7
  
-     invoke-static/range {p1 .. p1}, Lcom/samsung/android/settings/asbase/vibration/PatternRestoreHelper;->supportsLivePattern(Landroid/content/Context;)Z
+-    if-lt v6, v8, :cond_3a
++    if-lt v6, v8, :cond_39
  
-     move-result v0
+     invoke-static {v0}, Lcom/samsung/android/settings/asbase/vibration/PatternRestoreHelper;->supportsLivePattern(Landroid/content/Context;)Z
  
--    if-eqz v0, :cond_3b
-+    if-eqz v0, :cond_3a
+     move-result v7
+ 
+-    if-eqz v7, :cond_3b
++    if-eqz v7, :cond_3a
  
 -    :cond_3a
 +    :cond_39
-     invoke-static {}, Lcom/samsung/android/settings/asbase/vibration/VibPickerConstants;->getNotificationColorfulStartId()I
+     check-cast v5, Ljava/util/ArrayList;
  
-     move-result v0
+     invoke-virtual {v5}, Ljava/util/ArrayList;->size()I
+@@ -6901,20 +6834,20 @@
  
--    if-lt v5, v0, :cond_3c
-+    if-lt v5, v0, :cond_3b
+     add-int/lit8 v5, v5, 0x1
  
-     invoke-static/range {p1 .. p1}, Lcom/samsung/android/settings/asbase/vibration/PatternRestoreHelper;->supportsColorfulPattern(Landroid/content/Context;)Z
+-    if-lt v6, v5, :cond_3c
++    if-lt v6, v5, :cond_3b
+ 
+     invoke-static {v0}, Lcom/samsung/android/settings/asbase/vibration/PatternRestoreHelper;->supportsColorfulPattern(Landroid/content/Context;)Z
  
      move-result v0
  
@@ -3525,25 +3295,25 @@ index d5f617cd..1ef9ca6b 100644
  
 -    :cond_3b
 +    :cond_3a
-     invoke-static {v13, v10}, Landroid/util/Log;->w(Ljava/lang/String;Ljava/lang/String;)I
+     invoke-static {v13, v15}, Landroid/util/Log;->w(Ljava/lang/String;Ljava/lang/String;)I
  
-     goto/16 :goto_2
+     return-object v16
  
 -    :cond_3c
 +    :cond_3b
      new-instance v0, Ljava/lang/StringBuilder;
  
-     invoke-direct {v0}, Ljava/lang/StringBuilder;-><init>()V
-@@ -7126,7 +7030,7 @@
+     const-string v5, "content://com.android.settings.personalvibration.PersonalVibrationProvider/notification/"
+@@ -6947,7 +6880,7 @@
  
      sget-boolean v0, Lcom/samsung/android/settings/asbase/rune/VibRune;->SUPPORT_SYNC_WITH_HAPTIC:Z
  
--    if-eqz v0, :cond_2d
-+    if-eqz v0, :cond_2c
+-    if-eqz v0, :cond_3e
++    if-eqz v0, :cond_3d
  
-     invoke-virtual/range {p4 .. p4}, Lcom/samsung/android/lib/episode/SourceInfo;->getOneUIVersion()Ljava/lang/String;
+     iget-object v0, v3, Lcom/samsung/android/lib/episode/SourceInfo;->mOneUIVersion:Ljava/lang/String;
  
-@@ -7140,7 +7044,7 @@
+@@ -6955,7 +6888,7 @@
  
      move-result v1
  
@@ -3552,115 +3322,122 @@ index d5f617cd..1ef9ca6b 100644
  
      invoke-static {v0}, Ljava/lang/Float;->parseFloat(Ljava/lang/String;)F
  
-@@ -7150,11 +7054,11 @@
+@@ -6963,11 +6896,11 @@
  
-     cmpg-float v0, v0, v3
+     cmpg-float v0, v0, v17
  
 -    if-lez v0, :cond_3d
 +    if-lez v0, :cond_3c
  
--    if-nez v1, :cond_2d
-+    if-nez v1, :cond_2c
+-    if-nez v1, :cond_3e
++    if-nez v1, :cond_3d
  
 -    :cond_3d
 +    :cond_3c
-     invoke-static {v4, v12, v2}, Landroid/provider/Settings$System;->putInt(Landroid/content/ContentResolver;Ljava/lang/String;I)Z
+     const/4 v6, 0x0
  
-     const-string v0, "Sync with notification is turned off by the OneUI version of the backup device."
-@@ -7211,59 +7115,59 @@
+     invoke-static {v14, v10, v6}, Landroid/provider/Settings$System;->putInt(Landroid/content/ContentResolver;Ljava/lang/String;I)Z
+@@ -6976,7 +6909,7 @@
  
-     move-result v1
- 
--    if-eqz v1, :cond_40
-+    if-eqz v1, :cond_3f
- 
--    if-nez v0, :cond_42
-+    if-nez v0, :cond_41
- 
-     const/4 v1, 0x5
- 
--    if-ne v2, v1, :cond_3e
-+    if-ne v2, v1, :cond_3d
- 
-     const/4 v12, 0x3
- 
-     goto :goto_5
+     invoke-static {v13, v0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
  
 -    :cond_3e
 +    :cond_3d
-     const/4 v3, 0x3
+     :goto_5
+     return-object v16
  
--    if-lt v2, v3, :cond_3f
-+    if-lt v2, v3, :cond_3e
+@@ -7026,59 +6959,59 @@
  
-     const/4 v12, 0x2
+     move-result v0
  
-     goto :goto_5
+-    if-eqz v0, :cond_41
++    if-eqz v0, :cond_40
+ 
+-    if-nez v1, :cond_43
++    if-nez v1, :cond_42
+ 
+     const/4 v0, 0x5
+ 
+-    if-ne v2, v0, :cond_3f
++    if-ne v2, v0, :cond_3e
+ 
+     const/4 v9, 0x3
+ 
+     goto :goto_6
  
 -    :cond_3f
 +    :cond_3e
-     const/4 v0, 0x1
+     const/4 v3, 0x3
  
--    if-lt v2, v0, :cond_42
-+    if-lt v2, v0, :cond_41
+-    if-lt v2, v3, :cond_40
++    if-lt v2, v3, :cond_3f
  
-     const/4 v12, 0x1
+     const/4 v9, 0x2
  
-     goto :goto_5
+     goto :goto_6
  
 -    :cond_40
 +    :cond_3f
-     const/4 v1, 0x5
+     const/4 v8, 0x1
  
-     const/4 v3, 0x3
+-    if-lt v2, v8, :cond_43
++    if-lt v2, v8, :cond_42
  
--    if-eqz v0, :cond_42
-+    if-eqz v0, :cond_41
+     const/4 v9, 0x1
  
--    if-ne v2, v3, :cond_41
-+    if-ne v2, v3, :cond_40
- 
-     move v12, v1
- 
-     goto :goto_5
+     goto :goto_6
  
 -    :cond_41
 +    :cond_40
-     const/4 v0, 0x2
+     const/4 v0, 0x5
  
--    if-ne v2, v0, :cond_42
-+    if-ne v2, v0, :cond_41
+     const/4 v3, 0x3
  
-     move v12, v3
+-    if-eqz v1, :cond_43
++    if-eqz v1, :cond_42
  
-     goto :goto_5
+-    if-ne v2, v3, :cond_42
++    if-ne v2, v3, :cond_41
+ 
+     move v9, v0
+ 
+     goto :goto_6
  
 -    :cond_42
 +    :cond_41
-     move v12, v2
+     const/4 v0, 0x2
  
-     :goto_5
-@@ -7376,37 +7280,6 @@
-     goto/16 :goto_2
+-    if-ne v2, v0, :cond_43
++    if-ne v2, v0, :cond_42
  
-     :pswitch_1e
+     move v9, v3
+ 
+     goto :goto_6
+ 
+-    :cond_43
++    :cond_42
+     move v9, v2
+ 
+     :goto_6
+@@ -7189,35 +7122,6 @@
+     return-object v16
+ 
+     :pswitch_1f
 -    const-string/jumbo v0, "vibration_sound_enabled"
 -
--    invoke-static {v5}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
+-    invoke-static {v6}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
 -
 -    move-result v1
 -
--    invoke-static {v4, v0, v1}, Landroid/provider/Settings$System;->putInt(Landroid/content/ContentResolver;Ljava/lang/String;I)Z
+-    invoke-static {v14, v0, v1}, Landroid/provider/Settings$System;->putInt(Landroid/content/ContentResolver;Ljava/lang/String;I)Z
 -
 -    new-instance v0, Ljava/lang/StringBuilder;
 -
--    invoke-direct {v0}, Ljava/lang/StringBuilder;-><init>()V
--
 -    const-string/jumbo v1, "restore vibration sound enabled value="
 -
--    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+-    invoke-direct {v0, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
 -
--    invoke-static {v5}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
+-    invoke-static {v6}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
 -
 -    move-result v1
 -
@@ -3672,170 +3449,170 @@ index d5f617cd..1ef9ca6b 100644
 -
 -    invoke-static {v13, v0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
 -
--    goto/16 :goto_2
+-    return-object v16
 -
--    :pswitch_1f
+-    :pswitch_20
      const-string v0, "dialing_keypad_vibrate"
  
-     invoke-static {v5}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
-@@ -7417,7 +7290,7 @@
+     invoke-static {v6}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
+@@ -7228,7 +7132,7 @@
  
-     goto/16 :goto_2
- 
--    :pswitch_20
-+    :pswitch_1f
-     const-string v0, "VIB_RECVCALL_MAGNITUDE"
- 
-     invoke-static {v5}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
-@@ -7446,7 +7319,7 @@
- 
-     goto/16 :goto_2
+     return-object v16
  
 -    :pswitch_21
 +    :pswitch_20
-     const-string v0, "dtmf_tone"
+     move-object/from16 v1, v20
  
-     invoke-static {v5}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
-@@ -7457,7 +7330,7 @@
+     const-string v0, "VIB_RECVCALL_MAGNITUDE"
+@@ -7257,7 +7161,7 @@
  
-     goto/16 :goto_2
+     return-object v16
  
 -    :pswitch_22
 +    :pswitch_21
-     const-string/jumbo v0, "media_vibration_intensity"
+     const-string v0, "dtmf_tone"
  
-     invoke-static {v5}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
-@@ -7488,7 +7361,7 @@
+     invoke-static {v6}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
+@@ -7268,7 +7172,7 @@
  
-     goto/16 :goto_2
+     return-object v16
  
 -    :pswitch_23
 +    :pswitch_22
-     const-string v0, "charging_vibration_enabled"
+     const-string v0, "media_vibration_intensity"
  
-     invoke-static {v5}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
-@@ -7499,7 +7372,7 @@
+     invoke-static {v6}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
+@@ -7297,7 +7201,7 @@
  
-     goto/16 :goto_2
+     return-object v16
  
 -    :pswitch_24
 +    :pswitch_23
-     invoke-static {v5}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
+     const-string v0, "charging_vibration_enabled"
  
-     move-result v0
-@@ -7508,7 +7381,7 @@
+     invoke-static {v6}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
+@@ -7308,7 +7212,7 @@
  
-     goto/16 :goto_2
+     return-object v16
  
 -    :pswitch_25
 +    :pswitch_24
-     const-string/jumbo v2, "restore_multisound_app"
+     invoke-static {v6}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
  
-     invoke-static {v4, v2, v5}, Landroid/provider/Settings$System;->putString(Landroid/content/ContentResolver;Ljava/lang/String;Ljava/lang/String;)Z
-@@ -7517,7 +7390,7 @@
+     move-result v0
+@@ -7319,7 +7223,7 @@
  
-     goto/16 :goto_2
+     return-object v16
  
 -    :pswitch_26
 +    :pswitch_25
-     const-string v0, "SEM_VIBRATION_FORCE_TOUCH_INTENSITY"
+     const-string/jumbo v1, "restore_multisound_app"
  
-     invoke-static {v5}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
-@@ -7548,14 +7421,14 @@
+     invoke-static {v14, v1, v6}, Landroid/provider/Settings$System;->putString(Landroid/content/ContentResolver;Ljava/lang/String;Ljava/lang/String;)Z
+@@ -7328,7 +7232,7 @@
  
-     goto/16 :goto_2
+     return-object v16
  
 -    :pswitch_27
 +    :pswitch_26
-     invoke-static/range {p1 .. p1}, Lcom/samsung/android/settings/asbase/utils/VibUtils;->hasSystemVibrationMenu(Landroid/content/Context;)Z
+     const-string v0, "SEM_VIBRATION_FORCE_TOUCH_INTENSITY"
+ 
+     invoke-static {v6}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
+@@ -7357,14 +7261,14 @@
+ 
+     return-object v16
+ 
+-    :pswitch_28
++    :pswitch_27
+     invoke-static {v0}, Lcom/samsung/android/settings/asbase/utils/VibUtils;->hasSystemVibrationMenu(Landroid/content/Context;)Z
  
      move-result v0
  
      const-string v1, "haptic_feedback_enabled"
  
--    if-nez v0, :cond_43
-+    if-nez v0, :cond_42
+-    if-nez v0, :cond_44
++    if-nez v0, :cond_43
  
      const/4 v0, 0x0
  
-@@ -7563,7 +7436,7 @@
+@@ -7372,7 +7276,7 @@
  
-     goto/16 :goto_2
+     return-object v16
  
--    :cond_43
-+    :cond_42
-     invoke-static {v5}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
- 
-     move-result v0
-@@ -7572,7 +7445,7 @@
- 
-     goto/16 :goto_2
- 
--    :pswitch_28
-+    :pswitch_27
-     invoke-static {v5}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
+-    :cond_44
++    :cond_43
+     invoke-static {v6}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
  
      move-result v0
-@@ -7593,7 +7466,7 @@
+@@ -7381,7 +7285,7 @@
  
-     goto/16 :goto_2
+     return-object v16
  
 -    :pswitch_29
 +    :pswitch_28
+     move-object/from16 v15, v19
+ 
+     invoke-static {v6}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
+@@ -7404,7 +7308,7 @@
+ 
+     return-object v16
+ 
+-    :pswitch_2a
++    :pswitch_29
      const-string/jumbo v0, "sip_key_feedback_sound"
  
-     invoke-static {v5}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
-@@ -7607,22 +7480,19 @@
-     :goto_6
-     return-object v0
+     invoke-static {v6}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
+@@ -7415,20 +7319,21 @@
  
--    nop
--
+     return-object v16
+ 
++    nop
++
      :sswitch_data_0
      .sparse-switch
--        -0x792f53f5 -> :sswitch_2b
--        -0x782a3dcd -> :sswitch_2a
--        -0x73578aa6 -> :sswitch_29
--        -0x6bf572c7 -> :sswitch_28
--        -0x6b6f0411 -> :sswitch_27
--        -0x6afc11a3 -> :sswitch_26
--        -0x5e0b3bbc -> :sswitch_25
--        -0x499d027b -> :sswitch_24
--        -0x48073965 -> :sswitch_23
--        -0x3d7b48a7 -> :sswitch_22
--        -0x3aba98f7 -> :sswitch_21
--        -0x34738d79 -> :sswitch_20
-+        -0x792f53f5 -> :sswitch_2a
-+        -0x782a3dcd -> :sswitch_29
-+        -0x73578aa6 -> :sswitch_28
-+        -0x6bf572c7 -> :sswitch_27
-+        -0x6b6f0411 -> :sswitch_26
-+        -0x6afc11a3 -> :sswitch_25
-+        -0x5e0b3bbc -> :sswitch_24
-+        -0x499d027b -> :sswitch_23
-+        -0x48073965 -> :sswitch_22
-+        -0x3d7b48a7 -> :sswitch_21
-+        -0x3aba98f7 -> :sswitch_20
-         -0x1ddcc5dc -> :sswitch_1f
-         -0x1047e935 -> :sswitch_1e
-         -0x738eff9 -> :sswitch_1d
-@@ -7659,7 +7529,6 @@
+-        -0x792f53f5 -> :sswitch_2c
+-        -0x782a3dcd -> :sswitch_2b
+-        -0x73578aa6 -> :sswitch_2a
+-        -0x6bf572c7 -> :sswitch_29
+-        -0x6b6f0411 -> :sswitch_28
+-        -0x6afc11a3 -> :sswitch_27
+-        -0x5e0b3bbc -> :sswitch_26
+-        -0x499d027b -> :sswitch_25
+-        -0x48073965 -> :sswitch_24
+-        -0x3d7b48a7 -> :sswitch_23
+-        -0x3aba98f7 -> :sswitch_22
+-        -0x34738d79 -> :sswitch_21
++        -0x792f53f5 -> :sswitch_2b
++        -0x782a3dcd -> :sswitch_2a
++        -0x73578aa6 -> :sswitch_29
++        -0x6bf572c7 -> :sswitch_28
++        -0x6b6f0411 -> :sswitch_27
++        -0x6afc11a3 -> :sswitch_26
++        -0x5e0b3bbc -> :sswitch_25
++        -0x499d027b -> :sswitch_24
++        -0x48073965 -> :sswitch_23
++        -0x3d7b48a7 -> :sswitch_22
++        -0x3aba98f7 -> :sswitch_21
+         -0x1ddcc5dc -> :sswitch_20
+         -0x1047e935 -> :sswitch_1f
+         -0x738eff9 -> :sswitch_1e
+@@ -7466,7 +7371,6 @@
  
      :pswitch_data_0
      .packed-switch 0x0
--        :pswitch_29
+-        :pswitch_2a
+         :pswitch_29
          :pswitch_28
          :pswitch_27
-         :pswitch_26
-@@ -7692,7 +7561,7 @@
+@@ -7499,7 +7403,7 @@
+         :pswitch_c
          :pswitch_b
          :pswitch_a
+-        :pswitch_26
++        :pswitch_25
          :pswitch_9
--        :pswitch_25
-+        :pswitch_24
          :pswitch_8
          :pswitch_7
-         :pswitch_6
 -- 
-2.46.0
+2.51.0
 

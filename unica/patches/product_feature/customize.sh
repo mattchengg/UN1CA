@@ -68,6 +68,9 @@ if $SOURCE_AUDIO_SUPPORT_VIRTUAL_VIBRATION; then
         echo "Applying virtual vibration patches"
         APPLY_PATCH "system" "system/framework/framework.jar" "$SRC_DIR/unica/patches/product_feature/audio/virtual_vib/framework.jar/0001-Disable-virtual-vibration-support.patch"
         APPLY_PATCH "system" "system/framework/services.jar" "$SRC_DIR/unica/patches/product_feature/audio/virtual_vib/services.jar/0001-Disable-virtual-vibration-support.patch"
+        SMALI_PATCH "system" "system/framework/services.jar" "smali/com/android/server/audio/BtHelper\$\$ExternalSyntheticLambda0.smali" "remove"
+        SMALI_PATCH "system" "system/framework/services.jar" "smali_classes2/com/android/server/vibrator/VibratorManagerService\$SamsungBroadcastReceiver\$\$ExternalSyntheticLambda1.smali" "remove"
+        SMALI_PATCH "system" "system/framework/services.jar" "smali_classes2/com/android/server/vibrator/VirtualVibSoundHelper.smali" "remove"
         APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" "$SRC_DIR/unica/patches/product_feature/audio/virtual_vib/SecSettings.apk/0001-Disable-virtual-vibration-support.patch"
         APPLY_PATCH "system" "system/priv-app/SettingsProvider/SettingsProvider.apk" "$SRC_DIR/unica/patches/product_feature/audio/virtual_vib/SettingsProvider.apk/0001-Disable-virtual-vibration-support.patch"
     fi

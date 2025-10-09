@@ -1,92 +1,39 @@
-From 92548b4c472150098fc383b8eebe3a7f311ad5ee Mon Sep 17 00:00:00 2001
-From: BlackMesa123 <giangrecosalvo9@gmail.com>
-Date: Wed, 5 Jun 2024 22:57:32 +0200
+From d3ec7ba1147d0c19fa934726b3f1acea0289445e Mon Sep 17 00:00:00 2001
+From: Salvo Giangreco <giangrecosalvo9@gmail.com>
+Date: Sat, 30 Aug 2025 15:36:27 +0200
 Subject: [PATCH] Disable ACH ringtone support
 
 ---
- .../com/samsung/android/audio/Rune.smali      |  6 +++--
- .../samsung/android/vibrator/VibRune.smali    | 22 +++++++++----------
- 2 files changed, 15 insertions(+), 13 deletions(-)
+ smali_classes6/com/samsung/android/audio/Rune.smali       | 2 +-
+ smali_classes6/com/samsung/android/vibrator/VibRune.smali | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/smali_classes5/com/samsung/android/audio/Rune.smali b/smali_classes5/com/samsung/android/audio/Rune.smali
-index 7ac9ad91..ba627bea 100644
---- a/smali_classes5/com/samsung/android/audio/Rune.smali
-+++ b/smali_classes5/com/samsung/android/audio/Rune.smali
-@@ -443,9 +443,11 @@
+diff --git a/smali_classes6/com/samsung/android/audio/Rune.smali b/smali_classes6/com/samsung/android/audio/Rune.smali
+index da0fff18..67f0c356 100644
+--- a/smali_classes6/com/samsung/android/audio/Rune.smali
++++ b/smali_classes6/com/samsung/android/audio/Rune.smali
+@@ -435,7 +435,7 @@
  
      sput-boolean v2, Lcom/samsung/android/audio/Rune;->SEC_AUDIO_SUPPORT_SOUND_THEME:Z
  
--    const-string v0, "ACH"
-+    const-string v0, ""
+-    sput-boolean v2, Lcom/samsung/android/audio/Rune;->SEC_AUDIO_SUPPORT_ACH_RINGTONE:Z
++    sput-boolean v1, Lcom/samsung/android/audio/Rune;->SEC_AUDIO_SUPPORT_ACH_RINGTONE:Z
  
--    invoke-virtual {v0, v0}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
-+    const-string v3, "ACH"
-+
-+    invoke-virtual {v0, v3}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+     invoke-static {}, Lcom/samsung/android/feature/SemFloatingFeature;->getInstance()Lcom/samsung/android/feature/SemFloatingFeature;
  
-     move-result v0
+diff --git a/smali_classes6/com/samsung/android/vibrator/VibRune.smali b/smali_classes6/com/samsung/android/vibrator/VibRune.smali
+index 9c2b5121..cf1c264f 100644
+--- a/smali_classes6/com/samsung/android/vibrator/VibRune.smali
++++ b/smali_classes6/com/samsung/android/vibrator/VibRune.smali
+@@ -8,7 +8,7 @@
  
-diff --git a/smali_classes5/com/samsung/android/vibrator/VibRune.smali b/smali_classes5/com/samsung/android/vibrator/VibRune.smali
-index 2db9c622..e828c776 100644
---- a/smali_classes5/com/samsung/android/vibrator/VibRune.smali
-+++ b/smali_classes5/com/samsung/android/vibrator/VibRune.smali
-@@ -81,7 +81,9 @@
+ .field public static final blacklist SUPPORT_4D_VIBRATION:Z = true
  
-     const-string v1, "ACH"
+-.field public static final blacklist SUPPORT_ACH:Z = true
++.field public static final blacklist SUPPORT_ACH:Z = false
  
--    invoke-virtual {v1, v1}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
-+    const-string v2, ""
-+
-+    invoke-virtual {v2, v1}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
- 
-     move-result v1
- 
-@@ -91,9 +93,9 @@
- 
-     move-result-object v1
- 
--    const-string v2, "SEC_FLOATING_FEATURE_AUDIO_SUPPORT_DC_MOTOR_HAPTIC_FEEDBACK"
-+    const-string v3, "SEC_FLOATING_FEATURE_AUDIO_SUPPORT_DC_MOTOR_HAPTIC_FEEDBACK"
- 
--    invoke-virtual {v1, v2}, Lcom/samsung/android/feature/SemFloatingFeature;->getBoolean(Ljava/lang/String;)Z
-+    invoke-virtual {v1, v3}, Lcom/samsung/android/feature/SemFloatingFeature;->getBoolean(Ljava/lang/String;)Z
- 
-     move-result v1
- 
-@@ -103,15 +105,15 @@
- 
-     move-result-object v1
- 
--    const-string v2, "CountryISO"
-+    const-string v3, "CountryISO"
- 
--    invoke-virtual {v1, v2}, Lcom/samsung/android/feature/SemCscFeature;->getString(Ljava/lang/String;)Ljava/lang/String;
-+    invoke-virtual {v1, v3}, Lcom/samsung/android/feature/SemCscFeature;->getString(Ljava/lang/String;)Ljava/lang/String;
- 
-     move-result-object v1
- 
--    const-string v2, "JP"
-+    const-string v3, "JP"
- 
--    invoke-virtual {v2, v1}, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
-+    invoke-virtual {v3, v1}, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
- 
-     move-result v1
- 
-@@ -121,11 +123,9 @@
- 
-     move-result-object v1
- 
--    const-string v2, "CscFeature_SystemUI_ConfigDndExceptionPackage"
--
--    const-string v3, ""
-+    const-string v3, "CscFeature_SystemUI_ConfigDndExceptionPackage"
- 
--    invoke-virtual {v1, v2, v3}, Lcom/samsung/android/feature/SemCscFeature;->getString(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
-+    invoke-virtual {v1, v3, v2}, Lcom/samsung/android/feature/SemCscFeature;->getString(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
- 
-     move-result-object v1
+ .field public static final blacklist SUPPORT_ALWAYS_VIBRATE:Z
  
 -- 
-2.46.0
+2.51.0
 

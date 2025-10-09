@@ -1,102 +1,30 @@
-From a45b2426569e715e7f1e2d2bbb02c18359fe07b4 Mon Sep 17 00:00:00 2001
-From: BlackMesa123 <giangrecosalvo9@gmail.com>
-Date: Sat, 8 Jun 2024 15:23:47 +0200
+From 2860859effc43739831a2d89e5e3fcab95bd3485 Mon Sep 17 00:00:00 2001
+From: Salvo Giangreco <giangrecosalvo9@gmail.com>
+Date: Thu, 9 Oct 2025 23:48:35 +0200
 Subject: [PATCH] Disable virtual vibration support
 
+UN1CA: this patch is not complete! Please check unica/patches/product_feature/customize.sh for more info.
 ---
- .../BtHelper$$ExternalSyntheticLambda0.smali  |  34 --
- smali/com/android/server/audio/BtHelper.smali |  83 -----
- .../vibrator/VibrationCustomSettings.smali    | 243 --------------
- .../server/vibrator/VibrationSettings.smali   |  34 --
- .../vibrator/VibratorManagerInternal.smali    |  23 --
- .../vibrator/VibratorManagerService$1.smali   |  34 +-
- ...nagerService$ExternalVibratorService.smali | 165 +++-------
- ...stReceiver$$ExternalSyntheticLambda1.smali |  40 ---
- ...agerService$SamsungBroadcastReceiver.smali | 194 ++---------
- .../vibrator/VibratorManagerService.smali     | 187 +++--------
- .../vibrator/VirtualVibSoundHelper.smali      | 306 ------------------
- 11 files changed, 105 insertions(+), 1238 deletions(-)
- delete mode 100644 smali/com/android/server/audio/BtHelper$$ExternalSyntheticLambda0.smali
- delete mode 100644 smali_classes3/com/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda1.smali
- delete mode 100644 smali_classes3/com/android/server/vibrator/VirtualVibSoundHelper.smali
+ .../server/audio/AudioDeviceBroker.smali      | 123 +++---
+ smali/com/android/server/audio/BtHelper.smali |   4 -
+ .../vibrator/VibrationCustomSettings.smali    |   6 -
+ .../server/vibrator/VibrationSettings.smali   |   4 +-
+ .../vibrator/VibratorManagerInternal.smali    |  49 ---
+ .../vibrator/VibratorManagerService$1.smali   | 251 ++++--------
+ ...nagerService$ExternalVibratorService.smali | 374 ++++++++----------
+ .../VibratorManagerService$Lifecycle.smali    |  12 +-
+ ...stReceiver$$ExternalSyntheticLambda0.smali |  23 +-
+ .../vibrator/VibratorManagerService.smali     | 111 +-----
+ .../android/server/audio/utils/BtUtils.smali  |  68 ----
+ 11 files changed, 339 insertions(+), 686 deletions(-)
 
-diff --git a/smali/com/android/server/audio/BtHelper$$ExternalSyntheticLambda0.smali b/smali/com/android/server/audio/BtHelper$$ExternalSyntheticLambda0.smali
-deleted file mode 100644
-index 8815a941..00000000
---- a/smali/com/android/server/audio/BtHelper$$ExternalSyntheticLambda0.smali
-+++ /dev/null
-@@ -1,34 +0,0 @@
--.class public final synthetic Lcom/android/server/audio/BtHelper$$ExternalSyntheticLambda0;
--.super Ljava/lang/Object;
--.source "R8$$SyntheticClass"
--
--# interfaces
--.implements Ljava/lang/Runnable;
--
--
--# instance fields
--.field public final synthetic f$0:Lcom/android/server/audio/BtHelper;
--
--
--# direct methods
--.method public synthetic constructor <init>(Lcom/android/server/audio/BtHelper;)V
--    .locals 0
--
--    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
--
--    iput-object p1, p0, Lcom/android/server/audio/BtHelper$$ExternalSyntheticLambda0;->f$0:Lcom/android/server/audio/BtHelper;
--
--    return-void
--.end method
--
--
--# virtual methods
--.method public final run()V
--    .locals 0
--
--    iget-object p0, p0, Lcom/android/server/audio/BtHelper$$ExternalSyntheticLambda0;->f$0:Lcom/android/server/audio/BtHelper;
--
--    invoke-static {p0}, Lcom/android/server/audio/BtHelper;->$r8$lambda$IzQFKGtqe8xUujzWykDPkyhyN40(Lcom/android/server/audio/BtHelper;)V
--
--    return-void
--.end method
-diff --git a/smali/com/android/server/audio/BtHelper.smali b/smali/com/android/server/audio/BtHelper.smali
-index 0cce5f91..7cb45784 100644
---- a/smali/com/android/server/audio/BtHelper.smali
-+++ b/smali/com/android/server/audio/BtHelper.smali
-@@ -34,14 +34,6 @@
- 
- 
- # direct methods
--.method public static synthetic $r8$lambda$IzQFKGtqe8xUujzWykDPkyhyN40(Lcom/android/server/audio/BtHelper;)V
--    .locals 0
--
--    invoke-direct {p0}, Lcom/android/server/audio/BtHelper;->lambda$receiveBtEvent$0()V
--
--    return-void
--.end method
--
- .method public static bridge synthetic -$$Nest$fgetmDeviceBroker(Lcom/android/server/audio/BtHelper;)Lcom/android/server/audio/AudioDeviceBroker;
-     .locals 0
- 
-@@ -493,14 +485,6 @@
-     return p0
- .end method
- 
--.method private synthetic lambda$receiveBtEvent$0()V
--    .locals 0
--
--    invoke-virtual {p0}, Lcom/android/server/audio/BtHelper;->updateWatchConnectionState()V
--
--    return-void
--.end method
--
- .method public static onNotifyPreferredAudioProfileApplied(Landroid/bluetooth/BluetoothDevice;)V
-     .locals 1
- 
-@@ -2479,12 +2463,6 @@
- 
-     invoke-virtual {p0, p1}, Lcom/android/server/audio/BtHelper;->setBtScoActiveDevice(Landroid/bluetooth/BluetoothDevice;)V
+diff --git a/smali/com/android/server/audio/AudioDeviceBroker.smali b/smali/com/android/server/audio/AudioDeviceBroker.smali
+index 94243d8cb..8a2ab436a 100644
+--- a/smali/com/android/server/audio/AudioDeviceBroker.smali
++++ b/smali/com/android/server/audio/AudioDeviceBroker.smali
+@@ -621,12 +621,6 @@
+     :try_start_1
+     invoke-virtual {p0, p1}, Lcom/android/server/audio/BtHelper;->onSetBtScoActiveDevice(Landroid/bluetooth/BluetoothDevice;)V
  
 -    new-instance p1, Lcom/android/server/audio/BtHelper$$ExternalSyntheticLambda0;
 -
@@ -104,415 +32,337 @@ index 0cce5f91..7cb45784 100644
 -
 -    invoke-static {p1}, Lcom/samsung/android/server/audio/AudioExecutor;->execute(Ljava/lang/Runnable;)V
 -
-     goto/16 :goto_0
+     goto/16 :goto_2
  
+     :cond_1
+@@ -5422,9 +5416,9 @@
+ .method public final onUpdateCommunicationRouteClient(Landroid/content/AttributionSource;Ljava/lang/String;)V
+     .locals 8
+ 
+-    const/4 v0, 0x0
++    const/4 v0, 0x2
+ 
+-    const/4 v1, 0x2
++    const/4 v1, 0x0
+ 
+     const/4 v2, 0x1
+ 
+@@ -5441,7 +5435,7 @@
      :cond_0
-@@ -3919,64 +3897,3 @@
-     :goto_1
-     return-void
- .end method
--
--.method public final updateWatchConnectionState()V
--    .locals 4
--
--    iget-object v0, p0, Lcom/android/server/audio/BtHelper;->mBluetoothHeadset:Landroid/bluetooth/BluetoothHeadset;
--
--    const/4 v1, 0x0
--
--    if-eqz v0, :cond_0
--
--    invoke-virtual {v0}, Landroid/bluetooth/BluetoothHeadset;->getConnectedDevices()Ljava/util/List;
--
--    move-result-object v0
--
--    if-eqz v0, :cond_0
--
--    invoke-interface {v0}, Ljava/util/List;->size()I
--
--    move-result v2
--
--    const/4 v3, 0x1
--
--    if-ne v2, v3, :cond_0
--
--    invoke-interface {v0, v1}, Ljava/util/List;->get(I)Ljava/lang/Object;
--
--    move-result-object v0
--
--    check-cast v0, Landroid/bluetooth/BluetoothDevice;
--
--    iget-object v1, p0, Lcom/android/server/audio/BtHelper;->mBluetoothHeadset:Landroid/bluetooth/BluetoothHeadset;
--
--    invoke-static {v0, v1}, Lcom/samsung/android/server/audio/utils/BtUtils;->isSamsungWatch(Landroid/bluetooth/BluetoothDevice;Landroid/bluetooth/BluetoothHeadset;)Z
--
--    move-result v1
--
--    :cond_0
--    new-instance v0, Ljava/lang/StringBuilder;
--
--    invoke-direct {v0}, Ljava/lang/StringBuilder;-><init>()V
--
--    const-string/jumbo v2, "receiveBtEvent updateWatchConnectionState = "
--
--    invoke-virtual {v0, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
--
--    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Z)Ljava/lang/StringBuilder;
--
--    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
--
--    move-result-object v0
--
--    const-string v2, "AS.BtHelper"
--
--    invoke-static {v2, v0}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
--
--    iget-object p0, p0, Lcom/android/server/audio/BtHelper;->mVibratorManagerInternal:Lcom/android/server/vibrator/VibratorManagerInternal;
--
--    invoke-virtual {p0, v1}, Lcom/android/server/vibrator/VibratorManagerInternal;->updateWatchConnectionState(Z)V
--
--    return-void
--.end method
-diff --git a/smali_classes3/com/android/server/vibrator/VibrationCustomSettings.smali b/smali_classes3/com/android/server/vibrator/VibrationCustomSettings.smali
-index 2ae081e9..9600955b 100644
---- a/smali_classes3/com/android/server/vibrator/VibrationCustomSettings.smali
-+++ b/smali_classes3/com/android/server/vibrator/VibrationCustomSettings.smali
-@@ -369,30 +369,6 @@
-     return p0
- .end method
+     iget-object v4, p0, Lcom/android/server/audio/AudioDeviceBroker;->mBtHelper:Lcom/android/server/audio/BtHelper;
  
--.method public getRingtoneVolumeScale()F
--    .locals 2
--
--    iget-object v0, p0, Lcom/android/server/vibrator/VibrationCustomSettings;->LEVEL_TO_MAGNITUDE:[I
--
--    array-length v0, v0
--
--    add-int/lit8 v0, v0, -0x1
--
--    const-string v1, "VIB_RECVCALL_MAGNITUDE"
--
--    invoke-virtual {p0, v1, v0}, Lcom/android/server/vibrator/VibrationCustomSettings;->loadSystemSetting(Ljava/lang/String;I)I
--
--    move-result p0
--
--    int-to-float p0, p0
--
--    int-to-float v0, v0
--
--    div-float/2addr p0, v0
--
--    return p0
--.end method
--
- .method public initializeVibrationState()V
-     .locals 13
+-    if-eqz v3, :cond_6
++    if-eqz v3, :cond_8
  
-@@ -703,27 +679,6 @@
-     return-void
- .end method
+     iget-object p1, v3, Lcom/android/server/audio/AudioDeviceBroker$CommunicationRouteClient;->mDevice:Landroid/media/AudioDeviceAttributes;
  
--.method public final isVibrationSoundEnabled()Z
--    .locals 2
--
--    const-string/jumbo v0, "vibration_sound_enabled"
--
--    const/4 v1, 0x0
--
--    invoke-virtual {p0, v0, v1}, Lcom/android/server/vibrator/VibrationCustomSettings;->loadSystemSetting(Ljava/lang/String;I)I
--
--    move-result p0
--
--    const/4 v0, 0x1
--
--    if-ne p0, v0, :cond_0
--
--    move v1, v0
--
--    :cond_0
--    return v1
--.end method
--
- .method public final loadSystemSetting(Ljava/lang/String;I)I
-     .locals 1
+@@ -5451,40 +5445,71 @@
  
-@@ -923,178 +878,6 @@
-     return-void
- .end method
+     const/4 v5, 0x7
  
--.method public shouldSoundForRingerMode(I)Z
--    .locals 9
--
--    invoke-virtual {p0}, Lcom/android/server/vibrator/VibrationCustomSettings;->isVibrationSoundEnabled()Z
--
--    move-result v0
--
--    const/4 v1, 0x0
--
--    if-nez v0, :cond_0
--
--    const-string p0, "VibratorManagerService"
--
--    const-string/jumbo p1, "shouldSoundForRingerMode false"
--
--    invoke-static {p0, p1}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
--
--    return v1
--
--    :cond_0
--    const/16 v0, 0x21
--
--    if-eq p1, v0, :cond_1
--
--    return v1
--
--    :cond_1
--    iget-object p1, p0, Lcom/android/server/vibrator/VibrationCustomSettings;->mLock:Ljava/lang/Object;
--
--    monitor-enter p1
--
--    :try_start_0
--    iget-object v0, p0, Lcom/android/server/vibrator/VibrationCustomSettings;->mAudioManager:Landroid/media/AudioManager;
--
--    if-nez v0, :cond_2
--
--    monitor-exit p1
--
--    return v1
--
--    :cond_2
--    invoke-virtual {v0}, Landroid/media/AudioManager;->getRingerModeInternal()I
--
--    move-result v0
--
--    const/4 v2, 0x1
--
--    if-eq v0, v2, :cond_3
--
--    monitor-exit p1
--
--    return v1
--
--    :cond_3
--    iget-object v0, p0, Lcom/android/server/vibrator/VibrationCustomSettings;->mAudioManager:Landroid/media/AudioManager;
--
--    const/4 v3, 0x2
--
--    invoke-virtual {v0, v3}, Landroid/media/AudioManager;->getDevices(I)[Landroid/media/AudioDeviceInfo;
--
--    move-result-object v0
--
--    array-length v3, v0
--
--    move v4, v1
--
--    move v5, v4
--
--    :goto_0
--    if-ge v4, v3, :cond_7
--
--    aget-object v6, v0, v4
--
--    invoke-virtual {v6}, Landroid/media/AudioDeviceInfo;->getType()I
--
--    move-result v7
--
--    const/16 v8, 0x8
--
--    if-eq v7, v8, :cond_6
--
--    invoke-virtual {v6}, Landroid/media/AudioDeviceInfo;->getType()I
--
--    move-result v7
--
--    const/16 v8, 0x16
--
--    if-ne v7, v8, :cond_4
--
+-    if-ne p1, v5, :cond_4
++    if-ne p1, v5, :cond_6
+ 
+     iget-object p1, v4, Lcom/android/server/audio/BtHelper;->mBluetoothHeadsetDevice:Landroid/bluetooth/BluetoothDevice;
+ 
+     if-nez p1, :cond_1
+ 
 -    goto :goto_1
--
--    :cond_4
--    invoke-virtual {v6}, Landroid/media/AudioDeviceInfo;->getType()I
--
--    move-result v6
--
--    const/4 v7, 0x7
--
--    if-ne v6, v7, :cond_5
--
--    add-int/lit8 v5, v5, 0x1
--
--    :cond_5
--    add-int/lit8 v4, v4, 0x1
--
++    goto/16 :goto_2
+ 
+     :cond_1
+     iget-object v5, v4, Lcom/android/server/audio/BtHelper;->mBluetoothHeadset:Landroid/bluetooth/BluetoothHeadset;
+ 
+-    invoke-static {p1, v5}, Lcom/samsung/android/server/audio/utils/BtUtils;->isSamsungWatch(Landroid/bluetooth/BluetoothDevice;Landroid/bluetooth/BluetoothHeadset;)Z
++    sget-object v6, Lcom/samsung/android/server/audio/utils/BtUtils;->SAP_UUID:Landroid/os/ParcelUuid;
++
++    if-nez v5, :cond_2
++
++    move v5, v1
++
++    goto :goto_0
++
++    :cond_2
++    invoke-virtual {v5, p1}, Landroid/bluetooth/BluetoothHeadset;->getSamsungHandsfreeDeviceType(Landroid/bluetooth/BluetoothDevice;)Ljava/lang/String;
++
++    move-result-object v5
++
++    const-string/jumbo v6, "WA"
++
++    invoke-virtual {v6, v5}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v5
++
++    :goto_0
++    if-nez v5, :cond_5
++
++    invoke-virtual {p1}, Landroid/bluetooth/BluetoothDevice;->getUuids()[Landroid/os/ParcelUuid;
++
++    move-result-object p1
++
++    sget-object v5, Lcom/samsung/android/server/audio/utils/BtUtils;->SAP_UUID:Landroid/os/ParcelUuid;
++
++    invoke-static {p1, v5}, Lcom/android/internal/util/ArrayUtils;->contains([Ljava/lang/Object;Ljava/lang/Object;)Z
+ 
+     move-result p1
+ 
+-    if-nez p1, :cond_3
++    if-eqz p1, :cond_3
+ 
++    goto :goto_1
++
++    :cond_3
+     iget-object p1, v4, Lcom/android/server/audio/BtHelper;->mBluetoothHeadsetDevice:Landroid/bluetooth/BluetoothDevice;
+ 
+-    if-nez p1, :cond_2
++    if-nez p1, :cond_4
+ 
+-    goto :goto_1
++    goto :goto_2
+ 
+-    :cond_2
++    :cond_4
+     const/16 v4, 0x206
+ 
+     int-to-byte v4, v4
+ 
+-    int-to-byte v5, v1
++    int-to-byte v5, v0
+ 
+     :try_start_0
+-    new-array v6, v1, [B
++    new-array v6, v0, [B
+ 
+-    aput-byte v4, v6, v0
++    aput-byte v4, v6, v1
+ 
+     aput-byte v5, v6, v2
+ 
+@@ -5496,33 +5521,33 @@
+ 
+     int-to-byte v6, v6
+ 
+-    new-array v1, v1, [B
++    new-array v0, v0, [B
+ 
+-    aput-byte v6, v1, v0
++    aput-byte v6, v0, v1
+ 
+-    aput-byte v5, v1, v2
++    aput-byte v5, v0, v2
+ 
+-    invoke-virtual {p1, v1}, Landroid/bluetooth/BluetoothDevice;->semGetMetadata([B)[B
++    invoke-virtual {p1, v0}, Landroid/bluetooth/BluetoothDevice;->semGetMetadata([B)[B
+ 
+     move-result-object p1
+ 
+-    if-eqz v4, :cond_4
++    if-eqz v4, :cond_6
+ 
+-    if-eqz p1, :cond_4
++    if-eqz p1, :cond_6
+ 
+     const/4 v0, 0x3
+ 
+     aget-byte v1, v4, v0
+ 
+-    if-eq v1, v2, :cond_4
++    if-eq v1, v2, :cond_6
+ 
+     aget-byte p1, p1, v0
+     :try_end_0
+     .catch Ljava/lang/Exception; {:try_start_0 .. :try_end_0} :catch_0
+ 
+-    if-eq p1, v2, :cond_4
++    if-eq p1, v2, :cond_6
+ 
 -    goto :goto_0
--
--    :cond_6
++    goto :goto_1
+ 
+     :catch_0
+     move-exception v0
+@@ -5549,37 +5574,37 @@
+ 
+     invoke-static {v0, p1}, Landroid/util/Log;->w(Ljava/lang/String;Ljava/lang/String;)I
+ 
+-    goto :goto_1
++    goto :goto_2
+ 
+-    :cond_3
+-    :goto_0
++    :cond_5
++    :goto_1
+     invoke-virtual {p0, p2}, Lcom/android/server/audio/AudioDeviceBroker;->updateCommunicationRoute(Ljava/lang/String;)V
+ 
+     return-void
+ 
+-    :cond_4
 -    :goto_1
--    const-string p0, "VibratorManagerService"
++    :cond_6
++    :goto_2
+     iget-object p1, p0, Lcom/android/server/audio/AudioDeviceBroker;->mReceiverSupported:Ljava/lang/Boolean;
+ 
+     invoke-virtual {p1}, Ljava/lang/Boolean;->booleanValue()Z
+ 
+     move-result p1
+ 
+-    if-nez p1, :cond_5
++    if-nez p1, :cond_7
+ 
+     iget-object p1, v3, Lcom/android/server/audio/AudioDeviceBroker$CommunicationRouteClient;->mDevice:Landroid/media/AudioDeviceAttributes;
+ 
+-    if-eqz p1, :cond_5
++    if-eqz p1, :cond_7
+ 
+     iget-object v0, p0, Lcom/android/server/audio/AudioDeviceBroker;->mCurrentCallDevice:Landroid/media/AudioDeviceAttributes;
+ 
+-    if-eqz v0, :cond_5
++    if-eqz v0, :cond_7
+ 
+     invoke-virtual {v0, p1}, Landroid/media/AudioDeviceAttributes;->equals(Ljava/lang/Object;)Z
+ 
+     move-result p1
+ 
+-    if-eqz p1, :cond_5
++    if-eqz p1, :cond_7
+ 
+     new-instance p1, Ljava/lang/StringBuilder;
+ 
+@@ -5603,7 +5628,7 @@
+ 
+     return-void
+ 
+-    :cond_5
++    :cond_7
+     iget-object v2, v3, Lcom/android/server/audio/AudioDeviceBroker$CommunicationRouteClient;->mCb:Landroid/os/IBinder;
+ 
+     move-object p1, v3
+@@ -5624,28 +5649,26 @@
+ 
+     return-void
+ 
+-    :cond_6
+-    move-object v1, p0
 -
--    const-string/jumbo v0, "skip virtual sound: connected A2DP or USB_HEADSET"
--
--    invoke-static {p0, v0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
--
--    monitor-exit p1
--
--    return v1
--
++    :cond_8
+     move-object v7, p2
+ 
+-    if-eqz p1, :cond_7
++    if-eqz p1, :cond_9
+ 
+-    move v0, v2
++    move v1, v2
+ 
 -    :cond_7
--    const-string v0, "VibratorManagerService"
--
--    new-instance v3, Ljava/lang/StringBuilder;
--
--    invoke-direct {v3}, Ljava/lang/StringBuilder;-><init>()V
--
--    const-string/jumbo v4, "sco Devices:"
--
--    invoke-virtual {v3, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
--
--    invoke-virtual {v3, v5}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
--
--    const-string v4, ", only watch connected:"
--
--    invoke-virtual {v3, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
--
--    iget-boolean v4, p0, Lcom/android/server/vibrator/VibrationCustomSettings;->mOnlyWatchConnected:Z
--
--    invoke-virtual {v3, v4}, Ljava/lang/StringBuilder;->append(Z)Ljava/lang/StringBuilder;
--
--    invoke-virtual {v3}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
--
--    move-result-object v3
--
--    invoke-static {v0, v3}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
--
--    if-eqz v5, :cond_8
--
--    if-ne v5, v2, :cond_9
--
--    iget-boolean p0, p0, Lcom/android/server/vibrator/VibrationCustomSettings;->mOnlyWatchConnected:Z
--
--    if-eqz p0, :cond_9
--
+-    invoke-virtual {v1}, Lcom/android/server/audio/AudioDeviceBroker;->isBluetoothScoRequested()Z
++    :cond_9
++    invoke-virtual {p0}, Lcom/android/server/audio/AudioDeviceBroker;->isBluetoothScoRequested()Z
+ 
+-    move-result p0
++    move-result p1
+ 
+-    if-nez p0, :cond_8
++    if-nez p1, :cond_a
+ 
+-    if-eqz v0, :cond_8
++    if-eqz v1, :cond_a
+ 
+     invoke-virtual {v4, v7}, Lcom/android/server/audio/BtHelper;->stopBluetoothSco(Ljava/lang/String;)V
+ 
 -    :cond_8
--    move v1, v2
--
--    :cond_9
--    monitor-exit p1
--
--    return v1
--
--    :catchall_0
--    move-exception p0
--
--    monitor-exit p1
--    :try_end_0
--    .catchall {:try_start_0 .. :try_end_0} :catchall_0
--
--    throw p0
--.end method
--
- .method public updateAmplitudeLevel()V
-     .locals 7
- 
-@@ -1595,29 +1378,3 @@
-     :cond_0
-     return-void
- .end method
--
--.method public updateWatchConnectionState(Z)V
--    .locals 2
--
--    new-instance v0, Ljava/lang/StringBuilder;
--
--    invoke-direct {v0}, Ljava/lang/StringBuilder;-><init>()V
--
--    const-string v1, "Update only watch connected: "
--
--    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
--
--    invoke-virtual {v0, p1}, Ljava/lang/StringBuilder;->append(Z)Ljava/lang/StringBuilder;
--
--    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
--
--    move-result-object v0
--
--    const-string v1, "VibratorManagerService"
--
--    invoke-static {v1, v0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
--
--    iput-boolean p1, p0, Lcom/android/server/vibrator/VibrationCustomSettings;->mOnlyWatchConnected:Z
--
--    return-void
--.end method
-diff --git a/smali_classes3/com/android/server/vibrator/VibrationSettings.smali b/smali_classes3/com/android/server/vibrator/VibrationSettings.smali
-index 25861c96..be37ba71 100644
---- a/smali_classes3/com/android/server/vibrator/VibrationSettings.smali
-+++ b/smali_classes3/com/android/server/vibrator/VibrationSettings.smali
-@@ -878,18 +878,6 @@
-     return p0
- .end method
- 
--.method public getRingtoneVolumeScale()F
--    .locals 0
--
--    iget-object p0, p0, Lcom/android/server/vibrator/VibrationSettings;->mCustomSettings:Lcom/android/server/vibrator/VibrationCustomSettings;
--
--    invoke-virtual {p0}, Lcom/android/server/vibrator/VibrationCustomSettings;->getRingtoneVolumeScale()F
--
--    move-result p0
--
--    return p0
--.end method
--
- .method public final loadSystemSetting(Ljava/lang/String;I)I
-     .locals 1
- 
-@@ -1526,18 +1514,6 @@
-     throw p0
- .end method
- 
--.method public shouldSoundForRingerMode(I)Z
--    .locals 0
--
--    iget-object p0, p0, Lcom/android/server/vibrator/VibrationSettings;->mCustomSettings:Lcom/android/server/vibrator/VibrationCustomSettings;
--
--    invoke-virtual {p0, p1}, Lcom/android/server/vibrator/VibrationCustomSettings;->shouldSoundForRingerMode(I)Z
--
--    move-result p0
--
--    return p0
--.end method
--
- .method public final shouldVibrateForRingerModeLocked(I)Z
-     .locals 2
- 
-@@ -2058,13 +2034,3 @@
- 
-     throw v0
- .end method
--
--.method public updateWatchConnectionState(Z)V
--    .locals 0
--
--    iget-object p0, p0, Lcom/android/server/vibrator/VibrationSettings;->mCustomSettings:Lcom/android/server/vibrator/VibrationCustomSettings;
--
--    invoke-virtual {p0, p1}, Lcom/android/server/vibrator/VibrationCustomSettings;->updateWatchConnectionState(Z)V
--
--    return-void
--.end method
-diff --git a/smali_classes3/com/android/server/vibrator/VibratorManagerInternal.smali b/smali_classes3/com/android/server/vibrator/VibratorManagerInternal.smali
-index 4e1f98f9..c4b2077b 100644
---- a/smali_classes3/com/android/server/vibrator/VibratorManagerInternal.smali
-+++ b/smali_classes3/com/android/server/vibrator/VibratorManagerInternal.smali
-@@ -21,26 +21,3 @@
+-    invoke-virtual {v1, v7}, Lcom/android/server/audio/AudioDeviceBroker;->updateCommunicationRoute(Ljava/lang/String;)V
++    :cond_a
++    invoke-virtual {p0, v7}, Lcom/android/server/audio/AudioDeviceBroker;->updateCommunicationRoute(Ljava/lang/String;)V
  
      return-void
  .end method
+diff --git a/smali/com/android/server/audio/BtHelper.smali b/smali/com/android/server/audio/BtHelper.smali
+index 0c2afcfee..a3801dca8 100644
+--- a/smali/com/android/server/audio/BtHelper.smali
++++ b/smali/com/android/server/audio/BtHelper.smali
+@@ -42,8 +42,6 @@
+ 
+ .field public mScoConnectionState:I
+ 
+-.field public mVibratorManagerInternal:Lcom/android/server/vibrator/VibratorManagerInternal;
+-
+ 
+ # direct methods
+ .method public constructor <init>(Lcom/android/server/audio/AudioDeviceBroker;Landroid/content/Context;)V
+@@ -3283,8 +3281,6 @@
+     move-result-object v0
+ 
+     check-cast v0, Lcom/android/server/vibrator/VibratorManagerInternal;
+-
+-    iput-object v0, p0, Lcom/android/server/audio/BtHelper;->mVibratorManagerInternal:Lcom/android/server/vibrator/VibratorManagerInternal;
+     :try_end_0
+     .catchall {:try_start_0 .. :try_end_0} :catchall_0
+ 
+diff --git a/smali_classes2/com/android/server/vibrator/VibrationCustomSettings.smali b/smali_classes2/com/android/server/vibrator/VibrationCustomSettings.smali
+index 94ed19055..588d02ecc 100644
+--- a/smali_classes2/com/android/server/vibrator/VibrationCustomSettings.smali
++++ b/smali_classes2/com/android/server/vibrator/VibrationCustomSettings.smali
+@@ -8,8 +8,6 @@
+ 
+ .field public LEVEL_TO_TOUCH_MAGNITUDE:[I
+ 
+-.field public mAudioManager:Landroid/media/AudioManager;
+-
+ .field public mAudioMode:I
+ 
+ .field public mCallMagnitude:I
+@@ -34,8 +32,6 @@
+ 
+ .field public final mOnModeChangedListener:Lcom/android/server/vibrator/VibrationCustomSettings$$ExternalSyntheticLambda0;
+ 
+-.field public mOnlyWatchConnected:Z
+-
+ .field public final mSettingObserver:Lcom/android/server/vibrator/VibrationSettings$SettingsContentObserver;
+ 
+ .field public mTouchMagnitude:I
+@@ -87,8 +83,6 @@
+ 
+     iput v0, p0, Lcom/android/server/vibrator/VibrationCustomSettings;->mMotorType:I
+ 
+-    iput-boolean v0, p0, Lcom/android/server/vibrator/VibrationCustomSettings;->mOnlyWatchConnected:Z
+-
+     const/4 v0, -0x1
+ 
+     iput v0, p0, Lcom/android/server/vibrator/VibrationCustomSettings;->mAudioMode:I
+diff --git a/smali_classes2/com/android/server/vibrator/VibrationSettings.smali b/smali_classes2/com/android/server/vibrator/VibrationSettings.smali
+index 49815294d..760ee1b74 100644
+--- a/smali_classes2/com/android/server/vibrator/VibrationSettings.smali
++++ b/smali_classes2/com/android/server/vibrator/VibrationSettings.smali
+@@ -1402,11 +1402,9 @@
+ 
+     monitor-enter v8
+ 
+-    :try_start_4
+-    iput-object v6, v1, Lcom/android/server/vibrator/VibrationCustomSettings;->mAudioManager:Landroid/media/AudioManager;
+-
+     if-eqz v6, :cond_3
+ 
++    :try_start_4
+     iget-object v7, v1, Lcom/android/server/vibrator/VibrationCustomSettings;->mContext:Landroid/content/Context;
+ 
+     invoke-virtual {v7}, Landroid/content/Context;->getMainExecutor()Ljava/util/concurrent/Executor;
+diff --git a/smali_classes2/com/android/server/vibrator/VibratorManagerInternal.smali b/smali_classes2/com/android/server/vibrator/VibratorManagerInternal.smali
+index b13056bdd..fc3eac20c 100644
+--- a/smali_classes2/com/android/server/vibrator/VibratorManagerInternal.smali
++++ b/smali_classes2/com/android/server/vibrator/VibratorManagerInternal.smali
+@@ -1,52 +1,3 @@
+ .class public final Lcom/android/server/vibrator/VibratorManagerInternal;
+ .super Ljava/lang/Object;
+ .source "qb/101886872 4ec8f6d2813f753a220c00d05e2aa013ded863b1967e4bb65f3969ed08f5cc72"
+-
+-
+-# instance fields
+-.field public mServiceWeakReference:Ljava/lang/ref/WeakReference;
 -
 -
 -# virtual methods
--.method public updateWatchConnectionState(Z)V
--    .locals 0
+-.method public final updateWatchConnectionState(Z)V
+-    .locals 2
 -
 -    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerInternal;->mServiceWeakReference:Ljava/lang/ref/WeakReference;
 -
@@ -527,493 +377,42 @@ index 4e1f98f9..c4b2077b 100644
 -    return-void
 -
 -    :cond_0
--    invoke-virtual {p0, p1}, Lcom/android/server/vibrator/VibratorManagerService;->updateWatchConnectionState(Z)V
+-    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mVibrationSettings:Lcom/android/server/vibrator/VibrationSettings;
 -
--    return-void
--.end method
-diff --git a/smali_classes3/com/android/server/vibrator/VibratorManagerService$1.smali b/smali_classes3/com/android/server/vibrator/VibratorManagerService$1.smali
-index fd3d76b6..9fe5afaf 100644
---- a/smali_classes3/com/android/server/vibrator/VibratorManagerService$1.smali
-+++ b/smali_classes3/com/android/server/vibrator/VibratorManagerService$1.smali
-@@ -119,39 +119,21 @@
- 
-     if-eqz p2, :cond_3
- 
--    iget-object p2, p0, Lcom/android/server/vibrator/VibratorManagerService$1;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+-    iget-object p0, p0, Lcom/android/server/vibrator/VibrationSettings;->mCustomSettings:Lcom/android/server/vibrator/VibrationCustomSettings;
 -
--    invoke-static {p2}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$fgetmCurrentVibration(Lcom/android/server/vibrator/VibratorManagerService;)Lcom/android/server/vibrator/VibrationStepConductor;
+-    invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
 -
--    move-result-object p2
+-    new-instance v0, Ljava/lang/StringBuilder;
 -
--    new-instance v0, Lcom/android/server/vibrator/Vibration$EndInfo;
+-    const-string/jumbo v1, "Update only watch connected: "
 -
--    sget-object v1, Lcom/android/server/vibrator/Vibration$Status;->CANCELLED_BY_SCREEN_OFF:Lcom/android/server/vibrator/Vibration$Status;
+-    invoke-direct {v0, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
 -
--    invoke-direct {v0, v1}, Lcom/android/server/vibrator/Vibration$EndInfo;-><init>(Lcom/android/server/vibrator/Vibration$Status;)V
+-    invoke-virtual {v0, p1}, Ljava/lang/StringBuilder;->append(Z)Ljava/lang/StringBuilder;
 -
--    const/4 v1, 0x0
--
--    invoke-virtual {p2, v0, v1}, Lcom/android/server/vibrator/VibrationStepConductor;->notifyCancelled(Lcom/android/server/vibrator/Vibration$EndInfo;Z)V
--
--    iget-object p2, p0, Lcom/android/server/vibrator/VibratorManagerService$1;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
--
--    invoke-static {p2}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$fgetmVirtualVibSoundHelper(Lcom/android/server/vibrator/VibratorManagerService;)Lcom/android/server/vibrator/VirtualVibSoundHelper;
-+    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService$1;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
- 
--    move-result-object p2
-+    invoke-static {p0}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$fgetmCurrentVibration(Lcom/android/server/vibrator/VibratorManagerService;)Lcom/android/server/vibrator/VibrationStepConductor;
- 
--    if-eqz p2, :cond_3
-+    move-result-object p0
- 
--    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService$1;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
-+    new-instance p2, Lcom/android/server/vibrator/Vibration$EndInfo;
- 
--    invoke-static {p0}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$fgetmVirtualVibSoundHelper(Lcom/android/server/vibrator/VibratorManagerService;)Lcom/android/server/vibrator/VirtualVibSoundHelper;
-+    sget-object v0, Lcom/android/server/vibrator/Vibration$Status;->CANCELLED_BY_SCREEN_OFF:Lcom/android/server/vibrator/Vibration$Status;
- 
--    move-result-object p0
-+    invoke-direct {p2, v0}, Lcom/android/server/vibrator/Vibration$EndInfo;-><init>(Lcom/android/server/vibrator/Vibration$Status;)V
- 
--    const-string p2, "cancel"
-+    const/4 v0, 0x0
- 
--    invoke-virtual {p0, p2}, Lcom/android/server/vibrator/VirtualVibSoundHelper;->stopVirtualSound(Ljava/lang/String;)V
-+    invoke-virtual {p0, p2, v0}, Lcom/android/server/vibrator/VibrationStepConductor;->notifyCancelled(Lcom/android/server/vibrator/Vibration$EndInfo;Z)V
- 
-     :cond_3
-     monitor-exit p1
-diff --git a/smali_classes3/com/android/server/vibrator/VibratorManagerService$ExternalVibratorService.smali b/smali_classes3/com/android/server/vibrator/VibratorManagerService$ExternalVibratorService.smali
-index 0769e2cd..7888eae7 100644
---- a/smali_classes3/com/android/server/vibrator/VibratorManagerService$ExternalVibratorService.smali
-+++ b/smali_classes3/com/android/server/vibrator/VibratorManagerService$ExternalVibratorService.smali
-@@ -206,7 +206,7 @@
- 
-     const/4 v6, 0x0
- 
--    if-nez v5, :cond_8
-+    if-nez v5, :cond_7
- 
-     iget-object v5, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
- 
-@@ -214,7 +214,7 @@
- 
-     move-result-object v5
- 
--    if-eqz v5, :cond_7
-+    if-eqz v5, :cond_6
- 
-     iget-object v5, v0, Lcom/android/server/vibrator/Vibration;->stats:Lcom/android/server/vibrator/VibrationStats;
- 
-@@ -260,39 +260,20 @@
- 
-     invoke-virtual {v5, v7, v4}, Lcom/android/server/vibrator/VibrationStepConductor;->notifyCancelled(Lcom/android/server/vibrator/Vibration$EndInfo;Z)V
- 
--    iget-object v5, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
--
--    invoke-static {v5}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$fgetmVirtualVibSoundHelper(Lcom/android/server/vibrator/VibratorManagerService;)Lcom/android/server/vibrator/VirtualVibSoundHelper;
--
--    move-result-object v5
--
--    if-eqz v5, :cond_6
--
--    iget-object v5, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
--
--    invoke-static {v5}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$fgetmVirtualVibSoundHelper(Lcom/android/server/vibrator/VibratorManagerService;)Lcom/android/server/vibrator/VirtualVibSoundHelper;
--
--    move-result-object v5
--
--    const-string v7, "cancel"
--
--    invoke-virtual {v5, v7}, Lcom/android/server/vibrator/VirtualVibSoundHelper;->stopVirtualSound(Ljava/lang/String;)V
--
--    :cond_6
-     move v5, v4
- 
-     move v7, v6
- 
-     goto :goto_0
- 
--    :cond_7
-+    :cond_6
-     move v5, v6
- 
-     move v7, v5
- 
-     goto :goto_0
- 
--    :cond_8
-+    :cond_7
-     iget-object v5, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
- 
-     invoke-static {v5}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$fgetmCurrentExternalVibration(Lcom/android/server/vibrator/VibratorManagerService;)Lcom/android/server/vibrator/VibratorManagerService$ExternalVibrationHolder;
-@@ -325,25 +306,6 @@
- 
-     invoke-static {v5, v7, v4}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$mendExternalVibrateLocked(Lcom/android/server/vibrator/VibratorManagerService;Lcom/android/server/vibrator/Vibration$EndInfo;Z)V
- 
--    iget-object v5, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
--
--    invoke-static {v5}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$fgetmVirtualVibSoundHelper(Lcom/android/server/vibrator/VibratorManagerService;)Lcom/android/server/vibrator/VirtualVibSoundHelper;
--
--    move-result-object v5
--
--    if-eqz v5, :cond_9
--
--    iget-object v5, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
--
--    invoke-static {v5}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$fgetmVirtualVibSoundHelper(Lcom/android/server/vibrator/VibratorManagerService;)Lcom/android/server/vibrator/VirtualVibSoundHelper;
--
--    move-result-object v5
--
--    const-string/jumbo v7, "mute"
--
--    invoke-virtual {v5, v7}, Lcom/android/server/vibrator/VirtualVibSoundHelper;->stopVirtualSound(Ljava/lang/String;)V
--
--    :cond_9
-     move v7, v4
- 
-     move v5, v6
-@@ -375,7 +337,7 @@
-     :try_end_0
-     .catchall {:try_start_0 .. :try_end_0} :catchall_1
- 
--    if-eqz v5, :cond_a
-+    if-eqz v5, :cond_8
- 
-     iget-object v2, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
- 
-@@ -389,7 +351,7 @@
- 
-     move-result v2
- 
--    if-nez v2, :cond_a
-+    if-nez v2, :cond_8
- 
-     const-string p1, "VibratorManagerService"
- 
-@@ -429,8 +391,8 @@
- 
-     throw p0
- 
--    :cond_a
--    if-nez v7, :cond_b
-+    :cond_8
-+    if-nez v7, :cond_9
- 
-     const-string v2, "VibratorManagerService"
- 
-@@ -444,10 +406,10 @@
- 
-     invoke-static {v2, v4, v3}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$msetExternalControl(Lcom/android/server/vibrator/VibratorManagerService;ZLcom/android/server/vibrator/VibrationStats;)V
- 
--    :cond_b
-+    :cond_9
-     sget-boolean v2, Lcom/samsung/android/vibrator/VibRune;->SUPPORT_ACH:Z
- 
--    if-eqz v2, :cond_e
-+    if-eqz v2, :cond_c
- 
-     iget-object v2, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
- 
-@@ -485,99 +447,64 @@
- 
-     invoke-static {v3, v4}, Landroid/util/Slog;->d(Ljava/lang/String;Ljava/lang/String;)I
- 
--    if-nez v2, :cond_c
-+    if-nez v2, :cond_a
- 
-     iput v1, v0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibrationHolder;->scale:I
- 
-     goto :goto_1
- 
--    :cond_c
--    iget-object v3, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
-+    :cond_a
-+    iget-object v1, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
- 
--    invoke-static {v3}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$fgetmVibrators(Lcom/android/server/vibrator/VibratorManagerService;)Landroid/util/SparseArray;
-+    invoke-static {v1}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$fgetmVibrators(Lcom/android/server/vibrator/VibratorManagerService;)Landroid/util/SparseArray;
- 
--    move-result-object v3
-+    move-result-object v1
- 
--    invoke-virtual {v3, v6}, Landroid/util/SparseArray;->get(I)Ljava/lang/Object;
-+    invoke-virtual {v1, v6}, Landroid/util/SparseArray;->get(I)Ljava/lang/Object;
- 
--    move-result-object v3
-+    move-result-object v1
- 
--    check-cast v3, Lcom/android/server/vibrator/VibratorController;
-+    check-cast v1, Lcom/android/server/vibrator/VibratorController;
- 
--    if-eqz v3, :cond_d
-+    if-eqz v1, :cond_b
- 
--    int-to-long v4, v2
-+    int-to-long v2, v2
- 
--    invoke-virtual {v3, v4, v5}, Lcom/android/server/vibrator/VibratorController;->setIntensity(J)V
-+    invoke-virtual {v1, v2, v3}, Lcom/android/server/vibrator/VibratorController;->setIntensity(J)V
- 
--    :cond_d
-+    :cond_b
-     iput v6, v0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibrationHolder;->scale:I
- 
-     :goto_1
--    iget-object v2, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
--
--    invoke-static {v2, p1}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$mreportVibrationInfo(Lcom/android/server/vibrator/VibratorManagerService;Landroid/os/ExternalVibration;)V
--
--    :cond_e
--    const-string v2, "VibratorManagerService"
--
--    new-instance v3, Ljava/lang/StringBuilder;
--
--    invoke-direct {v3}, Ljava/lang/StringBuilder;-><init>()V
--
--    const-string v4, "Playing external vibration: "
--
--    invoke-virtual {v3, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
--
--    invoke-virtual {v3, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;
--
--    invoke-virtual {v3}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
--
--    move-result-object v3
--
--    invoke-static {v2, v3}, Landroid/util/Slog;->d(Ljava/lang/String;Ljava/lang/String;)I
--
--    iget-object v2, v0, Lcom/android/server/vibrator/Vibration;->stats:Lcom/android/server/vibrator/VibrationStats;
--
--    invoke-virtual {v2}, Lcom/android/server/vibrator/VibrationStats;->reportStarted()V
--
--    sget-boolean v2, Lcom/samsung/android/vibrator/VibRune;->SUPPORT_ACH:Z
--
--    if-eqz v2, :cond_f
--
--    iget v2, v0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibrationHolder;->scale:I
--
--    if-eq v2, v1, :cond_f
--
--    iget-object v1, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
-+    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
- 
--    invoke-static {v1}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$fgetmVirtualVibSoundHelper(Lcom/android/server/vibrator/VibratorManagerService;)Lcom/android/server/vibrator/VirtualVibSoundHelper;
-+    invoke-static {p0, p1}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$mreportVibrationInfo(Lcom/android/server/vibrator/VibratorManagerService;Landroid/os/ExternalVibration;)V
- 
--    move-result-object v1
-+    :cond_c
-+    const-string p0, "VibratorManagerService"
- 
--    if-eqz v1, :cond_f
-+    new-instance v1, Ljava/lang/StringBuilder;
- 
--    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
-+    invoke-direct {v1}, Ljava/lang/StringBuilder;-><init>()V
- 
--    invoke-static {p0}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$fgetmVirtualVibSoundHelper(Lcom/android/server/vibrator/VibratorManagerService;)Lcom/android/server/vibrator/VirtualVibSoundHelper;
-+    const-string v2, "Playing external vibration: "
- 
--    move-result-object p0
-+    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
- 
--    invoke-virtual {p1}, Landroid/os/ExternalVibration;->getPackage()Ljava/lang/String;
-+    invoke-virtual {v1, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;
- 
--    move-result-object v1
-+    invoke-virtual {v1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
- 
--    invoke-virtual {p1}, Landroid/os/ExternalVibration;->getVibrationAttributesWithTags()Landroid/os/VibrationAttributes;
-+    move-result-object p1
- 
--    move-result-object v2
-+    invoke-static {p0, p1}, Landroid/util/Slog;->d(Ljava/lang/String;Ljava/lang/String;)I
- 
--    invoke-virtual {p1}, Landroid/os/ExternalVibration;->isRepeating()Z
-+    iget-object p0, v0, Lcom/android/server/vibrator/Vibration;->stats:Lcom/android/server/vibrator/VibrationStats;
- 
--    move-result p1
-+    invoke-virtual {p0}, Lcom/android/server/vibrator/VibrationStats;->reportStarted()V
- 
--    invoke-virtual {p0, v1, v2, p1}, Lcom/android/server/vibrator/VirtualVibSoundHelper;->playVirtualSoundIfNeeded(Ljava/lang/String;Landroid/os/VibrationAttributes;Z)V
-+    sget-boolean p0, Lcom/samsung/android/vibrator/VibRune;->SUPPORT_ACH:Z
- 
--    :cond_f
-     iget p0, v0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibrationHolder;->scale:I
- 
-     return p0
-@@ -655,24 +582,6 @@
- 
-     invoke-static {p1, v1}, Landroid/util/Log;->secD(Ljava/lang/String;Ljava/lang/String;)I
- 
--    iget-object p1, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
--
--    invoke-static {p1}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$fgetmVirtualVibSoundHelper(Lcom/android/server/vibrator/VibratorManagerService;)Lcom/android/server/vibrator/VirtualVibSoundHelper;
--
--    move-result-object p1
--
--    if-eqz p1, :cond_0
--
--    iget-object p1, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
--
--    invoke-static {p1}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$fgetmVirtualVibSoundHelper(Lcom/android/server/vibrator/VibratorManagerService;)Lcom/android/server/vibrator/VirtualVibSoundHelper;
--
--    move-result-object p1
--
--    const-string/jumbo v1, "stop"
--
--    invoke-virtual {p1, v1}, Lcom/android/server/vibrator/VirtualVibSoundHelper;->stopVirtualSound(Ljava/lang/String;)V
--
-     :cond_0
-     iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
- 
-diff --git a/smali_classes3/com/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda1.smali b/smali_classes3/com/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda1.smali
-deleted file mode 100644
-index de0f455c..00000000
---- a/smali_classes3/com/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda1.smali
-+++ /dev/null
-@@ -1,40 +0,0 @@
--.class public final synthetic Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda1;
--.super Ljava/lang/Object;
--.source "R8$$SyntheticClass"
--
--# interfaces
--.implements Ljava/lang/Runnable;
--
--
--# instance fields
--.field public final synthetic f$0:Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver;
--
--.field public final synthetic f$1:Ljava/lang/String;
--
--
--# direct methods
--.method public synthetic constructor <init>(Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver;Ljava/lang/String;)V
--    .locals 0
--
--    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
--
--    iput-object p1, p0, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda1;->f$0:Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver;
--
--    iput-object p2, p0, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda1;->f$1:Ljava/lang/String;
--
--    return-void
--.end method
--
--
--# virtual methods
--.method public final run()V
--    .locals 1
--
--    iget-object v0, p0, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda1;->f$0:Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver;
--
--    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda1;->f$1:Ljava/lang/String;
--
--    invoke-static {v0, p0}, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver;->$r8$lambda$QfkFTfe3Pm_ryA73i2GqaypxYlg(Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver;Ljava/lang/String;)V
--
--    return-void
--.end method
-diff --git a/smali_classes3/com/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver.smali b/smali_classes3/com/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver.smali
-index 09da69db..8ef25d4a 100644
---- a/smali_classes3/com/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver.smali
-+++ b/smali_classes3/com/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver.smali
-@@ -8,14 +8,6 @@
- 
- 
- # direct methods
--.method public static synthetic $r8$lambda$QfkFTfe3Pm_ryA73i2GqaypxYlg(Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver;Ljava/lang/String;)V
--    .locals 0
--
--    invoke-direct {p0, p1}, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver;->lambda$externalDeviceConnected$0(Ljava/lang/String;)V
--
--    return-void
--.end method
--
- .method public static synthetic $r8$lambda$gVLXrD90bGXLLH-Q4SLCStRWR4k(Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver;)V
-     .locals 0
- 
-@@ -42,49 +34,6 @@
-     return-void
- .end method
- 
--.method private synthetic lambda$externalDeviceConnected$0(Ljava/lang/String;)V
--    .locals 2
--
--    iget-object v0, p0, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
--
--    invoke-static {v0}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$fgetmLock(Lcom/android/server/vibrator/VibratorManagerService;)Ljava/lang/Object;
+-    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
 -
 -    move-result-object v0
 -
--    monitor-enter v0
+-    const-string/jumbo v1, "VibrationCustomSettings"
 -
--    :try_start_0
--    iget-object v1, p0, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+-    invoke-static {v1, v0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
 -
--    invoke-static {v1}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$fgetmVirtualVibSoundHelper(Lcom/android/server/vibrator/VibratorManagerService;)Lcom/android/server/vibrator/VirtualVibSoundHelper;
--
--    move-result-object v1
--
--    if-eqz v1, :cond_0
--
--    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
--
--    invoke-static {p0}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$fgetmVirtualVibSoundHelper(Lcom/android/server/vibrator/VibratorManagerService;)Lcom/android/server/vibrator/VirtualVibSoundHelper;
--
--    move-result-object p0
--
--    invoke-virtual {p0, p1}, Lcom/android/server/vibrator/VirtualVibSoundHelper;->stopVirtualSound(Ljava/lang/String;)V
--
--    :cond_0
--    monitor-exit v0
--
--    return-void
--
--    :catchall_0
--    move-exception p0
--
--    monitor-exit v0
--    :try_end_0
--    .catchall {:try_start_0 .. :try_end_0} :catchall_0
--
--    throw p0
--.end method
--
- .method private synthetic lambda$recoverService$1()V
-     .locals 2
- 
-@@ -119,38 +68,20 @@
- 
- 
- # virtual methods
--.method public externalDeviceConnected(Ljava/lang/String;)V
--    .locals 2
--
--    iget-object v0, p0, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
--
--    invoke-static {v0}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$fgetmHandler(Lcom/android/server/vibrator/VibratorManagerService;)Landroid/os/Handler;
--
--    move-result-object v0
--
--    new-instance v1, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda1;
--
--    invoke-direct {v1, p0, p1}, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda1;-><init>(Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver;Ljava/lang/String;)V
--
--    invoke-virtual {v0, v1}, Landroid/os/Handler;->post(Ljava/lang/Runnable;)Z
+-    iput-boolean p1, p0, Lcom/android/server/vibrator/VibrationCustomSettings;->mOnlyWatchConnected:Z
 -
 -    return-void
 -.end method
--
- .method public onReceive(Landroid/content/Context;Landroid/content/Intent;)V
--    .locals 3
-+    .locals 1
- 
-     invoke-virtual {p2}, Landroid/content/Intent;->getAction()Ljava/lang/String;
+diff --git a/smali_classes2/com/android/server/vibrator/VibratorManagerService$1.smali b/smali_classes2/com/android/server/vibrator/VibratorManagerService$1.smali
+index 5ece79fb1..bb01dd7c8 100644
+--- a/smali_classes2/com/android/server/vibrator/VibratorManagerService$1.smali
++++ b/smali_classes2/com/android/server/vibrator/VibratorManagerService$1.smali
+@@ -35,19 +35,19 @@
  
      move-result-object p1
  
--    const-string v0, "com.android.server.sepunion.semgoodcatchservice.GOOD_CATCH_STATE_CHANGED"
-+    const-string p2, "com.android.server.sepunion.semgoodcatchservice.GOOD_CATCH_STATE_CHANGED"
+-    const-string/jumbo v0, "com.android.server.sepunion.semgoodcatchservice.GOOD_CATCH_STATE_CHANGED"
++    const-string/jumbo p2, "com.android.server.sepunion.semgoodcatchservice.GOOD_CATCH_STATE_CHANGED"
  
 -    invoke-virtual {v0, p1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
 +    invoke-virtual {p2, p1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
@@ -1024,27 +423,21 @@ index 09da69db..8ef25d4a 100644
 -    if-eqz v0, :cond_0
 +    if-eqz p2, :cond_0
  
-     iget-object p1, p0, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+     iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService$1;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
  
-@@ -158,7 +89,7 @@
+     iget-object p1, p0, Lcom/android/server/vibrator/VibratorManagerService;->mGoodCatchManager:Lcom/samsung/android/server/audio/GoodCatchManager;
  
-     move-result-object p1
+-    if-nez p1, :cond_d
++    if-nez p1, :cond_a
  
--    if-nez p1, :cond_7
-+    if-nez p1, :cond_4
+     new-instance p1, Lcom/samsung/android/server/audio/GoodCatchManager;
  
-     iget-object p1, p0, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
- 
-@@ -176,16 +107,16 @@
- 
-     invoke-static {p1, p2}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$fputmGoodCatchManager(Lcom/android/server/vibrator/VibratorManagerService;Lcom/samsung/android/server/audio/GoodCatchManager;)V
- 
--    goto/16 :goto_1
-+    goto :goto_1
+@@ -62,29 +62,29 @@
+     goto/16 :goto_6
  
      :cond_0
--    const-string v0, "android.intent.action.BOOT_COMPLETED"
-+    const-string p2, "android.intent.action.BOOT_COMPLETED"
+-    const-string/jumbo v0, "android.intent.action.BOOT_COMPLETED"
++    const-string/jumbo p2, "android.intent.action.BOOT_COMPLETED"
  
 -    invoke-virtual {v0, p1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
 +    invoke-virtual {p2, p1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
@@ -1052,47 +445,112 @@ index 09da69db..8ef25d4a 100644
 -    move-result v0
 +    move-result p2
  
--    if-eqz v0, :cond_1
-+    if-eqz p2, :cond_1
+-    const-string/jumbo v1, "com.sec.media.action.VIBRTOR_LOGGING"
++    const/4 v1, 0x0
  
-     iget-object p1, p0, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
- 
-@@ -213,126 +144,47 @@
- 
-     invoke-virtual {p1, p0}, Lcom/samsung/android/server/vibrator/VibratorHqmHelper;->startLogging(Landroid/content/Context;)V
- 
--    goto/16 :goto_1
-+    goto :goto_1
- 
-     :cond_1
--    const-string v0, "android.intent.action.ACTION_SHUTDOWN"
-+    const-string p2, "android.intent.action.ACTION_SHUTDOWN"
- 
--    invoke-virtual {v0, p1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
-+    invoke-virtual {p2, p1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
- 
--    move-result v0
-+    move-result p2
- 
--    if-nez v0, :cond_6
-+    if-nez p2, :cond_3
- 
--    const-string v0, "com.sec.media.action.VIBRTOR_LOGGING"
-+    const-string p2, "com.sec.media.action.VIBRTOR_LOGGING"
- 
--    invoke-virtual {v0, p1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
-+    invoke-virtual {p2, p1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
- 
--    move-result v0
-+    move-result p2
+-    const/4 v2, 0x0
++    const-string/jumbo v0, "com.sec.media.action.VIBRTOR_LOGGING"
  
 -    if-eqz v0, :cond_2
 +    if-eqz p2, :cond_2
  
-     goto :goto_0
+     iget-object p1, p0, Lcom/android/server/vibrator/VibratorManagerService$1;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+     iget-object p2, p1, Lcom/android/server/vibrator/VibratorManagerService;->mContext:Landroid/content/Context;
+ 
+-    sget-object v0, Lcom/samsung/android/server/vibrator/VibratorHqmHelper;->sInstance:Lcom/samsung/android/server/vibrator/VibratorHqmHelper;
++    sget-object v2, Lcom/samsung/android/server/vibrator/VibratorHqmHelper;->sInstance:Lcom/samsung/android/server/vibrator/VibratorHqmHelper;
+ 
+-    if-nez v0, :cond_1
++    if-nez v2, :cond_1
+ 
+-    new-instance v0, Lcom/samsung/android/server/vibrator/VibratorHqmHelper;
++    new-instance v2, Lcom/samsung/android/server/vibrator/VibratorHqmHelper;
+ 
+-    invoke-direct {v0}, Ljava/lang/Object;-><init>()V
++    invoke-direct {v2}, Ljava/lang/Object;-><init>()V
+ 
+     const-string v3, "HqmManagerService"
+ 
+@@ -94,7 +94,7 @@
+ 
+     check-cast v3, Landroid/os/SemHqmManager;
+ 
+-    iput-object v3, v0, Lcom/samsung/android/server/vibrator/VibratorHqmHelper;->mSemHqmManager:Landroid/os/SemHqmManager;
++    iput-object v3, v2, Lcom/samsung/android/server/vibrator/VibratorHqmHelper;->mSemHqmManager:Landroid/os/SemHqmManager;
+ 
+     const-string/jumbo v3, "alarm"
+ 
+@@ -104,9 +104,9 @@
+ 
+     check-cast p2, Landroid/app/AlarmManager;
+ 
+-    iput-object p2, v0, Lcom/samsung/android/server/vibrator/VibratorHqmHelper;->mAlarmManager:Landroid/app/AlarmManager;
++    iput-object p2, v2, Lcom/samsung/android/server/vibrator/VibratorHqmHelper;->mAlarmManager:Landroid/app/AlarmManager;
+ 
+-    sput-object v0, Lcom/samsung/android/server/vibrator/VibratorHqmHelper;->sInstance:Lcom/samsung/android/server/vibrator/VibratorHqmHelper;
++    sput-object v2, Lcom/samsung/android/server/vibrator/VibratorHqmHelper;->sInstance:Lcom/samsung/android/server/vibrator/VibratorHqmHelper;
+ 
+     :cond_1
+     sget-object p2, Lcom/samsung/android/server/vibrator/VibratorHqmHelper;->sInstance:Lcom/samsung/android/server/vibrator/VibratorHqmHelper;
+@@ -123,15 +123,15 @@
+ 
+     new-instance p2, Landroid/content/Intent;
+ 
+-    invoke-direct {p2, v1}, Landroid/content/Intent;-><init>(Ljava/lang/String;)V
++    invoke-direct {p2, v0}, Landroid/content/Intent;-><init>(Ljava/lang/String;)V
+ 
+     const/high16 v0, 0x4000000
+ 
+-    invoke-static {p0, v2, p2, v0}, Landroid/app/PendingIntent;->getBroadcast(Landroid/content/Context;ILandroid/content/Intent;I)Landroid/app/PendingIntent;
++    invoke-static {p0, v1, p2, v0}, Landroid/app/PendingIntent;->getBroadcast(Landroid/content/Context;ILandroid/content/Intent;I)Landroid/app/PendingIntent;
+ 
+-    move-result-object v9
++    move-result-object v8
+ 
+-    iget-object v3, p1, Lcom/samsung/android/server/vibrator/VibratorHqmHelper;->mAlarmManager:Landroid/app/AlarmManager;
++    iget-object v2, p1, Lcom/samsung/android/server/vibrator/VibratorHqmHelper;->mAlarmManager:Landroid/app/AlarmManager;
+ 
+     invoke-static {}, Landroid/os/SystemClock;->elapsedRealtime()J
+ 
+@@ -139,142 +139,41 @@
+ 
+     const-wide/32 v0, 0x5265c00
+ 
+-    add-long v5, p0, v0
++    add-long v4, p0, v0
+ 
+-    const-wide/32 v7, 0x5265c00
++    const-wide/32 v6, 0x5265c00
+ 
+-    const/4 v4, 0x3
++    const/4 v3, 0x3
+ 
+-    invoke-virtual/range {v3 .. v9}, Landroid/app/AlarmManager;->setRepeating(IJJLandroid/app/PendingIntent;)V
++    invoke-virtual/range {v2 .. v8}, Landroid/app/AlarmManager;->setRepeating(IJJLandroid/app/PendingIntent;)V
+ 
+     goto/16 :goto_6
  
      :cond_2
--    const-string v0, "android.media.STREAM_DEVICES_CHANGED_ACTION"
+-    const-string/jumbo v0, "android.intent.action.ACTION_SHUTDOWN"
+-
+-    invoke-virtual {v0, p1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+-
+-    move-result v0
+-
+-    if-nez v0, :cond_7
+-
+-    invoke-virtual {v1, p1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+-
+-    move-result v0
+-
+-    if-eqz v0, :cond_3
++    const-string/jumbo p2, "android.intent.action.ACTION_SHUTDOWN"
+ 
+-    goto/16 :goto_0
+-
+-    :cond_3
+-    const-string/jumbo v0, "android.media.STREAM_DEVICES_CHANGED_ACTION"
 -
 -    invoke-virtual {v0, p1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
 -
@@ -1100,9 +558,9 @@ index 09da69db..8ef25d4a 100644
 -
 -    const/4 v1, 0x2
 -
--    if-eqz v0, :cond_3
+-    if-eqz v0, :cond_4
 -
--    const-string p1, "android.media.EXTRA_VOLUME_STREAM_TYPE"
+-    const-string/jumbo p1, "android.media.EXTRA_VOLUME_STREAM_TYPE"
 -
 -    const/4 v0, -0x1
 -
@@ -1110,755 +568,1466 @@ index 09da69db..8ef25d4a 100644
 -
 -    move-result p1
 -
--    const-string v2, "android.media.EXTRA_VOLUME_STREAM_DEVICES"
+-    const-string/jumbo v2, "android.media.EXTRA_VOLUME_STREAM_DEVICES"
 -
 -    invoke-virtual {p2, v2, v0}, Landroid/content/Intent;->getIntExtra(Ljava/lang/String;I)I
--
--    move-result p2
--
++    invoke-virtual {p2, p1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+ 
+     move-result p2
+ 
 -    const/4 v0, 0x3
 -
--    if-ne p1, v0, :cond_7
+-    if-ne p1, v0, :cond_d
 -
 -    and-int/lit8 p1, p2, 0x2
 -
--    if-nez p1, :cond_7
+-    if-nez p1, :cond_d
 -
--    const-string p1, "Detected device changed"
+-    iget-object p1, p0, Lcom/android/server/vibrator/VibratorManagerService$1;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
 -
--    invoke-virtual {p0, p1}, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver;->externalDeviceConnected(Ljava/lang/String;)V
+-    iget-object p1, p1, Lcom/android/server/vibrator/VibratorManagerService;->mHandler:Landroid/os/Handler;
 -
--    goto :goto_1
+-    new-instance p2, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda1;
 -
--    :cond_3
--    const-string v0, "android.intent.action.HEADSET_PLUG"
+-    const-string v0, "Detected device changed"
 -
--    invoke-virtual {v0, p1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+-    invoke-direct {p2, p0, v0}, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda1;-><init>(Lcom/android/server/vibrator/VibratorManagerService$1;Ljava/lang/String;)V
 -
--    move-result v0
+-    invoke-virtual {p1, p2}, Landroid/os/Handler;->post(Ljava/lang/Runnable;)Z
 -
--    if-eqz v0, :cond_4
--
--    const-string p1, "headset plug"
--
--    invoke-virtual {p0, p1}, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver;->externalDeviceConnected(Ljava/lang/String;)V
--
--    goto :goto_1
+-    goto/16 :goto_6
 -
 -    :cond_4
--    const-string v0, "android.bluetooth.a2dp.profile.action.CONNECTION_STATE_CHANGED"
--
--    invoke-virtual {v0, p1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
--
+-    const-string/jumbo v0, "android.intent.action.HEADSET_PLUG"
++    if-nez p2, :cond_4
+ 
+     invoke-virtual {v0, p1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+ 
 -    move-result v0
 -
 -    if-eqz v0, :cond_5
 -
--    const-string p1, "android.bluetooth.profile.extra.STATE"
+-    iget-object p1, p0, Lcom/android/server/vibrator/VibratorManagerService$1;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
 -
--    const/4 v0, 0x0
+-    iget-object p1, p1, Lcom/android/server/vibrator/VibratorManagerService;->mHandler:Landroid/os/Handler;
 -
--    invoke-virtual {p2, p1, v0}, Landroid/content/Intent;->getIntExtra(Ljava/lang/String;I)I
+-    new-instance p2, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda1;
+-
+-    const-string/jumbo v0, "headset plug"
+-
+-    invoke-direct {p2, p0, v0}, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda1;-><init>(Lcom/android/server/vibrator/VibratorManagerService$1;Ljava/lang/String;)V
+-
+-    invoke-virtual {p1, p2}, Landroid/os/Handler;->post(Ljava/lang/Runnable;)Z
+-
+-    goto/16 :goto_6
+-
+-    :cond_5
+-    const-string/jumbo v0, "android.bluetooth.a2dp.profile.action.CONNECTION_STATE_CHANGED"
+-
+-    invoke-virtual {v0, p1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+-
+-    move-result v0
+-
+-    if-eqz v0, :cond_6
+-
+-    const-string/jumbo p1, "android.bluetooth.profile.extra.STATE"
+-
+-    invoke-virtual {p2, p1, v2}, Landroid/content/Intent;->getIntExtra(Ljava/lang/String;I)I
 -
 -    move-result p1
 -
--    if-ne p1, v1, :cond_7
+-    if-ne p1, v1, :cond_d
 -
--    const-string p1, "a2dp device connected"
+-    iget-object p1, p0, Lcom/android/server/vibrator/VibratorManagerService$1;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
 -
--    invoke-virtual {p0, p1}, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver;->externalDeviceConnected(Ljava/lang/String;)V
+-    iget-object p1, p1, Lcom/android/server/vibrator/VibratorManagerService;->mHandler:Landroid/os/Handler;
 -
--    goto :goto_1
+-    new-instance p2, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda1;
 -
--    :cond_5
-     const-string p2, "com.android.launcher3.quickstep.closeall"
+-    const-string/jumbo v0, "a2dp device connected"
+-
+-    invoke-direct {p2, p0, v0}, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda1;-><init>(Lcom/android/server/vibrator/VibratorManagerService$1;Ljava/lang/String;)V
++    move-result p2
+ 
+-    invoke-virtual {p1, p2}, Landroid/os/Handler;->post(Ljava/lang/Runnable;)Z
++    if-eqz p2, :cond_3
+ 
+-    goto/16 :goto_6
++    goto :goto_0
+ 
+-    :cond_6
++    :cond_3
+     const-string/jumbo p2, "com.android.launcher3.quickstep.closeall"
  
      invoke-virtual {p2, p1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
      move-result p1
  
--    if-eqz p1, :cond_7
-+    if-eqz p1, :cond_4
+-    if-eqz p1, :cond_d
++    if-eqz p1, :cond_a
  
-     invoke-virtual {p0}, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver;->recoverService()V
+     iget-object p1, p0, Lcom/android/server/vibrator/VibratorManagerService$1;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
  
-     goto :goto_1
+@@ -290,13 +189,13 @@
  
--    :cond_6
-+    :cond_3
-     :goto_0
-     iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
- 
-     invoke-static {p0}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$msendDataToHqm(Lcom/android/server/vibrator/VibratorManagerService;)V
+     goto/16 :goto_6
  
 -    :cond_7
 +    :cond_4
+     :goto_0
+     iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService$1;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+     iget-object p1, p0, Lcom/android/server/vibrator/VibratorManagerService;->mHqmHelper:Lcom/samsung/android/server/vibrator/VibratorHqmHelper;
+ 
+-    if-eqz p1, :cond_d
++    if-eqz p1, :cond_a
+ 
+     iget-object p2, p0, Lcom/android/server/vibrator/VibratorManagerService;->mHqmLoggingData:Lcom/samsung/android/server/vibrator/VibratorHqmData;
+ 
+@@ -304,16 +203,16 @@
+ 
+     invoke-direct {v0}, Ljava/util/ArrayList;-><init>()V
+ 
+-    new-instance v1, Ljava/util/ArrayList;
++    new-instance v2, Ljava/util/ArrayList;
+ 
+-    invoke-direct {v1}, Ljava/util/ArrayList;-><init>()V
++    invoke-direct {v2}, Ljava/util/ArrayList;-><init>()V
+ 
+-    move v3, v2
++    move v3, v1
+ 
      :goto_1
+     const/4 v4, 0x5
+ 
+-    if-ge v3, v4, :cond_9
++    if-ge v3, v4, :cond_6
+ 
+     sget-object v4, Lcom/samsung/android/server/vibrator/VibratorHqmHelper;->BIG_DATA:[Ljava/lang/String;
+ 
+@@ -321,7 +220,7 @@
+ 
+     iget-object v6, p2, Lcom/samsung/android/server/vibrator/VibratorHqmData;->mLoggingData:Ljava/util/HashMap;
+ 
+-    invoke-static {v2}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
++    invoke-static {v1}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+ 
+     move-result-object v7
+ 
+@@ -339,20 +238,20 @@
+ 
+     move-result-object v5
+ 
+-    if-eqz v5, :cond_8
++    if-eqz v5, :cond_5
+ 
+     aget-object v4, v4, v3
+ 
+     invoke-virtual {v0, v4}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
+ 
+-    invoke-virtual {v1, v5}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
++    invoke-virtual {v2, v5}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
+ 
+-    :cond_8
++    :cond_5
+     add-int/lit8 v3, v3, 0x1
+ 
+     goto :goto_1
+ 
+-    :cond_9
++    :cond_6
+     invoke-virtual {v0}, Ljava/util/ArrayList;->size()I
+ 
+     move-result p2
+@@ -362,10 +261,10 @@
+ 
+     invoke-direct {v3}, Lorg/json/JSONObject;-><init>()V
+ 
+-    move v4, v2
++    move v4, v1
+ 
+     :goto_2
+-    if-ge v4, p2, :cond_a
++    if-ge v4, p2, :cond_7
+ 
+     invoke-virtual {v0, v4}, Ljava/util/ArrayList;->get(I)Ljava/lang/Object;
+ 
+@@ -373,7 +272,7 @@
+ 
+     check-cast v5, Ljava/lang/String;
+ 
+-    invoke-virtual {v1, v4}, Ljava/util/ArrayList;->get(I)Ljava/lang/Object;
++    invoke-virtual {v2, v4}, Ljava/util/ArrayList;->get(I)Ljava/lang/Object;
+ 
+     move-result-object v6
+ 
+@@ -392,7 +291,7 @@
+ 
+     goto :goto_3
+ 
+-    :cond_a
++    :cond_7
+     invoke-virtual {v3}, Lorg/json/JSONObject;->toString()Ljava/lang/String;
+ 
+     move-result-object p2
+@@ -405,28 +304,28 @@
+     const/4 p2, 0x0
+ 
+     :goto_4
+-    if-nez p2, :cond_b
++    if-nez p2, :cond_8
+ 
+     goto :goto_5
+ 
+-    :cond_b
++    :cond_8
+     const-string/jumbo v0, "\\{"
+ 
+-    const-string v1, ""
++    const-string v2, ""
+ 
+-    invoke-virtual {p2, v0, v1}, Ljava/lang/String;->replaceAll(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
++    invoke-virtual {p2, v0, v2}, Ljava/lang/String;->replaceAll(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+ 
+     move-result-object p2
+ 
+     const-string/jumbo v0, "\\}"
+ 
+-    invoke-virtual {p2, v0, v1}, Ljava/lang/String;->replaceAll(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
++    invoke-virtual {p2, v0, v2}, Ljava/lang/String;->replaceAll(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+ 
+     move-result-object v11
+ 
+     iget-object v3, p1, Lcom/samsung/android/server/vibrator/VibratorHqmHelper;->mSemHqmManager:Landroid/os/SemHqmManager;
+ 
+-    if-eqz v3, :cond_c
++    if-eqz v3, :cond_9
+ 
+     const-string v8, "0.0"
+ 
+@@ -446,21 +345,21 @@
+ 
+     invoke-virtual/range {v3 .. v12}, Landroid/os/SemHqmManager;->sendHWParamToHQM(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z
+ 
+-    :cond_c
++    :cond_9
+     :goto_5
+     iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mHqmLoggingData:Lcom/samsung/android/server/vibrator/VibratorHqmData;
+ 
+-    iput v2, p0, Lcom/samsung/android/server/vibrator/VibratorHqmData;->mRingCount:I
++    iput v1, p0, Lcom/samsung/android/server/vibrator/VibratorHqmData;->mRingCount:I
+ 
+-    iput v2, p0, Lcom/samsung/android/server/vibrator/VibratorHqmData;->mAlarmCount:I
++    iput v1, p0, Lcom/samsung/android/server/vibrator/VibratorHqmData;->mAlarmCount:I
+ 
+-    iput v2, p0, Lcom/samsung/android/server/vibrator/VibratorHqmData;->mNotificationCount:I
++    iput v1, p0, Lcom/samsung/android/server/vibrator/VibratorHqmData;->mNotificationCount:I
+ 
+-    iput v2, p0, Lcom/samsung/android/server/vibrator/VibratorHqmData;->mTouchCount:I
++    iput v1, p0, Lcom/samsung/android/server/vibrator/VibratorHqmData;->mTouchCount:I
+ 
+-    iput v2, p0, Lcom/samsung/android/server/vibrator/VibratorHqmData;->mExtraCount:I
++    iput v1, p0, Lcom/samsung/android/server/vibrator/VibratorHqmData;->mExtraCount:I
+ 
+-    :cond_d
++    :cond_a
+     :goto_6
      return-void
- .end method
-diff --git a/smali_classes3/com/android/server/vibrator/VibratorManagerService.smali b/smali_classes3/com/android/server/vibrator/VibratorManagerService.smali
-index 4482f93d..fee08889 100644
---- a/smali_classes3/com/android/server/vibrator/VibratorManagerService.smali
-+++ b/smali_classes3/com/android/server/vibrator/VibratorManagerService.smali
-@@ -70,8 +70,6 @@
+ 
+@@ -475,7 +374,7 @@
+ 
+     move-result p1
+ 
+-    if-eqz p1, :cond_11
++    if-eqz p1, :cond_e
+ 
+     iget-object p1, p0, Lcom/android/server/vibrator/VibratorManagerService$1;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+@@ -494,7 +393,7 @@
+ 
+     const/16 v0, 0x13
+ 
+-    if-ne p2, v0, :cond_e
++    if-ne p2, v0, :cond_b
+ 
+     const-string/jumbo p0, "VibratorManagerService"
+ 
+@@ -513,12 +412,12 @@
+ 
+     goto :goto_8
+ 
+-    :cond_e
++    :cond_b
+     iget-object p2, p0, Lcom/android/server/vibrator/VibratorManagerService$1;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+     iget-object p2, p2, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentSession:Lcom/android/server/vibrator/VibrationSession;
+ 
+-    if-eqz p2, :cond_f
++    if-eqz p2, :cond_c
+ 
+     invoke-interface {p2}, Lcom/android/server/vibrator/VibrationSession;->getCallerInfo()Lcom/android/server/vibrator/VibrationSession$CallerInfo;
+ 
+@@ -532,7 +431,7 @@
+ 
+     move-result v1
+ 
+-    if-eqz v1, :cond_f
++    if-eqz v1, :cond_c
+ 
+     invoke-interface {p2}, Lcom/android/server/vibrator/VibrationSession;->getCallerInfo()Lcom/android/server/vibrator/VibrationSession$CallerInfo;
+ 
+@@ -546,7 +445,7 @@
+ 
+     const/16 v1, 0x21
+ 
+-    if-ne p2, v1, :cond_f
++    if-ne p2, v1, :cond_c
+ 
+     new-instance p2, Ljava/lang/StringBuilder;
+ 
+@@ -568,17 +467,17 @@
+ 
+     goto :goto_7
+ 
+-    :cond_f
++    :cond_c
+     const/4 p2, 0x0
+ 
+     :goto_7
+-    if-eqz p2, :cond_10
++    if-eqz p2, :cond_d
+ 
+     monitor-exit p1
+ 
+     goto :goto_9
+ 
+-    :cond_10
++    :cond_d
+     iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService$1;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+     new-instance p2, Lcom/android/server/vibrator/VibratorManagerService$1$$ExternalSyntheticLambda0;
+@@ -602,12 +501,12 @@
+ 
+     throw p0
+ 
+-    :cond_11
++    :cond_e
+     invoke-static {}, Lcom/android/server/pm/UserManagerInternal;->shouldShowNotificationForBackgroundUserSounds()Z
+ 
+     move-result p1
+ 
+-    if-eqz p1, :cond_12
++    if-eqz p1, :cond_f
+ 
+     invoke-virtual {p2}, Landroid/content/Intent;->getAction()Ljava/lang/String;
+ 
+@@ -619,7 +518,7 @@
+ 
+     move-result p1
+ 
+-    if-eqz p1, :cond_12
++    if-eqz p1, :cond_f
+ 
+     iget-object p1, p0, Lcom/android/server/vibrator/VibratorManagerService$1;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+@@ -655,7 +554,7 @@
+ 
+     throw p0
+ 
+-    :cond_12
++    :cond_f
+     :goto_9
+     return-void
+ 
+diff --git a/smali_classes2/com/android/server/vibrator/VibratorManagerService$ExternalVibratorService.smali b/smali_classes2/com/android/server/vibrator/VibratorManagerService$ExternalVibratorService.smali
+index 001989ce8..aca544c0a 100644
+--- a/smali_classes2/com/android/server/vibrator/VibratorManagerService$ExternalVibratorService.smali
++++ b/smali_classes2/com/android/server/vibrator/VibratorManagerService$ExternalVibratorService.smali
+@@ -21,7 +21,7 @@
+ 
+ # virtual methods
+ .method public final onExternalVibrationStart(Landroid/os/ExternalVibration;)Landroid/os/ExternalVibrationScale;
+-    .locals 11
++    .locals 10
+ 
+     const-string/jumbo v0, "onExternalVibrationStart"
+ 
+@@ -52,66 +52,66 @@
+     :try_end_0
+     .catchall {:try_start_0 .. :try_end_0} :catchall_2
+ 
+-    const/4 v5, 0x0
++    const/4 v4, 0x0
+ 
+-    move v6, v5
++    move v5, v4
+ 
+     :goto_0
+     :try_start_1
+-    iget-object v7, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
++    iget-object v6, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+-    iget-object v7, v7, Lcom/android/server/vibrator/VibratorManagerService;->mVibrators:Landroid/util/SparseArray;
++    iget-object v6, v6, Lcom/android/server/vibrator/VibratorManagerService;->mVibrators:Landroid/util/SparseArray;
+ 
+-    invoke-virtual {v7}, Landroid/util/SparseArray;->size()I
++    invoke-virtual {v6}, Landroid/util/SparseArray;->size()I
+ 
+-    move-result v7
++    move-result v6
+ 
+-    const/4 v8, 0x1
++    const/4 v7, 0x1
+ 
+-    if-ge v6, v7, :cond_1
++    if-ge v5, v6, :cond_1
+ 
+-    iget-object v7, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
++    iget-object v6, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+-    iget-object v7, v7, Lcom/android/server/vibrator/VibratorManagerService;->mVibrators:Landroid/util/SparseArray;
++    iget-object v6, v6, Lcom/android/server/vibrator/VibratorManagerService;->mVibrators:Landroid/util/SparseArray;
+ 
+-    invoke-virtual {v7, v6}, Landroid/util/SparseArray;->valueAt(I)Ljava/lang/Object;
++    invoke-virtual {v6, v5}, Landroid/util/SparseArray;->valueAt(I)Ljava/lang/Object;
+ 
+-    move-result-object v7
++    move-result-object v6
+ 
+-    check-cast v7, Lcom/android/server/vibrator/VibratorController;
++    check-cast v6, Lcom/android/server/vibrator/VibratorController;
+ 
+-    iget-object v7, v7, Lcom/android/server/vibrator/VibratorController;->mVibratorInfo:Landroid/os/VibratorInfo;
++    iget-object v6, v6, Lcom/android/server/vibrator/VibratorController;->mVibratorInfo:Landroid/os/VibratorInfo;
+ 
+-    const-wide/16 v9, 0x8
++    const-wide/16 v8, 0x8
+ 
+-    invoke-virtual {v7, v9, v10}, Landroid/os/VibratorInfo;->hasCapability(J)Z
++    invoke-virtual {v6, v8, v9}, Landroid/os/VibratorInfo;->hasCapability(J)Z
+ 
+-    move-result v7
++    move-result v6
+ 
+-    if-eqz v7, :cond_0
++    if-eqz v6, :cond_0
+ 
+-    move v6, v8
++    move v5, v7
+ 
+     goto :goto_1
+ 
+     :cond_0
+-    add-int/lit8 v6, v6, 0x1
++    add-int/lit8 v5, v5, 0x1
+ 
+     goto :goto_0
+ 
+     :cond_1
+-    move v6, v5
++    move v5, v4
+ 
+     :goto_1
+-    const/4 v7, 0x0
++    const/4 v6, 0x0
+ 
+-    if-nez v6, :cond_2
++    if-nez v5, :cond_2
+ 
+     iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+     sget-object p1, Lcom/android/server/vibrator/VibrationSession$Status;->IGNORED_UNSUPPORTED:Lcom/android/server/vibrator/VibrationSession$Status;
+ 
+-    invoke-virtual {p0, v0, p1, v7}, Lcom/android/server/vibrator/VibratorManagerService;->endSessionLocked(Lcom/android/server/vibrator/VibrationSession;Lcom/android/server/vibrator/VibrationSession$Status;Lcom/android/server/vibrator/VibrationSession$CallerInfo;)V
++    invoke-virtual {p0, v0, p1, v6}, Lcom/android/server/vibrator/VibratorManagerService;->endSessionLocked(Lcom/android/server/vibrator/VibrationSession;Lcom/android/server/vibrator/VibrationSession$Status;Lcom/android/server/vibrator/VibrationSession$CallerInfo;)V
+ 
+     iget-object p0, v0, Lcom/android/server/vibrator/ExternalVibrationSession;->mScale:Landroid/os/ExternalVibrationScale;
+ 
+@@ -130,19 +130,19 @@
+ 
+     :cond_2
+     :try_start_2
+-    const-string/jumbo v6, "android.permission.VIBRATE"
++    const-string/jumbo v5, "android.permission.VIBRATE"
+ 
+     invoke-virtual {p1}, Landroid/os/ExternalVibration;->getUid()I
+ 
+-    move-result v9
++    move-result v8
+ 
+-    const/4 v10, -0x1
++    const/4 v9, -0x1
+ 
+-    invoke-static {v6, v9, v10, v8}, Landroid/app/ActivityManager;->checkComponentPermission(Ljava/lang/String;IIZ)I
++    invoke-static {v5, v8, v9, v7}, Landroid/app/ActivityManager;->checkComponentPermission(Ljava/lang/String;IIZ)I
+ 
+-    move-result v6
++    move-result v5
+ 
+-    if-eqz v6, :cond_3
++    if-eqz v5, :cond_3
+ 
+     const-string/jumbo v4, "VibratorManagerService"
+ 
+@@ -150,19 +150,19 @@
+ 
+     invoke-direct {v5}, Ljava/lang/StringBuilder;-><init>()V
+ 
+-    const-string/jumbo v6, "pkg="
++    const-string/jumbo v7, "pkg="
+ 
+-    invoke-virtual {v5, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
++    invoke-virtual {v5, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+ 
+     invoke-virtual {p1}, Landroid/os/ExternalVibration;->getPackage()Ljava/lang/String;
+ 
+-    move-result-object v6
++    move-result-object v7
+ 
+-    invoke-virtual {v5, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
++    invoke-virtual {v5, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+ 
+-    const-string v6, ", uid="
++    const-string v7, ", uid="
+ 
+-    invoke-virtual {v5, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
++    invoke-virtual {v5, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+ 
+     invoke-virtual {p1}, Landroid/os/ExternalVibration;->getUid()I
+ 
+@@ -184,7 +184,7 @@
+ 
+     sget-object p1, Lcom/android/server/vibrator/VibrationSession$Status;->IGNORED_MISSING_PERMISSION:Lcom/android/server/vibrator/VibrationSession$Status;
+ 
+-    invoke-virtual {p0, v0, p1, v7}, Lcom/android/server/vibrator/VibratorManagerService;->endSessionLocked(Lcom/android/server/vibrator/VibrationSession;Lcom/android/server/vibrator/VibrationSession$Status;Lcom/android/server/vibrator/VibrationSession$CallerInfo;)V
++    invoke-virtual {p0, v0, p1, v6}, Lcom/android/server/vibrator/VibratorManagerService;->endSessionLocked(Lcom/android/server/vibrator/VibrationSession;Lcom/android/server/vibrator/VibrationSession$Status;Lcom/android/server/vibrator/VibrationSession$CallerInfo;)V
+ 
+     iget-object p0, v0, Lcom/android/server/vibrator/ExternalVibrationSession;->mScale:Landroid/os/ExternalVibrationScale;
+ 
+@@ -198,19 +198,19 @@
+ 
+     :cond_3
+     :try_start_3
+-    iget-object v6, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
++    iget-object v5, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+-    iget-object v9, v0, Lcom/android/server/vibrator/Vibration;->callerInfo:Lcom/android/server/vibrator/VibrationSession$CallerInfo;
++    iget-object v8, v0, Lcom/android/server/vibrator/Vibration;->callerInfo:Lcom/android/server/vibrator/VibrationSession$CallerInfo;
+ 
+-    invoke-virtual {v6, v9}, Lcom/android/server/vibrator/VibratorManagerService;->shouldIgnoreVibrationLocked(Lcom/android/server/vibrator/VibrationSession$CallerInfo;)Lcom/android/server/vibrator/VibrationSession$Status;
++    invoke-virtual {v5, v8}, Lcom/android/server/vibrator/VibratorManagerService;->shouldIgnoreVibrationLocked(Lcom/android/server/vibrator/VibrationSession$CallerInfo;)Lcom/android/server/vibrator/VibrationSession$Status;
+ 
+-    move-result-object v6
++    move-result-object v5
+ 
+-    if-eqz v6, :cond_4
++    if-eqz v5, :cond_4
+ 
+     iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+-    invoke-virtual {p0, v0, v6, v7}, Lcom/android/server/vibrator/VibratorManagerService;->endSessionLocked(Lcom/android/server/vibrator/VibrationSession;Lcom/android/server/vibrator/VibrationSession$Status;Lcom/android/server/vibrator/VibrationSession$CallerInfo;)V
++    invoke-virtual {p0, v0, v5, v6}, Lcom/android/server/vibrator/VibratorManagerService;->endSessionLocked(Lcom/android/server/vibrator/VibrationSession;Lcom/android/server/vibrator/VibrationSession$Status;Lcom/android/server/vibrator/VibrationSession$CallerInfo;)V
+ 
+     iget-object p0, v0, Lcom/android/server/vibrator/ExternalVibrationSession;->mScale:Landroid/os/ExternalVibrationScale;
+ 
+@@ -224,25 +224,25 @@
+ 
+     :cond_4
+     :try_start_4
+-    iget-object v6, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
++    iget-object v5, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+-    iget-object v6, v6, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentSession:Lcom/android/server/vibrator/VibrationSession;
++    iget-object v5, v5, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentSession:Lcom/android/server/vibrator/VibrationSession;
+ 
+-    instance-of v9, v6, Lcom/android/server/vibrator/ExternalVibrationSession;
++    instance-of v8, v5, Lcom/android/server/vibrator/ExternalVibrationSession;
+ 
+-    if-eqz v9, :cond_5
++    if-eqz v8, :cond_5
+ 
+-    check-cast v6, Lcom/android/server/vibrator/ExternalVibrationSession;
++    check-cast v5, Lcom/android/server/vibrator/ExternalVibrationSession;
+ 
+-    iget-object v9, v6, Lcom/android/server/vibrator/ExternalVibrationSession;->mExternalVibration:Landroid/os/ExternalVibration;
++    iget-object v8, v5, Lcom/android/server/vibrator/ExternalVibrationSession;->mExternalVibration:Landroid/os/ExternalVibration;
+ 
+-    invoke-virtual {v9, p1}, Landroid/os/ExternalVibration;->equals(Ljava/lang/Object;)Z
++    invoke-virtual {v8, p1}, Landroid/os/ExternalVibration;->equals(Ljava/lang/Object;)Z
+ 
+-    move-result v9
++    move-result v8
+ 
+-    if-eqz v9, :cond_5
++    if-eqz v8, :cond_5
+ 
+-    iget-object p0, v6, Lcom/android/server/vibrator/ExternalVibrationSession;->mScale:Landroid/os/ExternalVibrationScale;
++    iget-object p0, v5, Lcom/android/server/vibrator/ExternalVibrationSession;->mScale:Landroid/os/ExternalVibrationScale;
+ 
+     monitor-exit v3
+     :try_end_4
+@@ -254,19 +254,19 @@
+ 
+     :cond_5
+     :try_start_5
+-    iget-object v6, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
++    iget-object v5, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+-    invoke-virtual {v6, v0}, Lcom/android/server/vibrator/VibratorManagerService;->shouldIgnoreForOngoingLocked(Lcom/android/server/vibrator/VibrationSession;)Lcom/android/server/vibrator/Vibration$EndInfo;
++    invoke-virtual {v5, v0}, Lcom/android/server/vibrator/VibratorManagerService;->shouldIgnoreForOngoingLocked(Lcom/android/server/vibrator/VibrationSession;)Lcom/android/server/vibrator/Vibration$EndInfo;
+ 
+-    move-result-object v6
++    move-result-object v5
+ 
+-    if-eqz v6, :cond_6
++    if-eqz v5, :cond_6
+ 
+     iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+-    iget-object p1, v6, Lcom/android/server/vibrator/Vibration$EndInfo;->status:Lcom/android/server/vibrator/VibrationSession$Status;
++    iget-object p1, v5, Lcom/android/server/vibrator/Vibration$EndInfo;->status:Lcom/android/server/vibrator/VibrationSession$Status;
+ 
+-    iget-object v4, v6, Lcom/android/server/vibrator/Vibration$EndInfo;->endedBy:Lcom/android/server/vibrator/VibrationSession$CallerInfo;
++    iget-object v4, v5, Lcom/android/server/vibrator/Vibration$EndInfo;->endedBy:Lcom/android/server/vibrator/VibrationSession$CallerInfo;
+ 
+     invoke-virtual {p0, v0, p1, v4}, Lcom/android/server/vibrator/VibratorManagerService;->endSessionLocked(Lcom/android/server/vibrator/VibrationSession;Lcom/android/server/vibrator/VibrationSession$Status;Lcom/android/server/vibrator/VibrationSession$CallerInfo;)V
+ 
+@@ -282,70 +282,59 @@
+ 
+     :cond_6
+     :try_start_6
+-    iget-object v6, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
++    iget-object v5, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+-    sget-object v9, Lcom/android/server/vibrator/VibrationSession$Status;->IGNORED_FOR_EXTERNAL:Lcom/android/server/vibrator/VibrationSession$Status;
++    sget-object v8, Lcom/android/server/vibrator/VibrationSession$Status;->IGNORED_FOR_EXTERNAL:Lcom/android/server/vibrator/VibrationSession$Status;
+ 
+-    iget-object v10, v0, Lcom/android/server/vibrator/Vibration;->callerInfo:Lcom/android/server/vibrator/VibrationSession$CallerInfo;
++    iget-object v9, v0, Lcom/android/server/vibrator/Vibration;->callerInfo:Lcom/android/server/vibrator/VibrationSession$CallerInfo;
+ 
+-    invoke-virtual {v6, v9, v10}, Lcom/android/server/vibrator/VibratorManagerService;->clearNextSessionLocked(Lcom/android/server/vibrator/VibrationSession$Status;Lcom/android/server/vibrator/VibrationSession$CallerInfo;)V
++    invoke-virtual {v5, v8, v9}, Lcom/android/server/vibrator/VibratorManagerService;->clearNextSessionLocked(Lcom/android/server/vibrator/VibrationSession$Status;Lcom/android/server/vibrator/VibrationSession$CallerInfo;)V
+ 
+-    iget-object v6, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
++    iget-object v5, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+-    iput-object v0, v6, Lcom/android/server/vibrator/VibratorManagerService;->mNextSession:Lcom/android/server/vibrator/VibrationSession;
++    iput-object v0, v5, Lcom/android/server/vibrator/VibratorManagerService;->mNextSession:Lcom/android/server/vibrator/VibrationSession;
+ 
+-    iget-object v6, v6, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentSession:Lcom/android/server/vibrator/VibrationSession;
++    iget-object v5, v5, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentSession:Lcom/android/server/vibrator/VibrationSession;
+ 
+-    if-eqz v6, :cond_9
++    if-eqz v5, :cond_8
+ 
+-    iget-object v5, v0, Lcom/android/server/vibrator/Vibration;->stats:Lcom/android/server/vibrator/VibrationStats;
++    iget-object v4, v0, Lcom/android/server/vibrator/Vibration;->stats:Lcom/android/server/vibrator/VibrationStats;
+ 
+-    invoke-interface {v6}, Lcom/android/server/vibrator/VibrationSession;->getCallerInfo()Lcom/android/server/vibrator/VibrationSession$CallerInfo;
++    invoke-interface {v5}, Lcom/android/server/vibrator/VibrationSession;->getCallerInfo()Lcom/android/server/vibrator/VibrationSession$CallerInfo;
+ 
+-    move-result-object v6
++    move-result-object v5
+ 
+-    iget v9, v5, Lcom/android/server/vibrator/VibrationStats;->mInterruptedUsage:I
++    iget v8, v4, Lcom/android/server/vibrator/VibrationStats;->mInterruptedUsage:I
+ 
+-    if-gez v9, :cond_7
++    if-gez v8, :cond_7
+ 
+-    iget-object v6, v6, Lcom/android/server/vibrator/VibrationSession$CallerInfo;->attrs:Landroid/os/VibrationAttributes;
++    iget-object v5, v5, Lcom/android/server/vibrator/VibrationSession$CallerInfo;->attrs:Landroid/os/VibrationAttributes;
+ 
+-    invoke-virtual {v6}, Landroid/os/VibrationAttributes;->getUsage()I
++    invoke-virtual {v5}, Landroid/os/VibrationAttributes;->getUsage()I
+ 
+-    move-result v6
++    move-result v5
+ 
+-    iput v6, v5, Lcom/android/server/vibrator/VibrationStats;->mInterruptedUsage:I
++    iput v5, v4, Lcom/android/server/vibrator/VibrationStats;->mInterruptedUsage:I
+ 
+     :cond_7
+-    iget-object v5, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+-
+-    iget-object v5, v5, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentSession:Lcom/android/server/vibrator/VibrationSession;
+-
+-    sget-object v6, Lcom/android/server/vibrator/VibrationSession$Status;->CANCELLED_SUPERSEDED:Lcom/android/server/vibrator/VibrationSession$Status;
+-
+-    iget-object v9, v0, Lcom/android/server/vibrator/Vibration;->callerInfo:Lcom/android/server/vibrator/VibrationSession$CallerInfo;
+-
+-    invoke-interface {v5, v6, v9, v8}, Lcom/android/server/vibrator/VibrationSession;->requestEnd(Lcom/android/server/vibrator/VibrationSession$Status;Lcom/android/server/vibrator/VibrationSession$CallerInfo;Z)V
++    iget-object v4, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+-    iget-object v5, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
++    iget-object v4, v4, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentSession:Lcom/android/server/vibrator/VibrationSession;
+ 
+-    iget-object v5, v5, Lcom/android/server/vibrator/VibratorManagerService;->mVirtualVibSoundHelper:Lcom/android/server/vibrator/VirtualVibSoundHelper;
++    sget-object v5, Lcom/android/server/vibrator/VibrationSession$Status;->CANCELLED_SUPERSEDED:Lcom/android/server/vibrator/VibrationSession$Status;
+ 
+-    if-eqz v5, :cond_8
++    iget-object v8, v0, Lcom/android/server/vibrator/Vibration;->callerInfo:Lcom/android/server/vibrator/VibrationSession$CallerInfo;
+ 
+-    const-string/jumbo v6, "cancel"
++    invoke-interface {v4, v5, v8, v7}, Lcom/android/server/vibrator/VibrationSession;->requestEnd(Lcom/android/server/vibrator/VibrationSession$Status;Lcom/android/server/vibrator/VibrationSession$CallerInfo;Z)V
+ 
+-    invoke-virtual {v5, v6}, Lcom/android/server/vibrator/VirtualVibSoundHelper;->stopVirtualSound(Ljava/lang/String;)V
++    move v4, v7
+ 
+     :cond_8
+-    move v5, v8
+-
+-    :cond_9
+     monitor-exit v3
+     :try_end_6
+     .catchall {:try_start_6 .. :try_end_6} :catchall_0
+ 
+-    if-eqz v5, :cond_b
++    if-eqz v4, :cond_a
+ 
+     :try_start_7
+     iget-object v3, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+@@ -354,7 +343,7 @@
+ 
+     move-result v3
+ 
+-    if-nez v3, :cond_b
++    if-nez v3, :cond_a
+ 
+     const-string/jumbo p1, "VibratorManagerService"
+ 
+@@ -375,14 +364,14 @@
+ 
+     iget-object v3, p0, Lcom/android/server/vibrator/VibratorManagerService;->mNextSession:Lcom/android/server/vibrator/VibrationSession;
+ 
+-    if-ne v3, v0, :cond_a
++    if-ne v3, v0, :cond_9
+ 
+-    iput-object v7, p0, Lcom/android/server/vibrator/VibratorManagerService;->mNextSession:Lcom/android/server/vibrator/VibrationSession;
++    iput-object v6, p0, Lcom/android/server/vibrator/VibratorManagerService;->mNextSession:Lcom/android/server/vibrator/VibrationSession;
+ 
+-    :cond_a
++    :cond_9
+     sget-object v3, Lcom/android/server/vibrator/VibrationSession$Status;->IGNORED_ERROR_CANCELLING:Lcom/android/server/vibrator/VibrationSession$Status;
+ 
+-    invoke-virtual {p0, v0, v3, v7}, Lcom/android/server/vibrator/VibratorManagerService;->endSessionLocked(Lcom/android/server/vibrator/VibrationSession;Lcom/android/server/vibrator/VibrationSession$Status;Lcom/android/server/vibrator/VibrationSession$CallerInfo;)V
++    invoke-virtual {p0, v0, v3, v6}, Lcom/android/server/vibrator/VibratorManagerService;->endSessionLocked(Lcom/android/server/vibrator/VibrationSession;Lcom/android/server/vibrator/VibrationSession$Status;Lcom/android/server/vibrator/VibrationSession$CallerInfo;)V
+ 
+     iget-object p0, v0, Lcom/android/server/vibrator/ExternalVibrationSession;->mScale:Landroid/os/ExternalVibrationScale;
+ 
+@@ -410,7 +399,7 @@
+ 
+     goto/16 :goto_7
+ 
+-    :cond_b
++    :cond_a
+     iget-object v3, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+     iget-object v3, v3, Lcom/android/server/vibrator/VibratorManagerService;->mLock:Ljava/lang/Object;
+@@ -420,71 +409,71 @@
+     .catchall {:try_start_a .. :try_end_a} :catchall_2
+ 
+     :try_start_b
+-    iget-object v5, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
++    iget-object v4, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+-    iget-object v6, v5, Lcom/android/server/vibrator/VibratorManagerService;->mNextSession:Lcom/android/server/vibrator/VibrationSession;
++    iget-object v5, v4, Lcom/android/server/vibrator/VibratorManagerService;->mNextSession:Lcom/android/server/vibrator/VibrationSession;
+ 
+-    if-ne v6, v0, :cond_13
++    if-ne v5, v0, :cond_11
+ 
+-    iput-object v7, v5, Lcom/android/server/vibrator/VibratorManagerService;->mNextSession:Lcom/android/server/vibrator/VibrationSession;
++    iput-object v6, v4, Lcom/android/server/vibrator/VibratorManagerService;->mNextSession:Lcom/android/server/vibrator/VibrationSession;
+ 
+-    iget-object v5, v0, Lcom/android/server/vibrator/ExternalVibrationSession;->mExternalVibration:Landroid/os/ExternalVibration;
++    iget-object v4, v0, Lcom/android/server/vibrator/ExternalVibrationSession;->mExternalVibration:Landroid/os/ExternalVibration;
+ 
+-    invoke-virtual {v5, v0}, Landroid/os/ExternalVibration;->linkToDeath(Landroid/os/IBinder$DeathRecipient;)V
++    invoke-virtual {v4, v0}, Landroid/os/ExternalVibration;->linkToDeath(Landroid/os/IBinder$DeathRecipient;)V
+ 
+-    const-string/jumbo v5, "VibratorManagerService"
++    const-string/jumbo v4, "VibratorManagerService"
+ 
+-    const-string/jumbo v6, "Vibrator going under external control."
++    const-string/jumbo v5, "Vibrator going under external control."
+ 
+-    invoke-static {v5, v6}, Landroid/util/Slog;->d(Ljava/lang/String;Ljava/lang/String;)I
++    invoke-static {v4, v5}, Landroid/util/Slog;->d(Ljava/lang/String;Ljava/lang/String;)I
+ 
+-    iget-object v5, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
++    iget-object v4, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+-    iget-object v6, v0, Lcom/android/server/vibrator/Vibration;->stats:Lcom/android/server/vibrator/VibrationStats;
++    iget-object v5, v0, Lcom/android/server/vibrator/Vibration;->stats:Lcom/android/server/vibrator/VibrationStats;
+ 
+-    invoke-static {v5, v8, v6}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$msetExternalControl(Lcom/android/server/vibrator/VibratorManagerService;ZLcom/android/server/vibrator/VibrationStats;)V
++    invoke-static {v4, v7, v5}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$msetExternalControl(Lcom/android/server/vibrator/VibratorManagerService;ZLcom/android/server/vibrator/VibrationStats;)V
+ 
+-    const-string/jumbo v5, "VibratorManagerService"
++    const-string/jumbo v4, "VibratorManagerService"
+ 
+-    new-instance v6, Ljava/lang/StringBuilder;
++    new-instance v5, Ljava/lang/StringBuilder;
+ 
+-    invoke-direct {v6}, Ljava/lang/StringBuilder;-><init>()V
++    invoke-direct {v5}, Ljava/lang/StringBuilder;-><init>()V
+ 
+-    const-string/jumbo v8, "Playing external vibration: "
++    const-string/jumbo v7, "Playing external vibration: "
+ 
+-    invoke-virtual {v6, v8}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
++    invoke-virtual {v5, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+ 
+-    invoke-virtual {v6, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;
++    invoke-virtual {v5, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+ 
+-    invoke-virtual {v6}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
++    invoke-virtual {v5}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+ 
+-    move-result-object v6
++    move-result-object v5
+ 
+-    invoke-static {v5, v6}, Landroid/util/Slog;->d(Ljava/lang/String;Ljava/lang/String;)I
++    invoke-static {v4, v5}, Landroid/util/Slog;->d(Ljava/lang/String;Ljava/lang/String;)I
+ 
+-    iget-object v5, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
++    iget-object v4, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+     invoke-virtual {p1}, Landroid/os/ExternalVibration;->getVibrationAttributes()Landroid/os/VibrationAttributes;
+ 
+-    move-result-object v6
++    move-result-object v5
+ 
+-    invoke-virtual {v5, v6, v7}, Lcom/android/server/vibrator/VibratorManagerService;->fixupVibrationAttributes(Landroid/os/VibrationAttributes;Landroid/os/CombinedVibration;)Landroid/os/VibrationAttributes;
++    invoke-virtual {v4, v5, v6}, Lcom/android/server/vibrator/VibratorManagerService;->fixupVibrationAttributes(Landroid/os/VibrationAttributes;Landroid/os/CombinedVibration;)Landroid/os/VibrationAttributes;
+ 
+-    move-result-object v5
++    move-result-object v4
+ 
+-    const/4 v6, 0x4
++    const/4 v5, 0x4
+ 
+-    invoke-virtual {v5, v6}, Landroid/os/VibrationAttributes;->isFlagSet(I)Z
++    invoke-virtual {v4, v5}, Landroid/os/VibrationAttributes;->isFlagSet(I)Z
+ 
+-    move-result v6
++    move-result v5
+ 
+-    if-eqz v6, :cond_c
++    if-eqz v5, :cond_b
+ 
+-    iget-object v6, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
++    iget-object v5, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+-    iget-object v6, v6, Lcom/android/server/vibrator/VibratorManagerService;->mVibrationSettings:Lcom/android/server/vibrator/VibrationSettings;
++    iget-object v5, v5, Lcom/android/server/vibrator/VibratorManagerService;->mVibrationSettings:Lcom/android/server/vibrator/VibrationSettings;
+ 
+-    invoke-virtual {v6}, Lcom/android/server/vibrator/VibrationSettings;->update()V
++    invoke-virtual {v5}, Lcom/android/server/vibrator/VibrationSettings;->update()V
+ 
+     goto :goto_2
+ 
+@@ -493,101 +482,74 @@
+ 
+     goto/16 :goto_5
+ 
+-    :cond_c
++    :cond_b
+     :goto_2
+-    iget-object v6, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+-
+-    iput-object v0, v6, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentSession:Lcom/android/server/vibrator/VibrationSession;
+-
+-    iget-object v6, v6, Lcom/android/server/vibrator/VibratorManagerService;->mVibrationScaler:Lcom/android/server/vibrator/VibrationScaler;
+-
+-    invoke-virtual {v5}, Landroid/os/VibrationAttributes;->getUsage()I
+-
+-    move-result v5
+-
+-    iget-object v7, v0, Lcom/android/server/vibrator/ExternalVibrationSession;->mScale:Landroid/os/ExternalVibrationScale;
++    iget-object v5, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+-    invoke-virtual {v6, v5}, Lcom/android/server/vibrator/VibrationScaler;->getScaleLevel(I)I
++    iput-object v0, v5, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentSession:Lcom/android/server/vibrator/VibrationSession;
+ 
+-    move-result v8
++    iget-object v5, v5, Lcom/android/server/vibrator/VibratorManagerService;->mVibrationScaler:Lcom/android/server/vibrator/VibrationScaler;
+ 
+-    iput v8, v7, Landroid/os/ExternalVibrationScale;->scaleLevel:I
++    invoke-virtual {v4}, Landroid/os/VibrationAttributes;->getUsage()I
+ 
+-    iget-object v7, v0, Lcom/android/server/vibrator/ExternalVibrationSession;->mScale:Landroid/os/ExternalVibrationScale;
++    move-result v4
+ 
+-    iget-object v6, v6, Lcom/android/server/vibrator/VibrationScaler;->mAdaptiveHapticsScales:Landroid/util/SparseArray;
++    iget-object v6, v0, Lcom/android/server/vibrator/ExternalVibrationSession;->mScale:Landroid/os/ExternalVibrationScale;
+ 
+-    const/high16 v8, 0x3f800000    # 1.0f
++    invoke-virtual {v5, v4}, Lcom/android/server/vibrator/VibrationScaler;->getScaleLevel(I)I
+ 
+-    invoke-static {v8}, Ljava/lang/Float;->valueOf(F)Ljava/lang/Float;
++    move-result v7
+ 
+-    move-result-object v9
++    iput v7, v6, Landroid/os/ExternalVibrationScale;->scaleLevel:I
+ 
+-    invoke-virtual {v6, v5, v9}, Landroid/util/SparseArray;->get(ILjava/lang/Object;)Ljava/lang/Object;
++    iget-object v6, v0, Lcom/android/server/vibrator/ExternalVibrationSession;->mScale:Landroid/os/ExternalVibrationScale;
+ 
+-    move-result-object v5
++    iget-object v5, v5, Lcom/android/server/vibrator/VibrationScaler;->mAdaptiveHapticsScales:Landroid/util/SparseArray;
+ 
+-    check-cast v5, Ljava/lang/Float;
++    const/high16 v7, 0x3f800000    # 1.0f
+ 
+-    invoke-virtual {v5}, Ljava/lang/Float;->floatValue()F
++    invoke-static {v7}, Ljava/lang/Float;->valueOf(F)Ljava/lang/Float;
+ 
+-    move-result v5
++    move-result-object v8
+ 
+-    iput v5, v7, Landroid/os/ExternalVibrationScale;->adaptiveHapticsScale:F
++    invoke-virtual {v5, v4, v8}, Landroid/util/SparseArray;->get(ILjava/lang/Object;)Ljava/lang/Object;
+ 
+-    iget-object v5, v0, Lcom/android/server/vibrator/ExternalVibrationSession;->mScale:Landroid/os/ExternalVibrationScale;
++    move-result-object v4
+ 
+-    iget v5, v5, Landroid/os/ExternalVibrationScale;->adaptiveHapticsScale:F
++    check-cast v4, Ljava/lang/Float;
+ 
+-    iget-object v6, v0, Lcom/android/server/vibrator/Vibration;->stats:Lcom/android/server/vibrator/VibrationStats;
++    invoke-virtual {v4}, Ljava/lang/Float;->floatValue()F
+ 
+-    invoke-virtual {v6}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
++    move-result v4
+ 
+-    invoke-static {v5, v8}, Ljava/lang/Float;->compare(FF)I
++    iput v4, v6, Landroid/os/ExternalVibrationScale;->adaptiveHapticsScale:F
+ 
+-    move-result v7
++    iget-object v4, v0, Lcom/android/server/vibrator/ExternalVibrationSession;->mScale:Landroid/os/ExternalVibrationScale;
+ 
+-    if-eqz v7, :cond_d
++    iget v4, v4, Landroid/os/ExternalVibrationScale;->adaptiveHapticsScale:F
+ 
+-    iput v5, v6, Lcom/android/server/vibrator/VibrationStats;->mAdaptiveScale:F
++    iget-object v5, v0, Lcom/android/server/vibrator/Vibration;->stats:Lcom/android/server/vibrator/VibrationStats;
+ 
+-    :cond_d
+-    sget-boolean v5, Lcom/samsung/android/vibrator/VibRune;->SUPPORT_ACH:Z
++    invoke-virtual {v5}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+ 
+-    if-eqz v5, :cond_e
++    invoke-static {v4, v7}, Ljava/lang/Float;->compare(FF)I
+ 
+-    iget-object v5, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
++    move-result v6
+ 
+-    invoke-static {v5, v0}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$msetAchMagnitude(Lcom/android/server/vibrator/VibratorManagerService;Lcom/android/server/vibrator/ExternalVibrationSession;)V
++    if-eqz v6, :cond_c
+ 
+-    :cond_e
+-    iget-object v5, v0, Lcom/android/server/vibrator/ExternalVibrationSession;->mScale:Landroid/os/ExternalVibrationScale;
++    iput v4, v5, Lcom/android/server/vibrator/VibrationStats;->mAdaptiveScale:F
+ 
+-    iget v5, v5, Landroid/os/ExternalVibrationScale;->scaleLevel:I
++    :cond_c
++    sget-boolean v4, Lcom/samsung/android/vibrator/VibRune;->SUPPORT_ACH:Z
+ 
+-    if-eq v5, v4, :cond_f
++    if-eqz v4, :cond_d
+ 
+     iget-object v4, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+-    iget-object v4, v4, Lcom/android/server/vibrator/VibratorManagerService;->mVirtualVibSoundHelper:Lcom/android/server/vibrator/VirtualVibSoundHelper;
+-
+-    if-eqz v4, :cond_f
+-
+-    invoke-virtual {p1}, Landroid/os/ExternalVibration;->getPackage()Ljava/lang/String;
+-
+-    move-result-object v5
+-
+-    invoke-virtual {p1}, Landroid/os/ExternalVibration;->getVibrationAttributesWithTags()Landroid/os/VibrationAttributes;
++    invoke-static {v4, v0}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$msetAchMagnitude(Lcom/android/server/vibrator/VibratorManagerService;Lcom/android/server/vibrator/ExternalVibrationSession;)V
+ 
+-    move-result-object v6
+-
+-    invoke-virtual {p1}, Landroid/os/ExternalVibration;->isRepeating()Z
+-
+-    move-result v7
+-
+-    invoke-virtual {v4, v5, v6, v7}, Lcom/android/server/vibrator/VirtualVibSoundHelper;->playVirtualSoundIfNeeded(Ljava/lang/String;Landroid/os/VibrationAttributes;Z)V
+-
+-    :cond_f
++    :cond_d
+     iget-object v4, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+ 
+     invoke-static {v4, p1}, Lcom/android/server/vibrator/VibratorManagerService;->-$$Nest$mreportVibrationInfo(Lcom/android/server/vibrator/VibratorManagerService;Landroid/os/ExternalVibration;)V
+@@ -598,7 +560,7 @@
+ 
+     move-result-object p1
+ 
+-    if-eqz p1, :cond_10
++    if-eqz p1, :cond_e
+ 
+     invoke-virtual {p0}, Lcom/android/server/vibrator/VibratorManagerService;->getDefaultVibratorController()Lcom/android/server/vibrator/VibratorController;
+ 
+@@ -629,7 +591,7 @@
+     :try_start_d
+     throw p0
+ 
+-    :cond_10
++    :cond_e
+     :goto_3
+     iget-object p0, v0, Lcom/android/server/vibrator/Vibration;->stats:Lcom/android/server/vibrator/VibrationStats;
+ 
+@@ -639,20 +601,20 @@
+ 
+     cmp-long p1, v4, v6
+ 
+-    if-lez p1, :cond_11
++    if-lez p1, :cond_f
+ 
+     goto :goto_4
+ 
+-    :cond_11
++    :cond_f
+     iget-wide v4, p0, Lcom/android/server/vibrator/VibrationStats;->mStartUptimeMillis:J
+ 
+     cmp-long p1, v4, v6
+ 
+-    if-eqz p1, :cond_12
++    if-eqz p1, :cond_10
+ 
+     goto :goto_4
+ 
+-    :cond_12
++    :cond_10
+     invoke-static {}, Landroid/os/SystemClock;->uptimeMillis()J
+ 
+     move-result-wide v4
+@@ -676,7 +638,7 @@
+ 
+     return-object p0
+ 
+-    :cond_13
++    :cond_11
+     :try_start_e
+     iget-object p0, v0, Lcom/android/server/vibrator/ExternalVibrationSession;->mScale:Landroid/os/ExternalVibrationScale;
+ 
+@@ -783,16 +745,6 @@
+ 
+     invoke-static {p1, v0}, Landroid/util/Slog;->d(Ljava/lang/String;Ljava/lang/String;)I
+ 
+-    iget-object p1, p0, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibratorService;->this$0:Lcom/android/server/vibrator/VibratorManagerService;
+-
+-    iget-object p1, p1, Lcom/android/server/vibrator/VibratorManagerService;->mVirtualVibSoundHelper:Lcom/android/server/vibrator/VirtualVibSoundHelper;
+-
+-    if-eqz p1, :cond_0
+-
+-    const-string/jumbo v0, "stop"
+-
+-    invoke-virtual {p1, v0}, Lcom/android/server/vibrator/VirtualVibSoundHelper;->stopVirtualSound(Ljava/lang/String;)V
+-
+     goto :goto_0
+ 
+     :catchall_0
+diff --git a/smali_classes2/com/android/server/vibrator/VibratorManagerService$Lifecycle.smali b/smali_classes2/com/android/server/vibrator/VibratorManagerService$Lifecycle.smali
+index 63ad9a6cd..3f96e4da7 100644
+--- a/smali_classes2/com/android/server/vibrator/VibratorManagerService$Lifecycle.smali
++++ b/smali_classes2/com/android/server/vibrator/VibratorManagerService$Lifecycle.smali
+@@ -19,7 +19,7 @@
+ 
+ # virtual methods
+ .method public final onBootPhase(I)V
+-    .locals 2
++    .locals 1
+ 
+     const/16 v0, 0x1f4
+ 
+@@ -44,16 +44,6 @@
+ 
+     invoke-virtual {p1}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
+ 
+-    new-instance p1, Lcom/android/server/vibrator/VirtualVibSoundHelper;
+-
+-    iget-object v0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mContext:Landroid/content/Context;
+-
+-    iget-object v1, p0, Lcom/android/server/vibrator/VibratorManagerService;->mVibrationSettings:Lcom/android/server/vibrator/VibrationSettings;
+-
+-    invoke-direct {p1, v0, v1}, Lcom/android/server/vibrator/VirtualVibSoundHelper;-><init>(Landroid/content/Context;Lcom/android/server/vibrator/VibrationSettings;)V
+-
+-    iput-object p1, p0, Lcom/android/server/vibrator/VibratorManagerService;->mVirtualVibSoundHelper:Lcom/android/server/vibrator/VirtualVibSoundHelper;
+-
+     invoke-virtual {p0}, Lcom/android/server/vibrator/VibratorManagerService;->getDefaultVibratorController()Lcom/android/server/vibrator/VibratorController;
+ 
+     move-result-object p1
+diff --git a/smali_classes2/com/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda0.smali b/smali_classes2/com/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda0.smali
+index f8dc4432f..039eda008 100644
+--- a/smali_classes2/com/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda0.smali
++++ b/smali_classes2/com/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda0.smali
+@@ -24,7 +24,7 @@
+ 
+ # virtual methods
+ .method public final run()V
+-    .locals 4
++    .locals 3
+ 
+     iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda0;->f$0:Lcom/android/server/vibrator/VibratorManagerService$1;
+ 
+@@ -39,34 +39,25 @@
+ 
+     sget-object v1, Lcom/android/server/vibrator/VibrationSession$Status;->CANCELLED_SERVICE_RECOVERED:Lcom/android/server/vibrator/VibrationSession$Status;
+ 
+-    iget-object v2, p0, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentSession:Lcom/android/server/vibrator/VibrationSession;
++    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentSession:Lcom/android/server/vibrator/VibrationSession;
+ 
+-    if-eqz v2, :cond_1
++    if-eqz p0, :cond_1
+ 
+-    instance-of v3, v2, Lcom/android/server/vibrator/ExternalVibrationSession;
++    instance-of v2, p0, Lcom/android/server/vibrator/ExternalVibrationSession;
+ 
+-    if-eqz v3, :cond_0
++    if-eqz v2, :cond_0
+ 
+     sget-object v1, Lcom/android/server/vibrator/VibrationSession$Status;->FINISHED:Lcom/android/server/vibrator/VibrationSession$Status;
+ 
+-    invoke-interface {v2, v1}, Lcom/android/server/vibrator/VibrationSession;->requestEnd(Lcom/android/server/vibrator/VibrationSession$Status;)V
++    invoke-interface {p0, v1}, Lcom/android/server/vibrator/VibrationSession;->requestEnd(Lcom/android/server/vibrator/VibrationSession$Status;)V
+ 
+     goto :goto_0
+ 
+     :cond_0
+-    invoke-interface {v2, v1}, Lcom/android/server/vibrator/VibrationSession;->requestEnd(Lcom/android/server/vibrator/VibrationSession$Status;)V
++    invoke-interface {p0, v1}, Lcom/android/server/vibrator/VibrationSession;->requestEnd(Lcom/android/server/vibrator/VibrationSession$Status;)V
+ 
+     :cond_1
+     :goto_0
+-    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mVirtualVibSoundHelper:Lcom/android/server/vibrator/VirtualVibSoundHelper;
+-
+-    if-eqz p0, :cond_2
+-
+-    const-string/jumbo v1, "recovery"
+-
+-    invoke-virtual {p0, v1}, Lcom/android/server/vibrator/VirtualVibSoundHelper;->stopVirtualSound(Ljava/lang/String;)V
+-
+-    :cond_2
+     monitor-exit v0
+ 
+     return-void
+diff --git a/smali_classes2/com/android/server/vibrator/VibratorManagerService.smali b/smali_classes2/com/android/server/vibrator/VibratorManagerService.smali
+index bef2413e4..02672804c 100644
+--- a/smali_classes2/com/android/server/vibrator/VibratorManagerService.smali
++++ b/smali_classes2/com/android/server/vibrator/VibratorManagerService.smali
+@@ -82,8 +82,6 @@
  
  .field public final mVibrators:Landroid/util/SparseArray;
  
 -.field public mVirtualVibSoundHelper:Lcom/android/server/vibrator/VirtualVibSoundHelper;
 -
- .field public final mWakeLock:Landroid/os/PowerManager$WakeLock;
  
+ # direct methods
+ .method public static -$$Nest$mclearCurrentSessionLocked(Lcom/android/server/vibrator/VibratorManagerService;)V
+@@ -147,17 +145,9 @@
  
-@@ -230,14 +228,6 @@
-     return-object p0
- .end method
+     if-eqz p1, :cond_1
  
--.method public static bridge synthetic -$$Nest$fgetmVirtualVibSoundHelper(Lcom/android/server/vibrator/VibratorManagerService;)Lcom/android/server/vibrator/VirtualVibSoundHelper;
--    .locals 0
+-    iget-object p1, p0, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentSession:Lcom/android/server/vibrator/VibrationSession;
+-
+-    invoke-interface {p1, p2}, Lcom/android/server/vibrator/VibrationSession;->requestEnd(Lcom/android/server/vibrator/VibrationSession$Status;)V
 -
 -    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mVirtualVibSoundHelper:Lcom/android/server/vibrator/VirtualVibSoundHelper;
 -
--    return-object p0
--.end method
+-    if-eqz p0, :cond_1
 -
- .method public static bridge synthetic -$$Nest$fputmCurrentExternalVibration(Lcom/android/server/vibrator/VibratorManagerService;Lcom/android/server/vibrator/VibratorManagerService$ExternalVibrationHolder;)V
-     .locals 0
+-    const-string/jumbo p1, "cancel"
++    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentSession:Lcom/android/server/vibrator/VibrationSession;
  
-@@ -1187,21 +1177,11 @@
- .end method
- 
- .method public final bootCompleteReady()V
--    .locals 3
--
--    iget-object v0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mVibrationSettings:Lcom/android/server/vibrator/VibrationSettings;
--
--    invoke-virtual {v0}, Lcom/android/server/vibrator/VibrationSettings;->bootCompleteReady()V
--
--    new-instance v0, Lcom/android/server/vibrator/VirtualVibSoundHelper;
--
--    iget-object v1, p0, Lcom/android/server/vibrator/VibratorManagerService;->mContext:Landroid/content/Context;
--
--    iget-object v2, p0, Lcom/android/server/vibrator/VibratorManagerService;->mVibrationSettings:Lcom/android/server/vibrator/VibrationSettings;
-+    .locals 0
- 
--    invoke-direct {v0, v1, v2}, Lcom/android/server/vibrator/VirtualVibSoundHelper;-><init>(Landroid/content/Context;Lcom/android/server/vibrator/VibrationSettings;)V
-+    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mVibrationSettings:Lcom/android/server/vibrator/VibrationSettings;
- 
--    iput-object v0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mVirtualVibSoundHelper:Lcom/android/server/vibrator/VirtualVibSoundHelper;
-+    invoke-virtual {p0}, Lcom/android/server/vibrator/VibrationSettings;->bootCompleteReady()V
- 
-     return-void
- .end method
-@@ -1238,33 +1218,24 @@
-     iput-object v0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentExternalVibration:Lcom/android/server/vibrator/VibratorManagerService$ExternalVibrationHolder;
- 
-     :cond_0
--    iget-object v0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentVibration:Lcom/android/server/vibrator/VibrationStepConductor;
-+    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentVibration:Lcom/android/server/vibrator/VibrationStepConductor;
- 
--    if-eqz v0, :cond_1
-+    if-eqz p0, :cond_1
- 
--    new-instance v1, Lcom/android/server/vibrator/Vibration$EndInfo;
-+    new-instance v0, Lcom/android/server/vibrator/Vibration$EndInfo;
- 
--    invoke-direct {v1, p1}, Lcom/android/server/vibrator/Vibration$EndInfo;-><init>(Lcom/android/server/vibrator/Vibration$Status;)V
-+    invoke-direct {v0, p1}, Lcom/android/server/vibrator/Vibration$EndInfo;-><init>(Lcom/android/server/vibrator/Vibration$Status;)V
- 
-     const/4 p1, 0x1
- 
--    invoke-virtual {v0, v1, p1}, Lcom/android/server/vibrator/VibrationStepConductor;->notifyCancelled(Lcom/android/server/vibrator/Vibration$EndInfo;Z)V
-+    invoke-virtual {p0, v0, p1}, Lcom/android/server/vibrator/VibrationStepConductor;->notifyCancelled(Lcom/android/server/vibrator/Vibration$EndInfo;Z)V
- 
-     :cond_1
--    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mVirtualVibSoundHelper:Lcom/android/server/vibrator/VirtualVibSoundHelper;
--
--    if-eqz p0, :cond_2
--
--    const-string/jumbo p1, "recovery"
--
 -    invoke-virtual {p0, p1}, Lcom/android/server/vibrator/VirtualVibSoundHelper;->stopVirtualSound(Ljava/lang/String;)V
--
--    :cond_2
-     return-void
- .end method
- 
- .method public cancelVibrate(ILandroid/os/IBinder;)V
--    .locals 9
-+    .locals 8
- 
-     const-string v0, "cancelVibrate"
- 
-@@ -1326,9 +1297,7 @@
-     :cond_0
-     iget-object v6, p0, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentVibration:Lcom/android/server/vibrator/VibrationStepConductor;
- 
--    const/4 v7, 0x1
--
--    const/4 v8, 0x0
-+    const/4 v7, 0x0
- 
-     if-eqz v6, :cond_1
- 
-@@ -1344,27 +1313,20 @@
- 
-     iget-object p2, p0, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentVibration:Lcom/android/server/vibrator/VibrationStepConductor;
- 
--    invoke-virtual {p2, v3, v8}, Lcom/android/server/vibrator/VibrationStepConductor;->notifyCancelled(Lcom/android/server/vibrator/Vibration$EndInfo;Z)V
--
--    move p2, v7
--
--    goto :goto_0
-+    invoke-virtual {p2, v3, v7}, Lcom/android/server/vibrator/VibrationStepConductor;->notifyCancelled(Lcom/android/server/vibrator/Vibration$EndInfo;Z)V
++    invoke-interface {p0, p2}, Lcom/android/server/vibrator/VibrationSession;->requestEnd(Lcom/android/server/vibrator/VibrationSession$Status;)V
  
      :cond_1
--    move p2, v8
+     return-void
+@@ -606,24 +596,12 @@
+ 
+     const-string/jumbo v4, "com.sec.media.action.VIBRTOR_LOGGING"
+ 
+-    const-string/jumbo v9, "android.media.STREAM_DEVICES_CHANGED_ACTION"
++    const-string/jumbo v9, "com.android.launcher3.quickstep.closeall"
+ 
+     invoke-static {v1, v2, v3, v4, v9}, Lcom/android/server/VpnManagerService$$ExternalSyntheticOutline0;->m(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Landroid/content/IntentFilter;
+ 
+     move-result-object v1
+ 
+-    const-string/jumbo v2, "android.intent.action.HEADSET_PLUG"
 -
--    :goto_0
--    iget-object v6, p0, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentExternalVibration:Lcom/android/server/vibrator/VibratorManagerService$ExternalVibrationHolder;
-+    iget-object p2, p0, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentExternalVibration:Lcom/android/server/vibrator/VibratorManagerService$ExternalVibrationHolder;
- 
--    if-eqz v6, :cond_3
-+    if-eqz p2, :cond_3
- 
--    iget-object v6, v6, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibrationHolder;->externalVibration:Landroid/os/ExternalVibration;
-+    iget-object p2, p2, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibrationHolder;->externalVibration:Landroid/os/ExternalVibration;
- 
--    invoke-virtual {v6}, Landroid/os/ExternalVibration;->getVibrationAttributes()Landroid/os/VibrationAttributes;
-+    invoke-virtual {p2}, Landroid/os/ExternalVibration;->getVibrationAttributes()Landroid/os/VibrationAttributes;
- 
--    move-result-object v6
-+    move-result-object p2
- 
--    invoke-virtual {p0, v6, p1}, Lcom/android/server/vibrator/VibratorManagerService;->shouldCancelVibration(Landroid/os/VibrationAttributes;I)Z
-+    invoke-virtual {p0, p2, p1}, Lcom/android/server/vibrator/VibratorManagerService;->shouldCancelVibration(Landroid/os/VibrationAttributes;I)Z
- 
-     move-result p1
- 
-@@ -1405,27 +1367,11 @@
- 
-     invoke-virtual {p1}, Lcom/android/server/vibrator/VibratorManagerService$ExternalVibrationHolder;->mute()V
- 
--    invoke-virtual {p0, v3, v8}, Lcom/android/server/vibrator/VibratorManagerService;->endExternalVibrateLocked(Lcom/android/server/vibrator/Vibration$EndInfo;Z)V
+-    invoke-virtual {v1, v2}, Landroid/content/IntentFilter;->addAction(Ljava/lang/String;)V
 -
--    goto :goto_1
+-    const-string/jumbo v2, "android.bluetooth.a2dp.profile.action.CONNECTION_STATE_CHANGED"
 -
--    :cond_3
--    move v7, p2
+-    invoke-virtual {v1, v2}, Landroid/content/IntentFilter;->addAction(Ljava/lang/String;)V
 -
--    :goto_1
--    if-eqz v7, :cond_4
+-    const-string/jumbo v2, "com.android.launcher3.quickstep.closeall"
+-
+-    invoke-virtual {v1, v2}, Landroid/content/IntentFilter;->addAction(Ljava/lang/String;)V
+-
+     const/4 v9, 0x4
+ 
+     invoke-virtual {p1, v0, v1, v9}, Landroid/content/Context;->registerReceiver(Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;I)Landroid/content/Intent;
+@@ -636,8 +614,6 @@
+ 
+     invoke-direct {v1, p0}, Ljava/lang/ref/WeakReference;-><init>(Ljava/lang/Object;)V
+ 
+-    iput-object v1, v0, Lcom/android/server/vibrator/VibratorManagerInternal;->mServiceWeakReference:Ljava/lang/ref/WeakReference;
+-
+     const-class v1, Lcom/android/server/vibrator/VibratorManagerInternal;
+ 
+     invoke-static {v1, v0}, Lcom/android/server/LocalServices;->addService(Ljava/lang/Class;Ljava/lang/Object;)V
+@@ -1880,19 +1856,11 @@
+ 
+     :cond_3
+     :try_start_4
+-    iget-object p1, p0, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentSession:Lcom/android/server/vibrator/VibrationSession;
+-
+-    sget-object p2, Lcom/android/server/vibrator/VibrationSession$Status;->CANCELLED_BY_USER:Lcom/android/server/vibrator/VibrationSession$Status;
+-
+-    invoke-interface {p1, p2}, Lcom/android/server/vibrator/VibrationSession;->requestEnd(Lcom/android/server/vibrator/VibrationSession$Status;)V
 -
 -    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mVirtualVibSoundHelper:Lcom/android/server/vibrator/VirtualVibSoundHelper;
 -
 -    if-eqz p0, :cond_4
--
--    const-string p1, "cancel"
--
++    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentSession:Lcom/android/server/vibrator/VibrationSession;
+ 
+-    const-string/jumbo p1, "cancel"
++    sget-object p1, Lcom/android/server/vibrator/VibrationSession$Status;->CANCELLED_BY_USER:Lcom/android/server/vibrator/VibrationSession$Status;
+ 
 -    invoke-virtual {p0, p1}, Lcom/android/server/vibrator/VirtualVibSoundHelper;->stopVirtualSound(Ljava/lang/String;)V
-+    invoke-virtual {p0, v3, v7}, Lcom/android/server/vibrator/VibratorManagerService;->endExternalVibrateLocked(Lcom/android/server/vibrator/Vibration$EndInfo;Z)V
++    invoke-interface {p0, p1}, Lcom/android/server/vibrator/VibrationSession;->requestEnd(Lcom/android/server/vibrator/VibrationSession$Status;)V
      :try_end_4
      .catchall {:try_start_4 .. :try_end_4} :catchall_0
  
--    :cond_4
-+    :cond_3
-     :try_start_5
-     invoke-static {v4, v5}, Landroid/os/Binder;->restoreCallingIdentity(J)V
+@@ -7530,7 +7498,7 @@
+     iget-object v1, v5, Lcom/android/server/vibrator/Vibration$EndInfo;->endedBy:Lcom/android/server/vibrator/VibrationSession$CallerInfo;
  
-@@ -3989,18 +3935,6 @@
- 
-     invoke-virtual {v0, v1}, Landroid/content/IntentFilter;->addAction(Ljava/lang/String;)V
- 
--    const-string v1, "android.media.STREAM_DEVICES_CHANGED_ACTION"
--
--    invoke-virtual {v0, v1}, Landroid/content/IntentFilter;->addAction(Ljava/lang/String;)V
--
--    const-string v1, "android.intent.action.HEADSET_PLUG"
--
--    invoke-virtual {v0, v1}, Landroid/content/IntentFilter;->addAction(Ljava/lang/String;)V
--
--    const-string v1, "android.bluetooth.a2dp.profile.action.CONNECTION_STATE_CHANGED"
--
--    invoke-virtual {v0, v1}, Landroid/content/IntentFilter;->addAction(Ljava/lang/String;)V
--
-     const-string v1, "com.android.launcher3.quickstep.closeall"
- 
-     invoke-virtual {v0, v1}, Landroid/content/IntentFilter;->addAction(Ljava/lang/String;)V
-@@ -4835,7 +4769,7 @@
- .end method
- 
- .method public final startVibrationOnThreadLocked(Lcom/android/server/vibrator/VibrationStepConductor;)Lcom/android/server/vibrator/Vibration$EndInfo;
--    .locals 5
-+    .locals 4
- 
-     const-string/jumbo v0, "startVibrationThreadLocked"
- 
-@@ -4910,25 +4844,25 @@
- 
-     :cond_1
-     :try_start_2
--    const-string/jumbo v3, "vibration"
-+    const-string/jumbo v0, "vibration"
- 
--    const/4 v4, 0x0
-+    const/4 v3, 0x0
- 
--    invoke-static {v1, v2, v3, v4}, Landroid/os/Trace;->asyncTraceBegin(JLjava/lang/String;I)V
-+    invoke-static {v1, v2, v0, v3}, Landroid/os/Trace;->asyncTraceBegin(JLjava/lang/String;I)V
- 
-     iput-object p1, p0, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentVibration:Lcom/android/server/vibrator/VibrationStepConductor;
- 
--    iget-object v3, p0, Lcom/android/server/vibrator/VibratorManagerService;->mVibrationThread:Lcom/android/server/vibrator/VibrationThread;
-+    iget-object v0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mVibrationThread:Lcom/android/server/vibrator/VibrationThread;
- 
--    invoke-virtual {v3, p1}, Lcom/android/server/vibrator/VibrationThread;->runVibrationOnVibrationThread(Lcom/android/server/vibrator/VibrationStepConductor;)Z
-+    invoke-virtual {v0, p1}, Lcom/android/server/vibrator/VibrationThread;->runVibrationOnVibrationThread(Lcom/android/server/vibrator/VibrationStepConductor;)Z
- 
-     move-result p1
- 
--    const/4 v3, 0x0
-+    const/4 v0, 0x0
- 
-     if-nez p1, :cond_2
- 
--    iput-object v3, p0, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentVibration:Lcom/android/server/vibrator/VibrationStepConductor;
-+    iput-object v0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentVibration:Lcom/android/server/vibrator/VibrationStepConductor;
- 
-     new-instance p0, Lcom/android/server/vibrator/Vibration$EndInfo;
- 
-@@ -4943,29 +4877,9 @@
-     return-object p0
- 
-     :cond_2
--    :try_start_3
--    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mVirtualVibSoundHelper:Lcom/android/server/vibrator/VirtualVibSoundHelper;
--
--    if-eqz p0, :cond_3
--
--    iget-object p1, v0, Lcom/android/server/vibrator/Vibration;->callerInfo:Lcom/android/server/vibrator/Vibration$CallerInfo;
--
--    iget-object v4, p1, Lcom/android/server/vibrator/Vibration$CallerInfo;->opPkg:Ljava/lang/String;
--
--    iget-object p1, p1, Lcom/android/server/vibrator/Vibration$CallerInfo;->attrs:Landroid/os/VibrationAttributes;
--
--    invoke-virtual {v0}, Lcom/android/server/vibrator/HalVibration;->isRepeating()Z
--
--    move-result v0
--
--    invoke-virtual {p0, v4, p1, v0}, Lcom/android/server/vibrator/VirtualVibSoundHelper;->playVirtualSoundIfNeeded(Ljava/lang/String;Landroid/os/VibrationAttributes;Z)V
--    :try_end_3
--    .catchall {:try_start_3 .. :try_end_3} :catchall_0
--
--    :cond_3
-     invoke-static {v1, v2}, Landroid/os/Trace;->traceEnd(J)V
- 
--    return-object v3
-+    return-object v0
- 
-     :catchall_0
-     move-exception p0
-@@ -5380,23 +5294,15 @@
- 
-     invoke-static {v4, v1}, Landroid/util/Slog;->d(Ljava/lang/String;Ljava/lang/String;)I
- 
--    iget-object v1, p0, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentVibration:Lcom/android/server/vibrator/VibrationStepConductor;
--
--    new-instance v3, Lcom/android/server/vibrator/Vibration$EndInfo;
--
--    sget-object v4, Lcom/android/server/vibrator/Vibration$Status;->CANCELLED_BY_SETTINGS_UPDATE:Lcom/android/server/vibrator/Vibration$Status;
--
--    invoke-direct {v3, v4}, Lcom/android/server/vibrator/Vibration$EndInfo;-><init>(Lcom/android/server/vibrator/Vibration$Status;)V
-+    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentVibration:Lcom/android/server/vibrator/VibrationStepConductor;
- 
--    invoke-virtual {v1, v3, v2}, Lcom/android/server/vibrator/VibrationStepConductor;->notifyCancelled(Lcom/android/server/vibrator/Vibration$EndInfo;Z)V
-+    new-instance v1, Lcom/android/server/vibrator/Vibration$EndInfo;
- 
--    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mVirtualVibSoundHelper:Lcom/android/server/vibrator/VirtualVibSoundHelper;
-+    sget-object v3, Lcom/android/server/vibrator/Vibration$Status;->CANCELLED_BY_SETTINGS_UPDATE:Lcom/android/server/vibrator/Vibration$Status;
- 
--    if-eqz p0, :cond_4
-+    invoke-direct {v1, v3}, Lcom/android/server/vibrator/Vibration$EndInfo;-><init>(Lcom/android/server/vibrator/Vibration$Status;)V
- 
--    const-string v1, "cancel"
--
--    invoke-virtual {p0, v1}, Lcom/android/server/vibrator/VirtualVibSoundHelper;->stopVirtualSound(Ljava/lang/String;)V
-+    invoke-virtual {p0, v1, v2}, Lcom/android/server/vibrator/VibrationStepConductor;->notifyCancelled(Lcom/android/server/vibrator/Vibration$EndInfo;Z)V
- 
-     :cond_4
-     monitor-exit v0
-@@ -5413,16 +5319,6 @@
-     throw p0
- .end method
- 
--.method public updateWatchConnectionState(Z)V
--    .locals 0
--
--    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mVibrationSettings:Lcom/android/server/vibrator/VibrationSettings;
--
--    invoke-virtual {p0, p1}, Lcom/android/server/vibrator/VibrationSettings;->updateWatchConnectionState(Z)V
--
--    return-void
--.end method
--
- .method public vibrate(IILjava/lang/String;Landroid/os/CombinedVibration;Landroid/os/VibrationAttributes;Ljava/lang/String;Landroid/os/IBinder;)V
-     .locals 0
- 
-@@ -5896,7 +5792,7 @@
-     move-result-object v0
- 
-     :cond_8
--    if-nez v0, :cond_d
-+    if-nez v0, :cond_c
+     :cond_9
+-    if-nez v8, :cond_c
++    if-nez v8, :cond_b
  
      invoke-static {}, Landroid/os/Binder;->clearCallingIdentity()J
  
-@@ -5995,15 +5891,6 @@
+@@ -7562,19 +7530,10 @@
+     invoke-virtual {v0, v7}, Lcom/android/server/vibrator/VibratorManagerService;->startVendorSessionLocked(Lcom/android/server/vibrator/VendorVibrationSession;)Lcom/android/server/vibrator/VibrationSession$Status;
  
-     :cond_b
-     :goto_3
--    iget-object v0, v1, Lcom/android/server/vibrator/VibratorManagerService;->mVirtualVibSoundHelper:Lcom/android/server/vibrator/VirtualVibSoundHelper;
+     move-result-object v8
 -
--    if-eqz v0, :cond_c
+-    :goto_3
+-    iget-object v2, v0, Lcom/android/server/vibrator/VibratorManagerService;->mVirtualVibSoundHelper:Lcom/android/server/vibrator/VirtualVibSoundHelper;
 -
--    const-string v6, "cancel"
+-    if-eqz v2, :cond_b
 -
--    invoke-virtual {v0, v6}, Lcom/android/server/vibrator/VirtualVibSoundHelper;->stopVirtualSound(Ljava/lang/String;)V
+-    const-string/jumbo v4, "cancel"
 -
--    :cond_c
-     invoke-virtual {v1, v2}, Lcom/android/server/vibrator/VibratorManagerService;->startVibrationLocked(Lcom/android/server/vibrator/HalVibration;)Lcom/android/server/vibrator/Vibration$EndInfo;
+-    invoke-virtual {v2, v4}, Lcom/android/server/vibrator/VirtualVibSoundHelper;->stopVirtualSound(Ljava/lang/String;)V
+     :try_end_1
+     .catchall {:try_start_1 .. :try_end_1} :catchall_1
  
-     move-result-object v0
-@@ -6022,15 +5909,15 @@
+-    :cond_b
++    :goto_3
+     :try_start_2
+     invoke-static {v5, v6}, Landroid/os/Binder;->restoreCallingIdentity(J)V
+ 
+@@ -7585,13 +7544,13 @@
  
      throw v0
  
+-    :cond_c
++    :cond_b
+     :goto_5
+-    if-eqz v8, :cond_d
++    if-eqz v8, :cond_c
+ 
+     invoke-virtual {v0, v7, v8, v1}, Lcom/android/server/vibrator/VibratorManagerService;->endSessionLocked(Lcom/android/server/vibrator/VibrationSession;Lcom/android/server/vibrator/VibrationSession$Status;Lcom/android/server/vibrator/VibrationSession$CallerInfo;)V
+ 
 -    :cond_d
 +    :cond_c
-     :goto_4
--    if-eqz v0, :cond_e
-+    if-eqz v0, :cond_d
+     monitor-exit v3
  
-     const/4 v4, 0x1
+     return-object v7
+@@ -7961,21 +7920,6 @@
+     throw p0
  
-     invoke-virtual {v1, v2, v0, v4}, Lcom/android/server/vibrator/VibratorManagerService;->endVibrationLocked(Lcom/android/server/vibrator/HalVibration;Lcom/android/server/vibrator/Vibration$EndInfo;Z)V
- 
--    :cond_e
-+    :cond_d
-     invoke-virtual {v1, v2, v8}, Lcom/android/server/vibrator/VibratorManagerService;->reportVibrationInfo(Lcom/android/server/vibrator/HalVibration;Landroid/os/VibrationAttributes;)V
- 
-     iget-object v0, v1, Lcom/android/server/vibrator/VibratorManagerService;->mHqmLoggingData:Lcom/samsung/android/server/vibrator/VibratorHqmData;
-diff --git a/smali_classes3/com/android/server/vibrator/VirtualVibSoundHelper.smali b/smali_classes3/com/android/server/vibrator/VirtualVibSoundHelper.smali
-deleted file mode 100644
-index 40a59b64..00000000
---- a/smali_classes3/com/android/server/vibrator/VirtualVibSoundHelper.smali
-+++ /dev/null
-@@ -1,306 +0,0 @@
--.class public Lcom/android/server/vibrator/VirtualVibSoundHelper;
--.super Ljava/lang/Object;
--.source "VirtualVibSoundHelper.java"
+     :cond_3
+-    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mVirtualVibSoundHelper:Lcom/android/server/vibrator/VirtualVibSoundHelper;
 -
+-    if-eqz p0, :cond_4
 -
--# instance fields
--.field public mAudioSettingsHelper:Lcom/samsung/android/server/audio/AudioSettingsHelper;
+-    iget-object v0, v2, Lcom/android/server/vibrator/VibrationSession$CallerInfo;->attrs:Landroid/os/VibrationAttributes;
 -
--.field public mIsVirtualSoundPlaying:Z
--
--.field public final mSettings:Lcom/android/server/vibrator/VibrationSettings;
--
--.field public final mSoundPool:Landroid/media/SoundPool;
--
--.field public mStreamId:I
--
--.field public final mVirtualSoundId:I
--
--
--# direct methods
--.method public constructor <init>(Landroid/content/Context;Lcom/android/server/vibrator/VibrationSettings;)V
--    .locals 2
--
--    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
--
--    iput-object p2, p0, Lcom/android/server/vibrator/VirtualVibSoundHelper;->mSettings:Lcom/android/server/vibrator/VibrationSettings;
--
--    invoke-static {p1}, Lcom/samsung/android/server/audio/AudioSettingsHelper;->getInstance(Landroid/content/Context;)Lcom/samsung/android/server/audio/AudioSettingsHelper;
--
--    move-result-object p1
--
--    iput-object p1, p0, Lcom/android/server/vibrator/VirtualVibSoundHelper;->mAudioSettingsHelper:Lcom/samsung/android/server/audio/AudioSettingsHelper;
--
--    new-instance p1, Landroid/media/SoundPool$Builder;
--
--    invoke-direct {p1}, Landroid/media/SoundPool$Builder;-><init>()V
--
--    const/4 p2, 0x1
--
--    invoke-virtual {p1, p2}, Landroid/media/SoundPool$Builder;->setMaxStreams(I)Landroid/media/SoundPool$Builder;
--
--    move-result-object p1
--
--    new-instance v0, Landroid/media/AudioAttributes$Builder;
--
--    invoke-direct {v0}, Landroid/media/AudioAttributes$Builder;-><init>()V
--
--    const/16 v1, 0xd
--
--    invoke-virtual {v0, v1}, Landroid/media/AudioAttributes$Builder;->setUsage(I)Landroid/media/AudioAttributes$Builder;
--
--    move-result-object v0
--
--    invoke-virtual {v0, p2}, Landroid/media/AudioAttributes$Builder;->setFlags(I)Landroid/media/AudioAttributes$Builder;
--
--    move-result-object p2
--
--    const/4 v0, 0x4
--
--    invoke-virtual {p2, v0}, Landroid/media/AudioAttributes$Builder;->setContentType(I)Landroid/media/AudioAttributes$Builder;
--
--    move-result-object p2
--
--    const-string v0, "VIRTUAL_VIB_SOUND"
--
--    invoke-virtual {p2, v0}, Landroid/media/AudioAttributes$Builder;->semAddAudioTag(Ljava/lang/String;)Landroid/media/AudioAttributes$Builder;
--
--    move-result-object p2
--
--    invoke-virtual {p2}, Landroid/media/AudioAttributes$Builder;->build()Landroid/media/AudioAttributes;
--
--    move-result-object p2
--
--    invoke-virtual {p1, p2}, Landroid/media/SoundPool$Builder;->setAudioAttributes(Landroid/media/AudioAttributes;)Landroid/media/SoundPool$Builder;
--
--    move-result-object p1
--
--    invoke-virtual {p1}, Landroid/media/SoundPool$Builder;->build()Landroid/media/SoundPool;
--
--    move-result-object p1
--
--    iput-object p1, p0, Lcom/android/server/vibrator/VirtualVibSoundHelper;->mSoundPool:Landroid/media/SoundPool;
--
--    const/4 p2, 0x0
--
--    iput-boolean p2, p0, Lcom/android/server/vibrator/VirtualVibSoundHelper;->mIsVirtualSoundPlaying:Z
--
--    const-string v0, "/system/media/audio/ui/VIB_Vibration_Call.ogg"
--
--    invoke-virtual {p1, v0, p2}, Landroid/media/SoundPool;->load(Ljava/lang/String;I)I
+-    invoke-virtual {p1}, Lcom/android/server/vibrator/SingleVibrationSession;->isRepeating()Z
 -
 -    move-result p1
 -
--    iput p1, p0, Lcom/android/server/vibrator/VirtualVibSoundHelper;->mVirtualSoundId:I
+-    iget-object v2, v2, Lcom/android/server/vibrator/VibrationSession$CallerInfo;->opPkg:Ljava/lang/String;
 -
--    return-void
--.end method
--
--
--# virtual methods
--.method public playVirtualSoundIfNeeded(Ljava/lang/String;Landroid/os/VibrationAttributes;Z)V
--    .locals 7
--
--    if-nez p3, :cond_0
--
--    return-void
--
--    :cond_0
--    const-string p3, "VIRTUAL_VIB_SOUND"
--
--    invoke-virtual {p2, p3}, Landroid/os/VibrationAttributes;->hasTag(Ljava/lang/String;)Z
--
--    move-result p3
--
--    if-nez p3, :cond_1
--
--    iget-object p3, p0, Lcom/android/server/vibrator/VirtualVibSoundHelper;->mAudioSettingsHelper:Lcom/samsung/android/server/audio/AudioSettingsHelper;
--
--    const-string/jumbo v0, "virtual_vibration_sound_allowance"
--
--    invoke-virtual {p3, p1, v0}, Lcom/samsung/android/server/audio/AudioSettingsHelper;->checkAppCategory(Ljava/lang/String;Ljava/lang/String;)Z
--
--    move-result p1
--
--    if-nez p1, :cond_1
--
--    return-void
--
--    :cond_1
--    iget-object p1, p0, Lcom/android/server/vibrator/VirtualVibSoundHelper;->mSettings:Lcom/android/server/vibrator/VibrationSettings;
--
--    invoke-virtual {p2}, Landroid/os/VibrationAttributes;->getUsage()I
--
--    move-result p2
--
--    invoke-virtual {p1, p2}, Lcom/android/server/vibrator/VibrationSettings;->shouldSoundForRingerMode(I)Z
--
--    move-result p1
--
--    const-string p2, "VibratorManagerService"
--
--    if-eqz p1, :cond_5
--
--    iget-object p1, p0, Lcom/android/server/vibrator/VirtualVibSoundHelper;->mSoundPool:Landroid/media/SoundPool;
--
--    if-eqz p1, :cond_4
--
--    iget p1, p0, Lcom/android/server/vibrator/VirtualVibSoundHelper;->mVirtualSoundId:I
--
--    if-nez p1, :cond_2
--
--    goto :goto_0
--
--    :cond_2
--    iget-object p1, p0, Lcom/android/server/vibrator/VirtualVibSoundHelper;->mSettings:Lcom/android/server/vibrator/VibrationSettings;
--
--    invoke-virtual {p1}, Lcom/android/server/vibrator/VibrationSettings;->getRingtoneVolumeScale()F
--
--    move-result v3
--
--    const/4 p1, 0x0
--
--    cmpg-float p1, v3, p1
--
--    if-gtz p1, :cond_3
--
--    return-void
--
--    :cond_3
--    new-instance p1, Ljava/lang/StringBuilder;
--
--    invoke-direct {p1}, Ljava/lang/StringBuilder;-><init>()V
--
--    const-string/jumbo p3, "play virtual sound: "
--
--    invoke-virtual {p1, p3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
--
--    invoke-virtual {p1, v3}, Ljava/lang/StringBuilder;->append(F)Ljava/lang/StringBuilder;
--
--    const-string p3, " volume"
--
--    invoke-virtual {p1, p3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
--
--    invoke-virtual {p1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
--
--    move-result-object p1
--
--    invoke-static {p2, p1}, Landroid/util/Slog;->d(Ljava/lang/String;Ljava/lang/String;)I
--
--    const/4 p1, 0x1
--
--    iput-boolean p1, p0, Lcom/android/server/vibrator/VirtualVibSoundHelper;->mIsVirtualSoundPlaying:Z
--
--    iget-object p1, p0, Lcom/android/server/vibrator/VirtualVibSoundHelper;->mSoundPool:Landroid/media/SoundPool;
--
--    iget p2, p0, Lcom/android/server/vibrator/VirtualVibSoundHelper;->mVirtualSoundId:I
--
--    const-string/jumbo p3, "stv_virtual_vib_sound"
--
--    invoke-virtual {p1, p2, p3}, Landroid/media/SoundPool;->semSetSituationType(ILjava/lang/String;)V
--
--    iget-object v0, p0, Lcom/android/server/vibrator/VirtualVibSoundHelper;->mSoundPool:Landroid/media/SoundPool;
--
--    iget v1, p0, Lcom/android/server/vibrator/VirtualVibSoundHelper;->mVirtualSoundId:I
--
--    const/4 v4, 0x0
--
--    const/16 v5, 0x14
--
--    const/high16 v6, 0x3f800000    # 1.0f
--
--    move v2, v3
--
--    invoke-virtual/range {v0 .. v6}, Landroid/media/SoundPool;->play(IFFIIF)I
--
--    move-result p1
--
--    iput p1, p0, Lcom/android/server/vibrator/VirtualVibSoundHelper;->mStreamId:I
--
--    goto :goto_1
+-    invoke-virtual {p0, v2, v0, p1}, Lcom/android/server/vibrator/VirtualVibSoundHelper;->playVirtualSoundIfNeeded(Ljava/lang/String;Landroid/os/VibrationAttributes;Z)V
 -
 -    :cond_4
--    :goto_0
--    const-string p0, "cannot play virtual sound"
+     return-object v1
+ 
+     :catchall_1
+@@ -8527,19 +8471,11 @@
+ 
+     invoke-static {v1, v2}, Landroid/util/Slog;->d(Ljava/lang/String;Ljava/lang/String;)I
+ 
+-    iget-object v1, p0, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentSession:Lcom/android/server/vibrator/VibrationSession;
 -
--    invoke-static {p2, p0}, Landroid/util/Slog;->d(Ljava/lang/String;Ljava/lang/String;)I
+-    sget-object v2, Lcom/android/server/vibrator/VibrationSession$Status;->CANCELLED_BY_SETTINGS_UPDATE:Lcom/android/server/vibrator/VibrationSession$Status;
 -
--    return-void
+-    invoke-interface {v1, v2}, Lcom/android/server/vibrator/VibrationSession;->requestEnd(Lcom/android/server/vibrator/VibrationSession$Status;)V
 -
--    :cond_5
--    const-string/jumbo p0, "skip virtual sound: shouldSoundForRingerMode false"
+-    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mVirtualVibSoundHelper:Lcom/android/server/vibrator/VirtualVibSoundHelper;
 -
--    invoke-static {p2, p0}, Landroid/util/Slog;->d(Ljava/lang/String;Ljava/lang/String;)I
+-    if-eqz p0, :cond_5
++    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mCurrentSession:Lcom/android/server/vibrator/VibrationSession;
+ 
+-    const-string/jumbo v1, "cancel"
++    sget-object v1, Lcom/android/server/vibrator/VibrationSession$Status;->CANCELLED_BY_SETTINGS_UPDATE:Lcom/android/server/vibrator/VibrationSession$Status;
+ 
+-    invoke-virtual {p0, v1}, Lcom/android/server/vibrator/VirtualVibSoundHelper;->stopVirtualSound(Ljava/lang/String;)V
++    invoke-interface {p0, v1}, Lcom/android/server/vibrator/VibrationSession;->requestEnd(Lcom/android/server/vibrator/VibrationSession$Status;)V
+ 
+     :cond_5
+     monitor-exit v0
+@@ -9121,13 +9057,13 @@
+     :catchall_0
+     move-exception v0
+ 
+-    goto/16 :goto_d
++    goto :goto_d
+ 
+     :cond_15
+     move-object/from16 v12, v16
+ 
+     :goto_9
+-    if-nez v4, :cond_1a
++    if-nez v4, :cond_19
+ 
+     invoke-static {}, Landroid/os/Binder;->clearCallingIdentity()J
+ 
+@@ -9199,15 +9135,6 @@
+ 
+     :cond_18
+     :goto_a
+-    iget-object v6, v0, Lcom/android/server/vibrator/VibratorManagerService;->mVirtualVibSoundHelper:Lcom/android/server/vibrator/VirtualVibSoundHelper;
 -
--    :goto_1
--    return-void
--.end method
+-    if-eqz v6, :cond_19
 -
--.method public stopVirtualSound(Ljava/lang/String;)V
--    .locals 3
+-    const-string/jumbo v7, "cancel"
 -
--    iget-boolean v0, p0, Lcom/android/server/vibrator/VirtualVibSoundHelper;->mIsVirtualSoundPlaying:Z
+-    invoke-virtual {v6, v7}, Lcom/android/server/vibrator/VirtualVibSoundHelper;->stopVirtualSound(Ljava/lang/String;)V
 -
--    if-eqz v0, :cond_2
+-    :cond_19
+     sget-object v6, Lcom/android/server/vibrator/VibrationSession$Status;->CANCELLED_SUPERSEDED:Lcom/android/server/vibrator/VibrationSession$Status;
+ 
+     invoke-virtual {v0, v6, v14}, Lcom/android/server/vibrator/VibratorManagerService;->clearNextSessionLocked(Lcom/android/server/vibrator/VibrationSession$Status;Lcom/android/server/vibrator/VibrationSession$CallerInfo;)V
+@@ -9230,13 +9157,13 @@
+ 
+     throw v0
+ 
+-    :cond_1a
++    :cond_19
+     :goto_c
+-    if-eqz v4, :cond_1b
++    if-eqz v4, :cond_1a
+ 
+     invoke-virtual {v0, v1, v4, v12}, Lcom/android/server/vibrator/VibratorManagerService;->endSessionLocked(Lcom/android/server/vibrator/VibrationSession;Lcom/android/server/vibrator/VibrationSession$Status;Lcom/android/server/vibrator/VibrationSession$CallerInfo;)V
+ 
+-    :cond_1b
++    :cond_1a
+     invoke-virtual {v0, v2, v15}, Lcom/android/server/vibrator/VibratorManagerService;->reportVibrationInfo(Lcom/android/server/vibrator/HalVibration;Landroid/os/VibrationAttributes;)V
+ 
+     iget-object v0, v0, Lcom/android/server/vibrator/VibratorManagerService;->mHqmLoggingData:Lcom/samsung/android/server/vibrator/VibratorHqmData;
+diff --git a/smali_classes2/com/samsung/android/server/audio/utils/BtUtils.smali b/smali_classes2/com/samsung/android/server/audio/utils/BtUtils.smali
+index 5c8a336f4..2a4514dda 100644
+--- a/smali_classes2/com/samsung/android/server/audio/utils/BtUtils.smali
++++ b/smali_classes2/com/samsung/android/server/audio/utils/BtUtils.smali
+@@ -247,74 +247,6 @@
+     return-void
+ .end method
+ 
+-.method public static isSamsungWatch(Landroid/bluetooth/BluetoothDevice;Landroid/bluetooth/BluetoothHeadset;)Z
+-    .locals 2
 -
--    iget-object v0, p0, Lcom/android/server/vibrator/VirtualVibSoundHelper;->mSoundPool:Landroid/media/SoundPool;
+-    const/4 v0, 0x0
 -
--    const-string v1, "VibratorManagerService"
+-    if-eqz p0, :cond_1
 -
--    if-eqz v0, :cond_1
--
--    iget v0, p0, Lcom/android/server/vibrator/VirtualVibSoundHelper;->mVirtualSoundId:I
--
--    if-nez v0, :cond_0
+-    if-nez p1, :cond_0
 -
 -    goto :goto_0
 -
 -    :cond_0
--    :try_start_0
--    new-instance v0, Ljava/lang/StringBuilder;
--
--    invoke-direct {v0}, Ljava/lang/StringBuilder;-><init>()V
--
--    const-string/jumbo v2, "stop virtual sound : "
--
--    invoke-virtual {v0, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
--
--    invoke-virtual {v0, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
--
--    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+-    invoke-virtual {p1, p0}, Landroid/bluetooth/BluetoothHeadset;->getSamsungHandsfreeDeviceType(Landroid/bluetooth/BluetoothDevice;)Ljava/lang/String;
 -
 -    move-result-object p1
 -
--    invoke-static {v1, p1}, Landroid/util/Slog;->d(Ljava/lang/String;Ljava/lang/String;)I
+-    const-string/jumbo v1, "WA"
 -
--    const/4 p1, 0x0
+-    invoke-virtual {v1, p1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
 -
--    iput-boolean p1, p0, Lcom/android/server/vibrator/VirtualVibSoundHelper;->mIsVirtualSoundPlaying:Z
--
--    iget-object p1, p0, Lcom/android/server/vibrator/VirtualVibSoundHelper;->mSoundPool:Landroid/media/SoundPool;
--
--    iget p0, p0, Lcom/android/server/vibrator/VirtualVibSoundHelper;->mStreamId:I
--
--    invoke-virtual {p1, p0}, Landroid/media/SoundPool;->stop(I)V
--    :try_end_0
--    .catch Ljava/lang/Exception; {:try_start_0 .. :try_end_0} :catch_0
--
--    goto :goto_1
--
--    :catch_0
--    const-string p0, "failed stopping virtual sound"
--
--    invoke-static {v1, p0}, Landroid/util/Slog;->e(Ljava/lang/String;Ljava/lang/String;)I
+-    move-result p1
 -
 -    goto :goto_1
 -
 -    :cond_1
 -    :goto_0
--    const-string p0, "cannot stop virtual sound"
+-    move p1, v0
 -
--    invoke-static {v1, p0}, Landroid/util/Slog;->e(Ljava/lang/String;Ljava/lang/String;)I
+-    :goto_1
+-    const/4 v1, 0x1
+-
+-    if-nez p1, :cond_5
+-
+-    if-nez p0, :cond_3
 -
 -    :cond_2
--    :goto_1
--    return-void
+-    move p0, v0
+-
+-    goto :goto_2
+-
+-    :cond_3
+-    invoke-virtual {p0}, Landroid/bluetooth/BluetoothDevice;->getUuids()[Landroid/os/ParcelUuid;
+-
+-    move-result-object p0
+-
+-    sget-object p1, Lcom/samsung/android/server/audio/utils/BtUtils;->SAP_UUID:Landroid/os/ParcelUuid;
+-
+-    invoke-static {p0, p1}, Lcom/android/internal/util/ArrayUtils;->contains([Ljava/lang/Object;Ljava/lang/Object;)Z
+-
+-    move-result p0
+-
+-    if-eqz p0, :cond_2
+-
+-    move p0, v1
+-
+-    :goto_2
+-    if-eqz p0, :cond_4
+-
+-    goto :goto_3
+-
+-    :cond_4
+-    return v0
+-
+-    :cond_5
+-    :goto_3
+-    return v1
 -.end method
+-
+ .method public static sendAuracastAppListToNative(ILjava/lang/String;)V
+     .locals 2
+ 
 -- 
-2.46.0
+2.51.0
 

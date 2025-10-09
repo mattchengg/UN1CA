@@ -1,25 +1,36 @@
-From 7c448e609fd4418a0a51a421849096887bf20690 Mon Sep 17 00:00:00 2001
-From: BlackMesa123 <giangrecosalvo9@gmail.com>
-Date: Sun, 2 Jun 2024 13:14:16 +0200
+From 758377ecd20feb0587a67b7e3ac0ec4eb2c934ff Mon Sep 17 00:00:00 2001
+From: Salvo Giangreco <giangrecosalvo9@gmail.com>
+Date: Thu, 9 Oct 2025 23:41:30 +0200
 Subject: [PATCH] Disable dual speaker support
 
 ---
- smali/com/android/server/audio/AudioService.smali | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ smali/com/android/server/audio/AudioService.smali | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/smali/com/android/server/audio/AudioService.smali b/smali/com/android/server/audio/AudioService.smali
-index 27a4e6ed..37d55d2c 100644
+index 3c264d433..f4f4cc5b2 100644
 --- a/smali/com/android/server/audio/AudioService.smali
 +++ b/smali/com/android/server/audio/AudioService.smali
-@@ -4798,7 +4798,7 @@
+@@ -7815,9 +7815,7 @@
  
      invoke-virtual {p1, v0}, Ljava/io/PrintWriter;->print(Ljava/lang/String;)V
  
 -    const/4 v0, 0x1
-+    const/4 v0, 0x0
+-
+-    invoke-virtual {p1, v0}, Ljava/io/PrintWriter;->println(Z)V
++    invoke-virtual {p1, v1}, Ljava/io/PrintWriter;->println(Z)V
  
-     invoke-virtual {p1, v0}, Ljava/io/PrintWriter;->println(Z)V
+     const-string v2, "  mVolumeLimitOn="
  
+@@ -8078,6 +8076,8 @@
+ 
+     invoke-virtual {p1, v3}, Ljava/io/PrintWriter;->println(Ljava/lang/String;)V
+ 
++    const/4 v0, 0x1
++
+     invoke-virtual {v2, v0}, Lcom/samsung/android/server/audio/MultiSoundManager;->getPinDevice(Z)I
+ 
+     move-result v3
 -- 
-2.46.0
+2.51.0
 
