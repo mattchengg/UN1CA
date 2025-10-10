@@ -18,24 +18,46 @@ MODEL=$(echo -n "$TARGET_FIRMWARE" | cut -d "/" -f 1)
 REGION=$(echo -n "$TARGET_FIRMWARE" | cut -d "/" -f 2)
 
 if [[ "$SOURCE_PRODUCT_FIRST_API_LEVEL" != "$TARGET_PRODUCT_FIRST_API_LEVEL" ]]; then
-    echo "Applying MAINLINE_API_LEVEL patches"
-
-    DECODE_APK "system" "system/framework/esecomm.jar"
-    DECODE_APK "system" "system/framework/services.jar"
-
-    FTP="
-    system/framework/esecomm.jar/smali/com/sec/esecomm/EsecommAdapter.smali
-    system/framework/services.jar/smali/com/android/server/SystemServer.smali
-    system/framework/services.jar/smali_classes2/com/android/server/enterprise/hdm/HdmVendorController.smali
-    system/framework/services.jar/smali_classes2/com/android/server/knox/dar/ddar/ta/TAProxy.smali
-    system/framework/services.jar/smali_classes3/com/android/server/power/PowerManagerUtil.smali
-    "
-    for f in $FTP; do
-        sed -i \
-            "s/\"MAINLINE_API_LEVEL: $SOURCE_PRODUCT_FIRST_API_LEVEL\"/\"MAINLINE_API_LEVEL: $TARGET_PRODUCT_FIRST_API_LEVEL\"/g" \
-            "$APKTOOL_DIR/$f"
-        sed -i "s/\"$SOURCE_PRODUCT_FIRST_API_LEVEL\"/\"$TARGET_PRODUCT_FIRST_API_LEVEL\"/g" "$APKTOOL_DIR/$f"
-    done
+    SMALI_PATCH "system" "system/framework/esecomm.jar" \
+        "smali/com/sec/esecomm/EsecommAdapter.smali" "replace" \
+        "<clinit>()V" \
+        "$SOURCE_PRODUCT_FIRST_API_LEVEL" \
+        "$TARGET_PRODUCT_FIRST_API_LEVEL"
+    SMALI_PATCH "system" "system/framework/services.jar" \
+        "smali/com/android/server/enterprise/hdm/HdmSakManager.smali" "replace" \
+        "isSupported(Landroid/content/Context;)Z" \
+        "$SOURCE_PRODUCT_FIRST_API_LEVEL" \
+        "$TARGET_PRODUCT_FIRST_API_LEVEL"
+    SMALI_PATCH "system" "system/framework/services.jar" \
+        "smali/com/android/server/enterprise/hdm/HdmVendorController.smali" "replace" \
+        "<init>()V" \
+        "$SOURCE_PRODUCT_FIRST_API_LEVEL" \
+        "$TARGET_PRODUCT_FIRST_API_LEVEL"
+    SMALI_PATCH "system" "system/framework/services.jar" \
+        "smali/com/android/server/knox/dar/ddar/ta/TAProxy.smali" "replace" \
+        "updateServiceHolder(Z)V" \
+        "$SOURCE_PRODUCT_FIRST_API_LEVEL" \
+        "$TARGET_PRODUCT_FIRST_API_LEVEL"
+    SMALI_PATCH "system" "system/framework/services.jar" \
+        "smali/com/android/server/SystemServer.smali" "replace" \
+        "startOtherServices(Lcom/android/server/utils/TimingsTraceAndSlog;)V" \
+        "MAINLINE_API_LEVEL: $SOURCE_PRODUCT_FIRST_API_LEVEL" \
+        "MAINLINE_API_LEVEL: $TARGET_PRODUCT_FIRST_API_LEVEL"
+    SMALI_PATCH "system" "system/framework/services.jar" \
+        "smali/com/android/server/SystemServer.smali" "replace" \
+        "startOtherServices(Lcom/android/server/utils/TimingsTraceAndSlog;)V" \
+        "$SOURCE_PRODUCT_FIRST_API_LEVEL" \
+        "$TARGET_PRODUCT_FIRST_API_LEVEL"
+    SMALI_PATCH "system" "system/framework/services.jar" \
+        "smali_classes2/com/android/server/power/PowerManagerUtil.smali" "replace" \
+        "<clinit>()V" \
+        "$SOURCE_PRODUCT_FIRST_API_LEVEL" \
+        "$TARGET_PRODUCT_FIRST_API_LEVEL"
+    SMALI_PATCH "system" "system/framework/services.jar" \
+        "smali_classes2/com/android/server/sepunion/EngmodeService\$EngmodeTimeThread.smali" "replace" \
+        "<clinit>()V" \
+        "$SOURCE_PRODUCT_FIRST_API_LEVEL" \
+        "$TARGET_PRODUCT_FIRST_API_LEVEL"
 fi
 
 if $SOURCE_AUDIO_SUPPORT_ACH_RINGTONE; then
