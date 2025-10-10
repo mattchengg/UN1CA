@@ -308,16 +308,16 @@ if [[ "$SOURCE_HFR_SEAMLESS_BRT" != "$TARGET_HFR_SEAMLESS_BRT" ]] || \
 fi
 
 if [[ "$SOURCE_MULTI_MIC_MANAGER_VERSION" != "$TARGET_MULTI_MIC_MANAGER_VERSION" ]]; then
-    echo "Applying SemMultiMicManager patches"
-
-    DECODE_APK "system" "system/framework/framework.jar"
-
-    FTP="
-    system/framework/framework.jar/smali_classes5/com/samsung/android/camera/mic/SemMultiMicManager.smali
-    "
-    for f in $FTP; do
-        sed -i "s/$SOURCE_MULTI_MIC_MANAGER_VERSION/$TARGET_MULTI_MIC_MANAGER_VERSION/g" "$APKTOOL_DIR/$f"
-    done
+    SMALI_PATCH "system" "system/framework/framework.jar" \
+        "smali_classes6/com/samsung/android/camera/mic/SemMultiMicManager.smali" "replace" \
+        "isSupported()Z" \
+        "$SOURCE_MULTI_MIC_MANAGER_VERSION" \
+        "$TARGET_MULTI_MIC_MANAGER_VERSION"
+    SMALI_PATCH "system" "system/framework/framework.jar" \
+        "smali_classes6/com/samsung/android/camera/mic/SemMultiMicManager.smali" "replace" \
+        "isSupported(I)Z" \
+        "$SOURCE_MULTI_MIC_MANAGER_VERSION" \
+        "$TARGET_MULTI_MIC_MANAGER_VERSION"
 fi
 
 if [[ "$SOURCE_SSRM_CONFIG_NAME" != "$TARGET_SSRM_CONFIG_NAME" ]]; then
