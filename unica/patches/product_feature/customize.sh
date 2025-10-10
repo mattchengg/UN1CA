@@ -315,20 +315,21 @@ if [[ "$SOURCE_HFR_SUPPORTED_REFRESH_RATE" != "$TARGET_HFR_SUPPORTED_REFRESH_RAT
         "${TARGET_HFR_SUPPORTED_REFRESH_RATE//none/}"
 fi
 if [[ "$SOURCE_HFR_DEFAULT_REFRESH_RATE" != "$TARGET_HFR_DEFAULT_REFRESH_RATE" ]]; then
-    echo "Applying HFR_DEFAULT_REFRESH_RATE patches"
-
-    DECODE_APK "system" "system/framework/framework.jar"
-    DECODE_APK "system" "system/priv-app/SecSettings/SecSettings.apk"
-    DECODE_APK "system" "system/priv-app/SettingsProvider/SettingsProvider.apk"
-
-    FTP="
-    system/framework/framework.jar/smali_classes5/com/samsung/android/hardware/display/RefreshRateConfig.smali
-    system/priv-app/SecSettings/SecSettings.apk/smali_classes4/com/samsung/android/settings/display/SecDisplayUtils.smali
-    system/priv-app/SettingsProvider/SettingsProvider.apk/smali/com/android/providers/settings/DatabaseHelper.smali
-    "
-    for f in $FTP; do
-        sed -i "s/\"$SOURCE_HFR_DEFAULT_REFRESH_RATE\"/\"$TARGET_HFR_DEFAULT_REFRESH_RATE\"/g" "$APKTOOL_DIR/$f"
-    done
+    SMALI_PATCH "system" "system/framework/framework.jar" \
+        "smali_classes6/com/samsung/android/hardware/display/RefreshRateConfig.smali" "replace" \
+        "dump(Ljava/io/PrintWriter;Ljava/lang/String;Z)V" \
+        "HFR_DEFAULT_REFRESH_RATE: $SOURCE_HFR_DEFAULT_REFRESH_RATE" \
+        "HFR_DEFAULT_REFRESH_RATE: $TARGET_HFR_DEFAULT_REFRESH_RATE"
+    SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+        "smali_classes4/com/samsung/android/settings/display/SecDisplayUtils.smali" "replace" \
+        "getHighRefreshRateDefaultValue(Landroid/content/Context;I)I" \
+        "$SOURCE_HFR_DEFAULT_REFRESH_RATE" \
+        "$TARGET_HFR_DEFAULT_REFRESH_RATE"
+    SMALI_PATCH "system" "system/priv-app/SettingsProvider/SettingsProvider.apk" \
+        "smali/com/android/providers/settings/DatabaseHelper.smali" "replace" \
+        "loadRefreshRateMode(Landroid/database/sqlite/SQLiteStatement;Ljava/lang/String;)V" \
+        "$SOURCE_HFR_DEFAULT_REFRESH_RATE" \
+        "$TARGET_HFR_DEFAULT_REFRESH_RATE"
 fi
 if [[ "$SOURCE_HFR_SEAMLESS_BRT" != "$TARGET_HFR_SEAMLESS_BRT" ]] || \
     [[ "$SOURCE_HFR_SEAMLESS_LUX" != "$TARGET_HFR_SEAMLESS_LUX" ]]; then
