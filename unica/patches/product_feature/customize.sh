@@ -289,22 +289,26 @@ if [[ "$SOURCE_HFR_MODE" != "$TARGET_HFR_MODE" ]]; then
         "$TARGET_HFR_MODE"
 fi
 if [[ "$SOURCE_HFR_SUPPORTED_REFRESH_RATE" != "$TARGET_HFR_SUPPORTED_REFRESH_RATE" ]]; then
-    echo "Applying HFR_SUPPORTED_REFRESH_RATE patches"
-
-    DECODE_APK "system" "system/framework/framework.jar"
-    DECODE_APK "system" "system/priv-app/SecSettings/SecSettings.apk"
-
-    FTP="
-    system/framework/framework.jar/smali_classes5/com/samsung/android/hardware/display/RefreshRateConfig.smali
-    system/priv-app/SecSettings/SecSettings.apk/smali_classes4/com/samsung/android/settings/display/SecDisplayUtils.smali
-    "
-    for f in $FTP; do
-        if [[ "$TARGET_HFR_SUPPORTED_REFRESH_RATE" != "none" ]]; then
-            sed -i "s/\"$SOURCE_HFR_SUPPORTED_REFRESH_RATE\"/\"$TARGET_HFR_SUPPORTED_REFRESH_RATE\"/g" "$APKTOOL_DIR/$f"
-        else
-            sed -i "s/\"$SOURCE_HFR_SUPPORTED_REFRESH_RATE\"/\"\"/g" "$APKTOOL_DIR/$f"
-        fi
-    done
+    SMALI_PATCH "system" "system/framework/framework.jar" \
+        "smali_classes6/com/samsung/android/hardware/display/RefreshRateConfig.smali" "replace" \
+        "dump(Ljava/io/PrintWriter;Ljava/lang/String;Z)V" \
+        "HFR_SUPPORTED_REFRESH_RATE: $SOURCE_HFR_SUPPORTED_REFRESH_RATE" \
+        "HFR_SUPPORTED_REFRESH_RATE: $TARGET_HFR_SUPPORTED_REFRESH_RATE"
+    SMALI_PATCH "system" "system/framework/framework.jar" \
+        "smali_classes6/com/samsung/android/hardware/display/RefreshRateConfig.smali" "replace" \
+        "getMainInstance()Lcom/samsung/android/hardware/display/RefreshRateConfig;" \
+        "$SOURCE_HFR_SUPPORTED_REFRESH_RATE" \
+        "${TARGET_HFR_SUPPORTED_REFRESH_RATE//none/}"
+    SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+        "smali_classes4/com/samsung/android/settings/display/SecDisplayUtils.smali" "replace" \
+        "getHighRefreshRateSupportedValues(I)[Ljava/lang/String;" \
+        "$SOURCE_HFR_SUPPORTED_REFRESH_RATE" \
+        "${TARGET_HFR_SUPPORTED_REFRESH_RATE//none/}"
+    SMALI_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
+        "smali_classes2/com/android/systemui/keyguard/KeyguardViewMediatorHelperImpl\$\$ExternalSyntheticLambda0.smali" "replace" \
+        "invoke()Ljava/lang/Object;" \
+        "$SOURCE_HFR_SUPPORTED_REFRESH_RATE" \
+        "${TARGET_HFR_SUPPORTED_REFRESH_RATE//none/}"
 fi
 if [[ "$SOURCE_HFR_DEFAULT_REFRESH_RATE" != "$TARGET_HFR_DEFAULT_REFRESH_RATE" ]]; then
     echo "Applying HFR_DEFAULT_REFRESH_RATE patches"
