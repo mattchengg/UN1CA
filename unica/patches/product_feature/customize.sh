@@ -363,28 +363,38 @@ if [[ "$SOURCE_MULTI_MIC_MANAGER_VERSION" != "$TARGET_MULTI_MIC_MANAGER_VERSION"
 fi
 
 if [[ "$SOURCE_SSRM_CONFIG_NAME" != "$TARGET_SSRM_CONFIG_NAME" ]]; then
-    echo "Applying SSRM patches"
+    SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_SYSTEM_CONFIG_SIOP_POLICY_FILENAME" "$TARGET_SSRM_CONFIG_NAME"
 
-    DECODE_APK "system" "system/framework/ssrm.jar"
-
-    FTP="
-    system/framework/ssrm.jar/smali/com/android/server/ssrm/Feature.smali
-    "
-    for f in $FTP; do
-        sed -i "s/$SOURCE_SSRM_CONFIG_NAME/$TARGET_SSRM_CONFIG_NAME/g" "$APKTOOL_DIR/$f"
-    done
+    SMALI_PATCH "system" "system/framework/ssrm.jar" \
+        "smali/com/android/server/ssrm/Feature.smali" "replace" \
+        "<clinit>()V" \
+        "$SOURCE_SSRM_CONFIG_NAME" \
+        "$TARGET_SSRM_CONFIG_NAME"
+    # com/sec/android/sdhms/util/Feature
+    SMALI_PATCH "system" "system/priv-app/SamsungDeviceHealthManagerService/SamsungDeviceHealthManagerService.apk" \
+        "smali/U1/w.smali" "replace" \
+        "<clinit>()V" \
+        "$SOURCE_SSRM_CONFIG_NAME" \
+        "$TARGET_SSRM_CONFIG_NAME"
 fi
 if [[ "$SOURCE_DVFS_CONFIG_NAME" != "$TARGET_DVFS_CONFIG_NAME" ]]; then
-    echo "Applying DVFS patches"
-
-    DECODE_APK "system" "system/framework/ssrm.jar"
-
-    FTP="
-    system/framework/ssrm.jar/smali/com/android/server/ssrm/Feature.smali
-    "
-    for f in $FTP; do
-        sed -i "s/$SOURCE_DVFS_CONFIG_NAME/$TARGET_DVFS_CONFIG_NAME/g" "$APKTOOL_DIR/$f"
-    done
+    SMALI_PATCH "system" "system/framework/ssrm.jar" \
+        "smali/com/android/server/ssrm/Feature.smali" "replace" \
+        "<clinit>()V" \
+        "$SOURCE_DVFS_CONFIG_NAME" \
+        "$TARGET_DVFS_CONFIG_NAME"
+    # com/sec/android/sdhms/performance/PerformanceFeature
+    SMALI_PATCH "system" "system/priv-app/SamsungDeviceHealthManagerService/SamsungDeviceHealthManagerService.apk" \
+        "smali/r1/c.smali" "replace" \
+        "<clinit>()V" \
+        "$SOURCE_DVFS_CONFIG_NAME" \
+        "$TARGET_DVFS_CONFIG_NAME"
+    # com/sec/android/sdhms/performance/settings/PerformanceProperties
+    SMALI_PATCH "system" "system/priv-app/SamsungDeviceHealthManagerService/SamsungDeviceHealthManagerService.apk" \
+        "smali/z1/e.smali" "replace" \
+        "<init>(Landroid/content/Context;)V" \
+        "$SOURCE_DVFS_CONFIG_NAME" \
+        "$TARGET_DVFS_CONFIG_NAME"
 fi
 
 if $SOURCE_IS_ESIM_SUPPORTED; then
