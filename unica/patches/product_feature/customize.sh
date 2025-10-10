@@ -104,20 +104,21 @@ else
 fi
 
 if [[ "$SOURCE_AUTO_BRIGHTNESS_TYPE" != "$TARGET_AUTO_BRIGHTNESS_TYPE" ]]; then
-    echo "Applying auto brightness type patches"
-
-    DECODE_APK "system" "system/framework/services.jar"
-    DECODE_APK "system" "system/framework/ssrm.jar"
-    DECODE_APK "system" "system/priv-app/SecSettings/SecSettings.apk"
-
-    FTP="
-    system/framework/services.jar/smali_classes3/com/android/server/power/PowerManagerUtil.smali
-    system/framework/ssrm.jar/smali/com/android/server/ssrm/PreMonitor.smali
-    system/priv-app/SecSettings/SecSettings.apk/smali_classes4/com/samsung/android/settings/Rune.smali
-    "
-    for f in $FTP; do
-        sed -i "s/\"$SOURCE_AUTO_BRIGHTNESS_TYPE\"/\"$TARGET_AUTO_BRIGHTNESS_TYPE\"/g" "$APKTOOL_DIR/$f"
-    done
+    SMALI_PATCH "system" "system/framework/services.jar" \
+        "smali_classes2/com/android/server/power/PowerManagerUtil.smali" "replace" \
+        "<clinit>()V" \
+        "$SOURCE_AUTO_BRIGHTNESS_TYPE" \
+        "$TARGET_AUTO_BRIGHTNESS_TYPE"
+    SMALI_PATCH "system" "system/framework/ssrm.jar" \
+        "smali/com/android/server/ssrm/PreMonitor.smali" "replace" \
+        "getBrightness()Ljava/lang/String;" \
+        "$SOURCE_AUTO_BRIGHTNESS_TYPE" \
+        "$TARGET_AUTO_BRIGHTNESS_TYPE"
+    SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+        "smali_classes4/com/samsung/android/settings/Rune.smali" "replace" \
+        "<clinit>()V" \
+        "$SOURCE_AUTO_BRIGHTNESS_TYPE" \
+        "$TARGET_AUTO_BRIGHTNESS_TYPE"
 fi
 
 if [[ "$(GET_FP_SENSOR_TYPE "$SOURCE_FP_SENSOR_CONFIG")" != "$(GET_FP_SENSOR_TYPE "$TARGET_FP_SENSOR_CONFIG")" ]]; then
