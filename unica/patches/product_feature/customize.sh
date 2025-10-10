@@ -13,9 +13,6 @@ GET_FINGERPRINT_SENSOR_TYPE()
 }
 # ]
 
-MODEL=$(echo -n "$TARGET_FIRMWARE" | cut -d "/" -f 1)
-REGION=$(echo -n "$TARGET_FIRMWARE" | cut -d "/" -f 2)
-
 if [[ "$SOURCE_PRODUCT_FIRST_API_LEVEL" != "$TARGET_PRODUCT_FIRST_API_LEVEL" ]]; then
     SMALI_PATCH "system" "system/framework/esecomm.jar" \
         "smali/com/sec/esecomm/EsecommAdapter.smali" "replace" \
@@ -440,9 +437,14 @@ if $SOURCE_IS_ESIM_SUPPORTED; then
     fi
 fi
 
-if [ ! -f "$FW_DIR/${MODEL}_${REGION}/vendor/etc/permissions/android.hardware.strongbox_keystore.xml" ]; then
-    echo "Applying strongbox patches"
-    APPLY_PATCH "system" "system/framework/framework.jar" "$SRC_DIR/unica/patches/product_feature/strongbox/framework.jar/0001-Disable-StrongBox-in-DevRootKeyATCmd.patch"
+TARGET_FIRMWARE_PATH="$(cut -d "/" -f 1 -s <<< "$TARGET_FIRMWARE")_$(cut -d "/" -f 2 -s <<< "$TARGET_FIRMWARE")"
+
+if [ ! -f "$FW_DIR/$TARGET_FIRMWARE_PATH/vendor/etc/permissions/android.hardware.strongbox_keystore.xml" ]; then
+    SMALI_PATCH "system" "system/framework/framework.jar" \
+        "smali_classes6/com/samsung/android/service/DeviceIDProvisionService/DeviceIDProvisionManager\$DeviceIDProvisionWorker.smali" "return" \
+        "isSupportStrongboxDeviceID()Z" \
+        "false"
 fi
 
+unset TARGET_FIRMWARE_PATH
 unset -f GET_FINGERPRINT_SENSOR_TYPE
