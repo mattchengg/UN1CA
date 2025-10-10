@@ -1,5 +1,5 @@
 # [
-GET_FP_SENSOR_TYPE()
+GET_FINGERPRINT_SENSOR_TYPE()
 {
     if [[ "$1" == *"ultrasonic"* ]]; then
         echo "ultrasonic"
@@ -8,8 +8,7 @@ GET_FP_SENSOR_TYPE()
     elif [[ "$1" == *"side"* ]]; then
         echo "side"
     else
-        echo "Unsupported type: $1"
-        exit 1
+        ABORT "Unsupported type: $1"
     fi
 }
 # ]
@@ -121,47 +120,83 @@ if [[ "$SOURCE_AUTO_BRIGHTNESS_TYPE" != "$TARGET_AUTO_BRIGHTNESS_TYPE" ]]; then
         "$TARGET_AUTO_BRIGHTNESS_TYPE"
 fi
 
-if [[ "$(GET_FP_SENSOR_TYPE "$SOURCE_FP_SENSOR_CONFIG")" != "$(GET_FP_SENSOR_TYPE "$TARGET_FP_SENSOR_CONFIG")" ]]; then
-    echo "Applying fingerprint sensor patches"
+if [[ "$SOURCE_FP_SENSOR_CONFIG" != "$TARGET_FP_SENSOR_CONFIG" ]]; then
+    SMALI_PATCH "system" "system/framework/framework.jar" \
+        "smali_classes6/com/samsung/android/bio/fingerprint/SemFingerprintManager.smali" "replace" \
+        "getMaxTemplateNumberFromSPF()I" \
+        "$SOURCE_FP_SENSOR_CONFIG" \
+        "$TARGET_FP_SENSOR_CONFIG"
+    SMALI_PATCH "system" "system/framework/framework.jar" \
+        "smali_classes6/com/samsung/android/bio/fingerprint/SemFingerprintManager.smali" "replace" \
+        "getProductFeatureValue(Landroid/content/Context;)Ljava/lang/String;" \
+        "$SOURCE_FP_SENSOR_CONFIG" \
+        "$TARGET_FP_SENSOR_CONFIG"
+    SMALI_PATCH "system" "system/framework/framework.jar" \
+        "smali_classes6/com/samsung/android/bio/fingerprint/SemFingerprintManager\$Characteristics.smali" "replaceall" \
+        "$SOURCE_FP_SENSOR_CONFIG" \
+        "$TARGET_FP_SENSOR_CONFIG"
+    SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+        "smali_classes4/com/samsung/android/settings/biometrics/fingerprint/FingerprintSettingsUtils.smali" "replaceall" \
+        "$SOURCE_FP_SENSOR_CONFIG" \
+        "$TARGET_FP_SENSOR_CONFIG"
 
-    DECODE_APK "system" "system/framework/framework.jar"
-    DECODE_APK "system" "system/framework/services.jar"
-    DECODE_APK "system" "system/priv-app/SecSettings/SecSettings.apk"
-    DECODE_APK "system_ext" "priv-app/SystemUI/SystemUI.apk"
+    if [[ "$(GET_FINGERPRINT_SENSOR_TYPE "$SOURCE_FP_SENSOR_CONFIG")" != "$(GET_FINGERPRINT_SENSOR_TYPE "$TARGET_FP_SENSOR_CONFIG")" ]]; then
+        if [[ "$(GET_FINGERPRINT_SENSOR_TYPE "$TARGET_FP_SENSOR_CONFIG")" == "optical" ]]; then
+            # TODO update surfaceflinger blobs
+            ADD_TO_WORK_DIR "gts9xxx" "system" "." 0 0 755 "u:object_r:system_file:s0"
+            # TODO update BiometricSetting blobs
+            ADD_TO_WORK_DIR "r11sxxx" "system" "system/priv-app/BiometricSetting/BiometricSetting.apk" 0 0 644 "u:object_r:system_file:s0"
 
-    FTP="
-    system/framework/framework.jar/smali_classes2/android/hardware/fingerprint/FingerprintManager.smali
-    system/framework/framework.jar/smali_classes5/com/samsung/android/bio/fingerprint/SemFingerprintManager.smali
-    system/framework/framework.jar/smali_classes5/com/samsung/android/bio/fingerprint/SemFingerprintManager\$Characteristics.smali
-    system/framework/framework.jar/smali_classes5/com/samsung/android/rune/CoreRune.smali
-    system/framework/services.jar/smali/com/android/server/biometrics/sensors/fingerprint/FingerprintUtils.smali
-    system/priv-app/SecSettings/SecSettings.apk/smali_classes4/com/samsung/android/settings/biometrics/fingerprint/FingerprintSettingsUtils.smali
-    "
-    for f in $FTP; do
-        sed -i "s/$SOURCE_FP_SENSOR_CONFIG/$TARGET_FP_SENSOR_CONFIG/g" "$APKTOOL_DIR/$f"
-    done
+            APPLY_PATCH "system" "system/framework/framework.jar" \
+                "$SRC_DIR/unica/patches/product_feature/fingerprint/framework.jar/0001-Add-optical-FOD-support.patch"
+            APPLY_PATCH "system" "system/framework/services.jar" \
+                "$SRC_DIR/unica/patches/product_feature/fingerprint/services.jar/0001-Add-optical-FOD-support.patch"
+            APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+                "$SRC_DIR/unica/patches/product_feature/fingerprint/SecSettings.apk/0001-Add-optical-FOD-support.patch"
+            APPLY_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
+                "$SRC_DIR/unica/patches/product_feature/fingerprint/SystemUI.apk/0001-Add-optical-FOD-support.patch"
 
-    # TODO: handle ultrasonic devices
-    if [[ "$(GET_FP_SENSOR_TYPE "$TARGET_FP_SENSOR_CONFIG")" == "optical" ]]; then
-        ADD_TO_WORK_DIR "gts9xxx" "system" "." 0 0 755 "u:object_r:system_file:s0"
-        ADD_TO_WORK_DIR "r11sxxx" "system" "system/priv-app/BiometricSetting/BiometricSetting.apk" 0 0 644 "u:object_r:system_file:s0"
-        APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" "$SRC_DIR/unica/patches/product_feature/fingerprint/SecSettings.apk/0001-Enable-isOpticalSensor.patch"
-        APPLY_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" "$SRC_DIR/unica/patches/product_feature/fingerprint/SystemUI.apk/0001-Add-optical-FOD-support.patch"
-    elif [[ "$(GET_FP_SENSOR_TYPE "$TARGET_FP_SENSOR_CONFIG")" == "side" ]]; then
-        ADD_TO_WORK_DIR "b5qxxx" "system" "system/priv-app/BiometricSetting/BiometricSetting.apk" 0 0 644 "u:object_r:system_file:s0"
-        APPLY_PATCH "system" "system/framework/services.jar" "$SRC_DIR/unica/patches/product_feature/fingerprint/services.jar/0001-Disable-SECURITY_FINGERPRINT_IN_DISPLAY.patch"
-        APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" "$SRC_DIR/unica/patches/product_feature/fingerprint/SecSettings.apk/0001-Enable-isSideSensor.patch"
-        APPLY_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" "$SRC_DIR/unica/patches/product_feature/fingerprint/SystemUI.apk/0001-Add-side-fingerprint-sensor-support.patch"
+            if [[ "$TARGET_FP_SENSOR_CONFIG" == *"no_delay_in_screen_off"* ]]; then
+                APPLY_PATCH "system" "system/priv-app/BiometricSetting/BiometricSetting.apk" \
+                    "$SRC_DIR/unica/patches/product_feature/fingerprint/BiometricSetting.apk/0001-Enable-FP_FEATURE_NO_DELAY_IN_SCREEN_OFF.patch"
+            fi
+
+            if [[ "$TARGET_FP_SENSOR_CONFIG" == *"transition_effect_on"* ]]; then
+                SMALI_PATCH "system" "system/framework/framework.jar" \
+                    "smali_classes2/android/hardware/fingerprint/FingerprintManager.smali" "return" \
+                    "semGetTransitionEffectValue()I" \
+                    "1"
+            elif [[ "$TARGET_FP_SENSOR_CONFIG" == *"transition_effect_off"* ]]; then
+                SMALI_PATCH "system" "system/framework/framework.jar" \
+                    "smali_classes2/android/hardware/fingerprint/FingerprintManager.smali" "return" \
+                    "semGetTransitionEffectValue()I" \
+                    "0"
+            fi
+        elif [[ "$(GET_FINGERPRINT_SENSOR_TYPE "$TARGET_FP_SENSOR_CONFIG")" == "side" ]]; then
+            # TODO update BiometricSetting blobs
+            ADD_TO_WORK_DIR "b5qxxx" "system" "system/priv-app/BiometricSetting/BiometricSetting.apk" 0 0 644 "u:object_r:system_file:s0"
+
+            APPLY_PATCH "system" "system/framework/framework.jar" \
+                "$SRC_DIR/unica/patches/product_feature/fingerprint/framework.jar/0001-Add-side-fingerprint-sensor-support.patch"
+            APPLY_PATCH "system" "system/framework/services.jar" \
+                "$SRC_DIR/unica/patches/product_feature/fingerprint/services.jar/0001-Add-side-fingerprint-sensor-support.patch"
+            APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+                "$SRC_DIR/unica/patches/product_feature/fingerprint/SecSettings.apk/0001-Add-side-fingerprint-sensor-support.patch"
+            APPLY_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
+                "$SRC_DIR/unica/patches/product_feature/fingerprint/SystemUI.apk/0001-Add-side-fingerprint-sensor-support.patch"
+
+            if [[ "$TARGET_FP_SENSOR_CONFIG" == *"navi=1"* ]]; then
+                APPLY_PATCH "system" "system/framework/services.jar" \
+                    "$SRC_DIR/unica/patches/product_feature/fingerprint/services.jar/0002-Enable-FP_FEATURE_GESTURE_MODE.patch"
+            fi
+        fi
     fi
 
-    if [[ "$TARGET_FP_SENSOR_CONFIG" == *"navi=1"* ]]; then
-        APPLY_PATCH "system" "system/framework/services.jar" \
-            "$SRC_DIR/unica/patches/product_feature/fingerprint/services.jar/0001-Enable-FP_FEATURE_GESTURE_MODE.patch"
-    fi
-    if [[ "$TARGET_FP_SENSOR_CONFIG" == *"no_delay_in_screen_off"* ]]; then
-        APPLY_PATCH "system" "system/priv-app/BiometricSetting/BiometricSetting.apk" \
-            "$SRC_DIR/unica/patches/product_feature/fingerprint/BiometricSetting.apk/0001-Enable-FP_FEATURE_NO_DELAY_IN_SCREEN_OFF.patch"
-    fi
+    SMALI_PATCH "system" "system/priv-app/BiometricSetting/BiometricSetting.apk" \
+        "smali/com/samsung/android/biometrics/app/setting/DisplayStateManager.smali" "replace" \
+        "<init>(Lcom/samsung/android/biometrics/app/setting/BiometricsUIService;)V" \
+        "$SOURCE_FP_SENSOR_CONFIG" \
+        "$TARGET_FP_SENSOR_CONFIG"
 fi
 
 if [[ "$SOURCE_MDNIE_SUPPORTED_MODES" != "$TARGET_MDNIE_SUPPORTED_MODES" ]]; then
@@ -409,3 +444,5 @@ if [ ! -f "$FW_DIR/${MODEL}_${REGION}/vendor/etc/permissions/android.hardware.st
     echo "Applying strongbox patches"
     APPLY_PATCH "system" "system/framework/framework.jar" "$SRC_DIR/unica/patches/product_feature/strongbox/framework.jar/0001-Disable-StrongBox-in-DevRootKeyATCmd.patch"
 fi
+
+unset -f GET_FINGERPRINT_SENSOR_TYPE

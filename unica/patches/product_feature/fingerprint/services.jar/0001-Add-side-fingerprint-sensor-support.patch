@@ -1,0 +1,114 @@
+From 0d403aab6527973e91f34c7e09c9e29534a5767d Mon Sep 17 00:00:00 2001
+From: Salvo Giangreco <giangrecosalvo9@gmail.com>
+Date: Sat, 30 Aug 2025 16:29:23 +0200
+Subject: [PATCH] Add side fingerprint sensor support
+
+---
+ .../biometrics/SemBiometricFeature.smali      | 26 ++++++++++++++-----
+ .../server/display/EarlyWakeUpManager.smali   |  4 ---
+ .../server/power/PowerManagerUtil.smali       |  4 ---
+ 3 files changed, 20 insertions(+), 14 deletions(-)
+
+diff --git a/smali/com/android/server/biometrics/SemBiometricFeature.smali b/smali/com/android/server/biometrics/SemBiometricFeature.smali
+index 4353381e7..b6ec514a8 100644
+--- a/smali/com/android/server/biometrics/SemBiometricFeature.smali
++++ b/smali/com/android/server/biometrics/SemBiometricFeature.smali
+@@ -183,8 +183,6 @@
+ 
+     sput-boolean v0, Lcom/android/server/biometrics/SemBiometricFeature;->FP_FEATURE_USE_AOSP_HAL:Z
+ 
+-    sput-boolean v2, Lcom/android/server/biometrics/SemBiometricFeature;->FP_FEATURE_SENSOR_IS_IN_DISPLAY_TYPE:Z
+-
+     invoke-static {}, Lcom/samsung/android/feature/SemFloatingFeature;->getInstance()Lcom/samsung/android/feature/SemFloatingFeature;
+ 
+     move-result-object v0
+@@ -195,6 +193,22 @@
+ 
+     move-result-object v0
+ 
++    const-string/jumbo v5, "display"
++
++    invoke-virtual {v0, v5}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
++
++    move-result v0
++
++    sput-boolean v0, Lcom/android/server/biometrics/SemBiometricFeature;->FP_FEATURE_SENSOR_IS_IN_DISPLAY_TYPE:Z
++
++    invoke-static {}, Lcom/samsung/android/feature/SemFloatingFeature;->getInstance()Lcom/samsung/android/feature/SemFloatingFeature;
++
++    move-result-object v0
++
++    invoke-virtual {v0, v4}, Lcom/samsung/android/feature/SemFloatingFeature;->getString(Ljava/lang/String;)Ljava/lang/String;
++
++    move-result-object v0
++
+     const-string/jumbo v5, "optical"
+ 
+     invoke-virtual {v0, v5}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+@@ -203,8 +217,6 @@
+ 
+     sput-boolean v0, Lcom/android/server/biometrics/SemBiometricFeature;->FP_FEATURE_SENSOR_IS_OPTICAL:Z
+ 
+-    sput-boolean v2, Lcom/android/server/biometrics/SemBiometricFeature;->FP_FEATURE_SENSOR_IS_ULTRASONIC:Z
+-
+     invoke-static {}, Lcom/samsung/android/feature/SemFloatingFeature;->getInstance()Lcom/samsung/android/feature/SemFloatingFeature;
+ 
+     move-result-object v0
+@@ -213,13 +225,15 @@
+ 
+     move-result-object v0
+ 
+-    const-string/jumbo v4, "side"
++    const-string/jumbo v4, "ultrasonic"
+ 
+     invoke-virtual {v0, v4}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+ 
+     move-result v0
+ 
+-    sput-boolean v0, Lcom/android/server/biometrics/SemBiometricFeature;->FP_FEATURE_SENSOR_IS_SIDE:Z
++    sput-boolean v0, Lcom/android/server/biometrics/SemBiometricFeature;->FP_FEATURE_SENSOR_IS_ULTRASONIC:Z
++
++    sput-boolean v2, Lcom/android/server/biometrics/SemBiometricFeature;->FP_FEATURE_SENSOR_IS_SIDE:Z
+ 
+     invoke-static {}, Lcom/samsung/android/feature/SemFloatingFeature;->getInstance()Lcom/samsung/android/feature/SemFloatingFeature;
+ 
+diff --git a/smali/com/android/server/display/EarlyWakeUpManager.smali b/smali/com/android/server/display/EarlyWakeUpManager.smali
+index 13fc40859..d913c13c6 100644
+--- a/smali/com/android/server/display/EarlyWakeUpManager.smali
++++ b/smali/com/android/server/display/EarlyWakeUpManager.smali
+@@ -120,10 +120,6 @@
+ 
+     if-nez p1, :cond_1
+ 
+-    sget-boolean p1, Lcom/android/server/power/PowerManagerUtil;->SECURITY_FINGERPRINT_IN_DISPLAY:Z
+-
+-    if-nez p1, :cond_1
+-
+     sget-boolean p1, Lcom/android/server/power/PowerManagerUtil;->SEC_FEATURE_SUPPORT_AOD_LIVE_CLOCK:Z
+ 
+     if-nez p1, :cond_1
+diff --git a/smali_classes2/com/android/server/power/PowerManagerUtil.smali b/smali_classes2/com/android/server/power/PowerManagerUtil.smali
+index c747e84e0..a604f4da5 100644
+--- a/smali_classes2/com/android/server/power/PowerManagerUtil.smali
++++ b/smali_classes2/com/android/server/power/PowerManagerUtil.smali
+@@ -12,8 +12,6 @@
+ 
+ .field public static final LCD_FLASH_BRIGHTNESS:I
+ 
+-.field public static final SECURITY_FINGERPRINT_IN_DISPLAY:Z
+-
+ .field public static final SEC_FEATURE_AOD_BRIGHTNESS_ANIM:Z
+ 
+ .field public static final SEC_FEATURE_AOD_DISABLE_CLOCK_TRANSITION:Z
+@@ -801,8 +799,6 @@
+ 
+     sput-boolean v7, Lcom/android/server/power/PowerManagerUtil;->SEC_FEATURE_HQM_SEND_LBHD_HIGHEST:Z
+ 
+-    sput-boolean v2, Lcom/android/server/power/PowerManagerUtil;->SECURITY_FINGERPRINT_IN_DISPLAY:Z
+-
+     invoke-static {}, Lcom/samsung/android/feature/SemFloatingFeature;->getInstance()Lcom/samsung/android/feature/SemFloatingFeature;
+ 
+     move-result-object v0
+-- 
+2.51.0
+
