@@ -224,37 +224,69 @@ else
 fi
 
 if [[ "$SOURCE_HFR_MODE" != "$TARGET_HFR_MODE" ]]; then
-    echo "Applying HFR_MODE patches"
-
-    DECODE_APK "system" "system/framework/framework.jar"
-    DECODE_APK "system" "system/framework/gamemanager.jar"
-    DECODE_APK "system" "system/framework/gamesdk.jar"
-    DECODE_APK "system" "system/framework/secinputdev-service.jar"
-    DECODE_APK "system" "system/priv-app/SecSettings/SecSettings.apk"
-    DECODE_APK "system" "system/priv-app/SettingsProvider/SettingsProvider.apk"
-    DECODE_APK "system_ext" "priv-app/SystemUI/SystemUI.apk"
-
-    # TODO: this breaks 60hz AOD
-    #if [[ "${#TARGET_HFR_MODE}" -le "6" ]]; then
-    if [[ "$TARGET_HFR_MODE" -le "1" ]]; then
-        APPLY_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" "$SRC_DIR/unica/patches/product_feature/hfr/SystemUI.apk/0001-Nuke-KEYGUARD_ADJUST_REFRESH_RATE.patch"
-    fi
-
-    FTP="
-    system/framework/framework.jar/smali_classes5/com/samsung/android/hardware/display/RefreshRateConfig.smali
-    system/framework/framework.jar/smali_classes5/com/samsung/android/rune/CoreRune.smali
-    system/framework/gamemanager.jar/smali/com/samsung/android/game/GameManagerService.smali
-    system/framework/gamesdk.jar/smali/com/samsung/android/gamesdk/vrr/GameSDKVrrManager.smali
-    system/framework/secinputdev-service.jar/smali/com/samsung/android/hardware/secinputdev/SemInputDeviceManagerService.smali
-    system/framework/secinputdev-service.jar/smali/com/samsung/android/hardware/secinputdev/SemInputFeatures.smali
-    system/framework/secinputdev-service.jar/smali/com/samsung/android/hardware/secinputdev/SemInputFeaturesExtra.smali
-    system/priv-app/SecSettings/SecSettings.apk/smali_classes4/com/samsung/android/settings/display/SecDisplayUtils.smali
-    system/priv-app/SettingsProvider/SettingsProvider.apk/smali/com/android/providers/settings/DatabaseHelper.smali
-    system_ext/priv-app/SystemUI/SystemUI.apk/smali/com/android/systemui/LsRune.smali
-    "
-    for f in $FTP; do
-        sed -i "s/\"$SOURCE_HFR_MODE\"/\"$TARGET_HFR_MODE\"/g" "$APKTOOL_DIR/$f"
-    done
+    SMALI_PATCH "system" "system/framework/framework.jar" \
+        "smali_classes2/android/inputmethodservice/SemImsRune.smali" "replace" \
+        "<clinit>()V" \
+        "$SOURCE_HFR_MODE" \
+        "$TARGET_HFR_MODE"
+    SMALI_PATCH "system" "system/framework/framework.jar" \
+        "smali_classes6/com/samsung/android/hardware/display/RefreshRateConfig.smali" "replace" \
+        "dump(Ljava/io/PrintWriter;Ljava/lang/String;Z)V" \
+        "HFR_MODE: $SOURCE_HFR_MODE" \
+        "HFR_MODE: $TARGET_HFR_MODE"
+    SMALI_PATCH "system" "system/framework/framework.jar" \
+        "smali_classes6/com/samsung/android/hardware/display/RefreshRateConfig.smali" "replace" \
+        "getMainInstance()Lcom/samsung/android/hardware/display/RefreshRateConfig;" \
+        "$SOURCE_HFR_MODE" \
+        "$TARGET_HFR_MODE"
+    SMALI_PATCH "system" "system/framework/framework.jar" \
+        "smali_classes6/com/samsung/android/rune/CoreRune.smali" "replace" \
+        "<clinit>()V" \
+        "$SOURCE_HFR_MODE" \
+        "$TARGET_HFR_MODE"
+    SMALI_PATCH "system" "system/framework/gamemanager.jar" \
+        "smali/com/samsung/android/game/GameManagerService.smali" "replace" \
+        "isVariableRefreshRateSupported()Ljava/lang/String;" \
+        "$SOURCE_HFR_MODE" \
+        "$TARGET_HFR_MODE"
+    SMALI_PATCH "system" "system/framework/secinputdev-service.jar" \
+        "smali/com/samsung/android/hardware/secinputdev/utils/SemInputFeatures.smali" "replaceall" \
+        "$SOURCE_HFR_MODE" \
+        "$TARGET_HFR_MODE"
+    SMALI_PATCH "system" "system/framework/secinputdev-service.jar" \
+        "smali/com/samsung/android/hardware/secinputdev/utils/SemInputFeaturesExtra.smali" "replaceall" \
+        "$SOURCE_HFR_MODE" \
+        "$TARGET_HFR_MODE"
+    SMALI_PATCH "system" "system/framework/services.jar" \
+        "smali_classes2/com/android/server/power/PowerManagerUtil.smali" "replace" \
+        "<clinit>()V" \
+        "$SOURCE_HFR_MODE" \
+        "$TARGET_HFR_MODE"
+    SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+        "smali_classes4/com/samsung/android/settings/display/SecDisplayUtils.smali" "replace" \
+        "getHighRefreshRateSeamlessType(I)I" \
+        "$SOURCE_HFR_MODE" \
+        "$TARGET_HFR_MODE"
+    SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+        "smali_classes4/com/samsung/android/settings/display/SecDisplayUtils.smali" "replace" \
+        "isSupportMaxHS60RefreshRate(I)Z" \
+        "$SOURCE_HFR_MODE" \
+        "$TARGET_HFR_MODE"
+    SMALI_PATCH "system" "system/priv-app/SettingsProvider/SettingsProvider.apk" \
+        "smali/com/android/providers/settings/DatabaseHelper.smali" "replace" \
+        "loadRefreshRateMode(Landroid/database/sqlite/SQLiteStatement;Ljava/lang/String;)V" \
+        "$SOURCE_HFR_MODE" \
+        "$TARGET_HFR_MODE"
+    SMALI_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
+        "smali/com/android/systemui/BasicRune.smali" "replace" \
+        "<clinit>()V" \
+        "$SOURCE_HFR_MODE" \
+        "$TARGET_HFR_MODE"
+    SMALI_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
+        "smali/com/android/systemui/LsRune.smali" "replace" \
+        "<clinit>()V" \
+        "$SOURCE_HFR_MODE" \
+        "$TARGET_HFR_MODE"
 fi
 if [[ "$SOURCE_HFR_SUPPORTED_REFRESH_RATE" != "$TARGET_HFR_SUPPORTED_REFRESH_RATE" ]]; then
     echo "Applying HFR_SUPPORTED_REFRESH_RATE patches"
