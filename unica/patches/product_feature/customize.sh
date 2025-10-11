@@ -364,21 +364,31 @@ if [[ "$SOURCE_HFR_DEFAULT_REFRESH_RATE" != "$TARGET_HFR_DEFAULT_REFRESH_RATE" ]
         "$TARGET_HFR_DEFAULT_REFRESH_RATE"
 fi
 if [[ "$SOURCE_HFR_SEAMLESS_BRT" != "$TARGET_HFR_SEAMLESS_BRT" ]] || \
-    [[ "$SOURCE_HFR_SEAMLESS_LUX" != "$TARGET_HFR_SEAMLESS_LUX" ]]; then
-    echo "Applying HFR_SEAMLESS_BRT/HFR_SEAMLESS_LUX patches"
-
+        [[ "$SOURCE_HFR_SEAMLESS_LUX" != "$TARGET_HFR_SEAMLESS_LUX" ]]; then
     if [[ "$TARGET_HFR_SEAMLESS_BRT" == "none" ]] && [[ "$TARGET_HFR_SEAMLESS_LUX" == "none" ]]; then
-        APPLY_PATCH "system" "system/framework/framework.jar" "$SRC_DIR/unica/patches/product_feature/hfr/framework.jar/0001-Remove-brightness-threshold-values.patch"
+        APPLY_PATCH "system" "system/framework/framework.jar" \
+            "$SRC_DIR/unica/patches/product_feature/hfr/framework.jar/0001-Remove-brightness-threshold-values.patch"
     else
-        DECODE_APK "system" "system/framework/framework.jar"
-
-        FTP="
-        system/framework/framework.jar/smali_classes5/com/samsung/android/hardware/display/RefreshRateConfig.smali
-        "
-        for f in $FTP; do
-            sed -i "s/\"$SOURCE_HFR_SEAMLESS_BRT\"/\"$TARGET_HFR_SEAMLESS_BRT\"/g" "$APKTOOL_DIR/$f"
-            sed -i "s/\"$SOURCE_HFR_SEAMLESS_LUX\"/\"$TARGET_HFR_SEAMLESS_LUX\"/g" "$APKTOOL_DIR/$f"
-        done
+        SMALI_PATCH "system" "system/framework/framework.jar" \
+            "smali_classes6/com/samsung/android/hardware/display/RefreshRateConfig.smali" "replace" \
+            "dump(Ljava/io/PrintWriter;Ljava/lang/String;Z)V" \
+            "SEAMLESS_BRT: $SOURCE_HFR_SEAMLESS_BRT" \
+            "SEAMLESS_BRT: $TARGET_HFR_SEAMLESS_BRT"
+        SMALI_PATCH "system" "system/framework/framework.jar" \
+            "smali_classes6/com/samsung/android/hardware/display/RefreshRateConfig.smali" "replace" \
+            "dump(Ljava/io/PrintWriter;Ljava/lang/String;Z)V" \
+            "SEAMLESS_LUX: $SOURCE_HFR_SEAMLESS_LUX" \
+            "SEAMLESS_LUX: $TARGET_HFR_SEAMLESS_LUX"
+        SMALI_PATCH "system" "system/framework/framework.jar" \
+            "smali_classes6/com/samsung/android/hardware/display/RefreshRateConfig.smali" "replace" \
+            "getMainInstance()Lcom/samsung/android/hardware/display/RefreshRateConfig;" \
+            "$SOURCE_HFR_SEAMLESS_BRT" \
+            "$TARGET_HFR_SEAMLESS_BRT"
+        SMALI_PATCH "system" "system/framework/framework.jar" \
+            "smali_classes6/com/samsung/android/hardware/display/RefreshRateConfig.smali" "replace" \
+            "getMainInstance()Lcom/samsung/android/hardware/display/RefreshRateConfig;" \
+            "$SOURCE_HFR_SEAMLESS_LUX" \
+            "$TARGET_HFR_SEAMLESS_LUX"
     fi
 fi
 
