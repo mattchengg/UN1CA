@@ -9,7 +9,7 @@ DELETE_FROM_WORK_DIR "system" "system/framework/arm"
 DELETE_FROM_WORK_DIR "system" "system/framework/arm64"
 find "$WORK_DIR/system/system/framework" -type f -name "*.vdex" -print0 | xargs -0 -I "{}" -P "$(nproc)" \
     bash -c 'source "$SRC_DIR/scripts/utils/module_utils.sh"; DELETE_FROM_WORK_DIR "system" "${1//$WORK_DIR\/system\//}"' "bash" "{}"
-if $TARGET_HAS_SYSTEM_EXT; then
+if $TARGET_OS_BUILD_SYSTEM_EXT_PARTITION; then
     find "$WORK_DIR/system_ext" -type d -name "oat" -print0 | xargs -0 -I "{}" -P "$(nproc)" \
         bash -c 'source "$SRC_DIR/scripts/utils/module_utils.sh"; DELETE_FROM_WORK_DIR "system_ext" "${1//$WORK_DIR\/system_ext\//}"' "bash" "{}"
 fi

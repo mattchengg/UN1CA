@@ -4,8 +4,8 @@ RESIZE_APK()
     local WEBP_RES="2400"
     local MP4_RES="1080:-1"
 
-    if $TARGET_HAS_QHD_DISPLAY; then
-        if [[ "$TARGET_PRODUCT_FIRST_API_LEVEL" -le 30 ]]; then
+    if $TARGET_COMMON_SUPPORT_DYN_RESOLUTION_CONTROL; then
+        if [[ "$TARGET_PRODUCT_SHIPPING_API_LEVEL" -le 30 ]]; then
             WEBP_RES="3200"
         else
             WEBP_RES="3088"

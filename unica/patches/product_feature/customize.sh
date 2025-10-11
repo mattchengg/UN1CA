@@ -13,47 +13,47 @@ GET_FINGERPRINT_SENSOR_TYPE()
 }
 # ]
 
-if [[ "$SOURCE_PRODUCT_FIRST_API_LEVEL" != "$TARGET_PRODUCT_FIRST_API_LEVEL" ]]; then
+if [[ "$SOURCE_PRODUCT_SHIPPING_API_LEVEL" != "$TARGET_PRODUCT_SHIPPING_API_LEVEL" ]]; then
     SMALI_PATCH "system" "system/framework/esecomm.jar" \
         "smali/com/sec/esecomm/EsecommAdapter.smali" "replace" \
         "<clinit>()V" \
-        "$SOURCE_PRODUCT_FIRST_API_LEVEL" \
-        "$TARGET_PRODUCT_FIRST_API_LEVEL"
+        "$SOURCE_PRODUCT_SHIPPING_API_LEVEL" \
+        "$TARGET_PRODUCT_SHIPPING_API_LEVEL"
     SMALI_PATCH "system" "system/framework/services.jar" \
         "smali/com/android/server/enterprise/hdm/HdmSakManager.smali" "replace" \
         "isSupported(Landroid/content/Context;)Z" \
-        "$SOURCE_PRODUCT_FIRST_API_LEVEL" \
-        "$TARGET_PRODUCT_FIRST_API_LEVEL"
+        "$SOURCE_PRODUCT_SHIPPING_API_LEVEL" \
+        "$TARGET_PRODUCT_SHIPPING_API_LEVEL"
     SMALI_PATCH "system" "system/framework/services.jar" \
         "smali/com/android/server/enterprise/hdm/HdmVendorController.smali" "replace" \
         "<init>()V" \
-        "$SOURCE_PRODUCT_FIRST_API_LEVEL" \
-        "$TARGET_PRODUCT_FIRST_API_LEVEL"
+        "$SOURCE_PRODUCT_SHIPPING_API_LEVEL" \
+        "$TARGET_PRODUCT_SHIPPING_API_LEVEL"
     SMALI_PATCH "system" "system/framework/services.jar" \
         "smali/com/android/server/knox/dar/ddar/ta/TAProxy.smali" "replace" \
         "updateServiceHolder(Z)V" \
-        "$SOURCE_PRODUCT_FIRST_API_LEVEL" \
-        "$TARGET_PRODUCT_FIRST_API_LEVEL"
+        "$SOURCE_PRODUCT_SHIPPING_API_LEVEL" \
+        "$TARGET_PRODUCT_SHIPPING_API_LEVEL"
     SMALI_PATCH "system" "system/framework/services.jar" \
         "smali/com/android/server/SystemServer.smali" "replace" \
         "startOtherServices(Lcom/android/server/utils/TimingsTraceAndSlog;)V" \
-        "MAINLINE_API_LEVEL: $SOURCE_PRODUCT_FIRST_API_LEVEL" \
-        "MAINLINE_API_LEVEL: $TARGET_PRODUCT_FIRST_API_LEVEL"
+        "MAINLINE_API_LEVEL: $SOURCE_PRODUCT_SHIPPING_API_LEVEL" \
+        "MAINLINE_API_LEVEL: $TARGET_PRODUCT_SHIPPING_API_LEVEL"
     SMALI_PATCH "system" "system/framework/services.jar" \
         "smali/com/android/server/SystemServer.smali" "replace" \
         "startOtherServices(Lcom/android/server/utils/TimingsTraceAndSlog;)V" \
-        "$SOURCE_PRODUCT_FIRST_API_LEVEL" \
-        "$TARGET_PRODUCT_FIRST_API_LEVEL"
+        "$SOURCE_PRODUCT_SHIPPING_API_LEVEL" \
+        "$TARGET_PRODUCT_SHIPPING_API_LEVEL"
     SMALI_PATCH "system" "system/framework/services.jar" \
         "smali_classes2/com/android/server/power/PowerManagerUtil.smali" "replace" \
         "<clinit>()V" \
-        "$SOURCE_PRODUCT_FIRST_API_LEVEL" \
-        "$TARGET_PRODUCT_FIRST_API_LEVEL"
+        "$SOURCE_PRODUCT_SHIPPING_API_LEVEL" \
+        "$TARGET_PRODUCT_SHIPPING_API_LEVEL"
     SMALI_PATCH "system" "system/framework/services.jar" \
         "smali_classes2/com/android/server/sepunion/EngmodeService\$EngmodeTimeThread.smali" "replace" \
         "<clinit>()V" \
-        "$SOURCE_PRODUCT_FIRST_API_LEVEL" \
-        "$TARGET_PRODUCT_FIRST_API_LEVEL"
+        "$SOURCE_PRODUCT_SHIPPING_API_LEVEL" \
+        "$TARGET_PRODUCT_SHIPPING_API_LEVEL"
 fi
 
 if $SOURCE_AUDIO_SUPPORT_ACH_RINGTONE; then
@@ -99,46 +99,46 @@ else
     fi
 fi
 
-if [[ "$SOURCE_AUTO_BRIGHTNESS_TYPE" != "$TARGET_AUTO_BRIGHTNESS_TYPE" ]]; then
+if [[ "$SOURCE_LCD_CONFIG_CONTROL_AUTO_BRIGHTNESS" != "$TARGET_LCD_CONFIG_CONTROL_AUTO_BRIGHTNESS" ]]; then
     SMALI_PATCH "system" "system/framework/services.jar" \
         "smali_classes2/com/android/server/power/PowerManagerUtil.smali" "replace" \
         "<clinit>()V" \
-        "$SOURCE_AUTO_BRIGHTNESS_TYPE" \
-        "$TARGET_AUTO_BRIGHTNESS_TYPE"
+        "$SOURCE_LCD_CONFIG_CONTROL_AUTO_BRIGHTNESS" \
+        "$TARGET_LCD_CONFIG_CONTROL_AUTO_BRIGHTNESS"
     SMALI_PATCH "system" "system/framework/ssrm.jar" \
         "smali/com/android/server/ssrm/PreMonitor.smali" "replace" \
         "getBrightness()Ljava/lang/String;" \
-        "$SOURCE_AUTO_BRIGHTNESS_TYPE" \
-        "$TARGET_AUTO_BRIGHTNESS_TYPE"
+        "$SOURCE_LCD_CONFIG_CONTROL_AUTO_BRIGHTNESS" \
+        "$TARGET_LCD_CONFIG_CONTROL_AUTO_BRIGHTNESS"
     SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
         "smali_classes4/com/samsung/android/settings/Rune.smali" "replace" \
         "<clinit>()V" \
-        "$SOURCE_AUTO_BRIGHTNESS_TYPE" \
-        "$TARGET_AUTO_BRIGHTNESS_TYPE"
+        "$SOURCE_LCD_CONFIG_CONTROL_AUTO_BRIGHTNESS" \
+        "$TARGET_LCD_CONFIG_CONTROL_AUTO_BRIGHTNESS"
 fi
 
-if [[ "$SOURCE_FP_SENSOR_CONFIG" != "$TARGET_FP_SENSOR_CONFIG" ]]; then
+if [[ "$SOURCE_FINGERPRINT_CONFIG_SENSOR" != "$TARGET_FINGERPRINT_CONFIG_SENSOR" ]]; then
     SMALI_PATCH "system" "system/framework/framework.jar" \
         "smali_classes6/com/samsung/android/bio/fingerprint/SemFingerprintManager.smali" "replace" \
         "getMaxTemplateNumberFromSPF()I" \
-        "$SOURCE_FP_SENSOR_CONFIG" \
-        "$TARGET_FP_SENSOR_CONFIG"
+        "$SOURCE_FINGERPRINT_CONFIG_SENSOR" \
+        "$TARGET_FINGERPRINT_CONFIG_SENSOR"
     SMALI_PATCH "system" "system/framework/framework.jar" \
         "smali_classes6/com/samsung/android/bio/fingerprint/SemFingerprintManager.smali" "replace" \
         "getProductFeatureValue(Landroid/content/Context;)Ljava/lang/String;" \
-        "$SOURCE_FP_SENSOR_CONFIG" \
-        "$TARGET_FP_SENSOR_CONFIG"
+        "$SOURCE_FINGERPRINT_CONFIG_SENSOR" \
+        "$TARGET_FINGERPRINT_CONFIG_SENSOR"
     SMALI_PATCH "system" "system/framework/framework.jar" \
         "smali_classes6/com/samsung/android/bio/fingerprint/SemFingerprintManager\$Characteristics.smali" "replaceall" \
-        "$SOURCE_FP_SENSOR_CONFIG" \
-        "$TARGET_FP_SENSOR_CONFIG"
+        "$SOURCE_FINGERPRINT_CONFIG_SENSOR" \
+        "$TARGET_FINGERPRINT_CONFIG_SENSOR"
     SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
         "smali_classes4/com/samsung/android/settings/biometrics/fingerprint/FingerprintSettingsUtils.smali" "replaceall" \
-        "$SOURCE_FP_SENSOR_CONFIG" \
-        "$TARGET_FP_SENSOR_CONFIG"
+        "$SOURCE_FINGERPRINT_CONFIG_SENSOR" \
+        "$TARGET_FINGERPRINT_CONFIG_SENSOR"
 
-    if [[ "$(GET_FINGERPRINT_SENSOR_TYPE "$SOURCE_FP_SENSOR_CONFIG")" != "$(GET_FINGERPRINT_SENSOR_TYPE "$TARGET_FP_SENSOR_CONFIG")" ]]; then
-        if [[ "$(GET_FINGERPRINT_SENSOR_TYPE "$TARGET_FP_SENSOR_CONFIG")" == "optical" ]]; then
+    if [[ "$(GET_FINGERPRINT_SENSOR_TYPE "$SOURCE_FINGERPRINT_CONFIG_SENSOR")" != "$(GET_FINGERPRINT_SENSOR_TYPE "$TARGET_FINGERPRINT_CONFIG_SENSOR")" ]]; then
+        if [[ "$(GET_FINGERPRINT_SENSOR_TYPE "$TARGET_FINGERPRINT_CONFIG_SENSOR")" == "optical" ]]; then
             # TODO update surfaceflinger blobs
             ADD_TO_WORK_DIR "gts9xxx" "system" "." 0 0 755 "u:object_r:system_file:s0"
             # TODO update BiometricSetting blobs
@@ -153,23 +153,23 @@ if [[ "$SOURCE_FP_SENSOR_CONFIG" != "$TARGET_FP_SENSOR_CONFIG" ]]; then
             APPLY_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
                 "$SRC_DIR/unica/patches/product_feature/fingerprint/SystemUI.apk/0001-Add-optical-FOD-support.patch"
 
-            if [[ "$TARGET_FP_SENSOR_CONFIG" == *"no_delay_in_screen_off"* ]]; then
+            if [[ "$TARGET_FINGERPRINT_CONFIG_SENSOR" == *"no_delay_in_screen_off"* ]]; then
                 APPLY_PATCH "system" "system/priv-app/BiometricSetting/BiometricSetting.apk" \
                     "$SRC_DIR/unica/patches/product_feature/fingerprint/BiometricSetting.apk/0001-Enable-FP_FEATURE_NO_DELAY_IN_SCREEN_OFF.patch"
             fi
 
-            if [[ "$TARGET_FP_SENSOR_CONFIG" == *"transition_effect_on"* ]]; then
+            if [[ "$TARGET_FINGERPRINT_CONFIG_SENSOR" == *"transition_effect_on"* ]]; then
                 SMALI_PATCH "system" "system/framework/framework.jar" \
                     "smali_classes2/android/hardware/fingerprint/FingerprintManager.smali" "return" \
                     "semGetTransitionEffectValue()I" \
                     "1"
-            elif [[ "$TARGET_FP_SENSOR_CONFIG" == *"transition_effect_off"* ]]; then
+            elif [[ "$TARGET_FINGERPRINT_CONFIG_SENSOR" == *"transition_effect_off"* ]]; then
                 SMALI_PATCH "system" "system/framework/framework.jar" \
                     "smali_classes2/android/hardware/fingerprint/FingerprintManager.smali" "return" \
                     "semGetTransitionEffectValue()I" \
                     "0"
             fi
-        elif [[ "$(GET_FINGERPRINT_SENSOR_TYPE "$TARGET_FP_SENSOR_CONFIG")" == "side" ]]; then
+        elif [[ "$(GET_FINGERPRINT_SENSOR_TYPE "$TARGET_FINGERPRINT_CONFIG_SENSOR")" == "side" ]]; then
             # TODO update BiometricSetting blobs
             ADD_TO_WORK_DIR "b5qxxx" "system" "system/priv-app/BiometricSetting/BiometricSetting.apk" 0 0 644 "u:object_r:system_file:s0"
 
@@ -182,7 +182,7 @@ if [[ "$SOURCE_FP_SENSOR_CONFIG" != "$TARGET_FP_SENSOR_CONFIG" ]]; then
             APPLY_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
                 "$SRC_DIR/unica/patches/product_feature/fingerprint/SystemUI.apk/0001-Add-side-fingerprint-sensor-support.patch"
 
-            if [[ "$TARGET_FP_SENSOR_CONFIG" == *"navi=1"* ]]; then
+            if [[ "$TARGET_FINGERPRINT_CONFIG_SENSOR" == *"navi=1"* ]]; then
                 APPLY_PATCH "system" "system/framework/services.jar" \
                     "$SRC_DIR/unica/patches/product_feature/fingerprint/services.jar/0002-Enable-FP_FEATURE_GESTURE_MODE.patch"
             fi
@@ -192,24 +192,24 @@ if [[ "$SOURCE_FP_SENSOR_CONFIG" != "$TARGET_FP_SENSOR_CONFIG" ]]; then
     SMALI_PATCH "system" "system/priv-app/BiometricSetting/BiometricSetting.apk" \
         "smali/com/samsung/android/biometrics/app/setting/DisplayStateManager.smali" "replace" \
         "<init>(Lcom/samsung/android/biometrics/app/setting/BiometricsUIService;)V" \
-        "$SOURCE_FP_SENSOR_CONFIG" \
-        "$TARGET_FP_SENSOR_CONFIG"
+        "$SOURCE_FINGERPRINT_CONFIG_SENSOR" \
+        "$TARGET_FINGERPRINT_CONFIG_SENSOR"
 fi
 
-if [[ "$SOURCE_MDNIE_SUPPORTED_MODES" != "$TARGET_MDNIE_SUPPORTED_MODES" ]]; then
+if [[ "$SOURCE_COMMON_CONFIG_MDNIE_MODE" != "$TARGET_COMMON_CONFIG_MDNIE_MODE" ]]; then
     SMALI_PATCH "system" "system/framework/services.jar" \
         "smali_classes2/com/samsung/android/hardware/display/SemMdnieManagerService.smali" "replace" \
         "<init>(Landroid/content/Context;)V" \
-        "$SOURCE_MDNIE_SUPPORTED_MODES" \
-        "$TARGET_MDNIE_SUPPORTED_MODES"
+        "$SOURCE_COMMON_CONFIG_MDNIE_MODE" \
+        "$TARGET_COMMON_CONFIG_MDNIE_MODE"
 fi
-if $SOURCE_HAS_HW_MDNIE; then
-    if ! $TARGET_HAS_HW_MDNIE; then
+if $SOURCE_LCD_SUPPORT_MDNIE_HW; then
+    if ! $TARGET_LCD_SUPPORT_MDNIE_HW; then
         SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_LCD_SUPPORT_MDNIE_HW" --delete
 
         APPLY_PATCH "system" "system/framework/framework.jar" \
             "$SRC_DIR/unica/patches/product_feature/mdnie/hw/framework.jar/0001-Disable-HW-mDNIe.patch"
-        if [[ "$TARGET_MDNIE_WEAKNESS_SOLUTION_FUNCTION" == "0" ]]; then
+        if [[ "$TARGET_LCD_CONFIG_COLOR_WEAKNESS_SOLUTION" == "0" ]]; then
             APPLY_PATCH "system" "system/framework/framework.jar" \
                 "$SRC_DIR/unica/patches/product_feature/mdnie/hw/framework.jar/0002-Disable-A11Y_COLOR_BOOL_SUPPORT_DMC_COLORWEAKNESS.patch"
         fi
@@ -217,13 +217,13 @@ if $SOURCE_HAS_HW_MDNIE; then
             "$SRC_DIR/unica/patches/product_feature/mdnie/hw/services.jar/0001-Disable-HW-mDNIe.patch"
     fi
 else
-    if $TARGET_HAS_HW_MDNIE; then
+    if $TARGET_LCD_SUPPORT_MDNIE_HW; then
         # TODO: add HW mDNIe support
         true
     fi
 fi
-if $SOURCE_MDNIE_SUPPORT_HDR_EFFECT; then
-    if ! $TARGET_MDNIE_SUPPORT_HDR_EFFECT; then
+if $SOURCE_COMMON_SUPPORT_HDR_EFFECT; then
+    if ! $TARGET_COMMON_SUPPORT_HDR_EFFECT; then
         SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_COMMON_SUPPORT_HDR_EFFECT" --delete
 
         APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
@@ -232,14 +232,14 @@ if $SOURCE_MDNIE_SUPPORT_HDR_EFFECT; then
             "$SRC_DIR/unica/patches/product_feature/mdnie/hdr/SettingsProvider.apk/0001-Disable-HDR-Settings.patch"
     fi
 else
-    if $TARGET_MDNIE_SUPPORT_HDR_EFFECT; then
+    if $TARGET_COMMON_SUPPORT_HDR_EFFECT; then
         # TODO: won't be necessary anyway
         true
     fi
 fi
 
-if ! $SOURCE_HAS_QHD_DISPLAY; then
-    if $TARGET_HAS_QHD_DISPLAY; then
+if ! $SOURCE_COMMON_SUPPORT_DYN_RESOLUTION_CONTROL; then
+    if $TARGET_COMMON_SUPPORT_DYN_RESOLUTION_CONTROL; then
         SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_COMMON_CONFIG_DYN_RESOLUTION_CONTROL" "WQHD,FHD,HD"
 
         ADD_TO_WORK_DIR "b0qxxx" "system" "system/bin/bootanimation" 0 2000 755 "u:object_r:bootanim_exec:s0"
@@ -253,195 +253,195 @@ if ! $SOURCE_HAS_QHD_DISPLAY; then
         APPLY_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" "$SRC_DIR/unica/patches/product_feature/resolution/SystemUI.apk/0001-Enable-dynamic-resolution-control.patch"
     fi
 else
-    if ! $TARGET_HAS_QHD_DISPLAY; then
+    if ! $TARGET_COMMON_SUPPORT_DYN_RESOLUTION_CONTROL; then
         # TODO: won't be necessary anyway
         true
     fi
 fi
 
-if [[ "$SOURCE_HFR_MODE" != "$TARGET_HFR_MODE" ]]; then
+if [[ "$SOURCE_LCD_CONFIG_HFR_MODE" != "$TARGET_LCD_CONFIG_HFR_MODE" ]]; then
     SMALI_PATCH "system" "system/framework/framework.jar" \
         "smali_classes2/android/inputmethodservice/SemImsRune.smali" "replace" \
         "<clinit>()V" \
-        "$SOURCE_HFR_MODE" \
-        "$TARGET_HFR_MODE"
+        "$SOURCE_LCD_CONFIG_HFR_MODE" \
+        "$TARGET_LCD_CONFIG_HFR_MODE"
     SMALI_PATCH "system" "system/framework/framework.jar" \
         "smali_classes6/com/samsung/android/hardware/display/RefreshRateConfig.smali" "replace" \
         "dump(Ljava/io/PrintWriter;Ljava/lang/String;Z)V" \
-        "HFR_MODE: $SOURCE_HFR_MODE" \
-        "HFR_MODE: $TARGET_HFR_MODE"
+        "HFR_MODE: $SOURCE_LCD_CONFIG_HFR_MODE" \
+        "HFR_MODE: $TARGET_LCD_CONFIG_HFR_MODE"
     SMALI_PATCH "system" "system/framework/framework.jar" \
         "smali_classes6/com/samsung/android/hardware/display/RefreshRateConfig.smali" "replace" \
         "getMainInstance()Lcom/samsung/android/hardware/display/RefreshRateConfig;" \
-        "$SOURCE_HFR_MODE" \
-        "$TARGET_HFR_MODE"
+        "$SOURCE_LCD_CONFIG_HFR_MODE" \
+        "$TARGET_LCD_CONFIG_HFR_MODE"
     SMALI_PATCH "system" "system/framework/framework.jar" \
         "smali_classes6/com/samsung/android/rune/CoreRune.smali" "replace" \
         "<clinit>()V" \
-        "$SOURCE_HFR_MODE" \
-        "$TARGET_HFR_MODE"
+        "$SOURCE_LCD_CONFIG_HFR_MODE" \
+        "$TARGET_LCD_CONFIG_HFR_MODE"
     SMALI_PATCH "system" "system/framework/gamemanager.jar" \
         "smali/com/samsung/android/game/GameManagerService.smali" "replace" \
         "isVariableRefreshRateSupported()Ljava/lang/String;" \
-        "$SOURCE_HFR_MODE" \
-        "$TARGET_HFR_MODE"
+        "$SOURCE_LCD_CONFIG_HFR_MODE" \
+        "$TARGET_LCD_CONFIG_HFR_MODE"
     SMALI_PATCH "system" "system/framework/secinputdev-service.jar" \
         "smali/com/samsung/android/hardware/secinputdev/utils/SemInputFeatures.smali" "replaceall" \
-        "$SOURCE_HFR_MODE" \
-        "$TARGET_HFR_MODE"
+        "$SOURCE_LCD_CONFIG_HFR_MODE" \
+        "$TARGET_LCD_CONFIG_HFR_MODE"
     SMALI_PATCH "system" "system/framework/secinputdev-service.jar" \
         "smali/com/samsung/android/hardware/secinputdev/utils/SemInputFeaturesExtra.smali" "replaceall" \
-        "$SOURCE_HFR_MODE" \
-        "$TARGET_HFR_MODE"
+        "$SOURCE_LCD_CONFIG_HFR_MODE" \
+        "$TARGET_LCD_CONFIG_HFR_MODE"
     SMALI_PATCH "system" "system/framework/services.jar" \
         "smali_classes2/com/android/server/power/PowerManagerUtil.smali" "replace" \
         "<clinit>()V" \
-        "$SOURCE_HFR_MODE" \
-        "$TARGET_HFR_MODE"
+        "$SOURCE_LCD_CONFIG_HFR_MODE" \
+        "$TARGET_LCD_CONFIG_HFR_MODE"
     SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
         "smali_classes4/com/samsung/android/settings/display/SecDisplayUtils.smali" "replace" \
         "getHighRefreshRateSeamlessType(I)I" \
-        "$SOURCE_HFR_MODE" \
-        "$TARGET_HFR_MODE"
+        "$SOURCE_LCD_CONFIG_HFR_MODE" \
+        "$TARGET_LCD_CONFIG_HFR_MODE"
     SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
         "smali_classes4/com/samsung/android/settings/display/SecDisplayUtils.smali" "replace" \
         "isSupportMaxHS60RefreshRate(I)Z" \
-        "$SOURCE_HFR_MODE" \
-        "$TARGET_HFR_MODE"
+        "$SOURCE_LCD_CONFIG_HFR_MODE" \
+        "$TARGET_LCD_CONFIG_HFR_MODE"
     SMALI_PATCH "system" "system/priv-app/SettingsProvider/SettingsProvider.apk" \
         "smali/com/android/providers/settings/DatabaseHelper.smali" "replace" \
         "loadRefreshRateMode(Landroid/database/sqlite/SQLiteStatement;Ljava/lang/String;)V" \
-        "$SOURCE_HFR_MODE" \
-        "$TARGET_HFR_MODE"
+        "$SOURCE_LCD_CONFIG_HFR_MODE" \
+        "$TARGET_LCD_CONFIG_HFR_MODE"
     SMALI_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
         "smali/com/android/systemui/BasicRune.smali" "replace" \
         "<clinit>()V" \
-        "$SOURCE_HFR_MODE" \
-        "$TARGET_HFR_MODE"
+        "$SOURCE_LCD_CONFIG_HFR_MODE" \
+        "$TARGET_LCD_CONFIG_HFR_MODE"
     SMALI_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
         "smali/com/android/systemui/LsRune.smali" "replace" \
         "<clinit>()V" \
-        "$SOURCE_HFR_MODE" \
-        "$TARGET_HFR_MODE"
+        "$SOURCE_LCD_CONFIG_HFR_MODE" \
+        "$TARGET_LCD_CONFIG_HFR_MODE"
 fi
-if [[ "$SOURCE_HFR_SUPPORTED_REFRESH_RATE" != "$TARGET_HFR_SUPPORTED_REFRESH_RATE" ]]; then
+if [[ "$SOURCE_LCD_CONFIG_HFR_SUPPORTED_REFRESH_RATE" != "$TARGET_LCD_CONFIG_HFR_SUPPORTED_REFRESH_RATE" ]]; then
     SMALI_PATCH "system" "system/framework/framework.jar" \
         "smali_classes6/com/samsung/android/hardware/display/RefreshRateConfig.smali" "replace" \
         "dump(Ljava/io/PrintWriter;Ljava/lang/String;Z)V" \
-        "HFR_SUPPORTED_REFRESH_RATE: $SOURCE_HFR_SUPPORTED_REFRESH_RATE" \
-        "HFR_SUPPORTED_REFRESH_RATE: $TARGET_HFR_SUPPORTED_REFRESH_RATE"
+        "HFR_SUPPORTED_REFRESH_RATE: $SOURCE_LCD_CONFIG_HFR_SUPPORTED_REFRESH_RATE" \
+        "HFR_SUPPORTED_REFRESH_RATE: $TARGET_LCD_CONFIG_HFR_SUPPORTED_REFRESH_RATE"
     SMALI_PATCH "system" "system/framework/framework.jar" \
         "smali_classes6/com/samsung/android/hardware/display/RefreshRateConfig.smali" "replace" \
         "getMainInstance()Lcom/samsung/android/hardware/display/RefreshRateConfig;" \
-        "$SOURCE_HFR_SUPPORTED_REFRESH_RATE" \
-        "${TARGET_HFR_SUPPORTED_REFRESH_RATE//none/}"
+        "$SOURCE_LCD_CONFIG_HFR_SUPPORTED_REFRESH_RATE" \
+        "${TARGET_LCD_CONFIG_HFR_SUPPORTED_REFRESH_RATE//none/}"
     SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
         "smali_classes4/com/samsung/android/settings/display/SecDisplayUtils.smali" "replace" \
         "getHighRefreshRateSupportedValues(I)[Ljava/lang/String;" \
-        "$SOURCE_HFR_SUPPORTED_REFRESH_RATE" \
-        "${TARGET_HFR_SUPPORTED_REFRESH_RATE//none/}"
+        "$SOURCE_LCD_CONFIG_HFR_SUPPORTED_REFRESH_RATE" \
+        "${TARGET_LCD_CONFIG_HFR_SUPPORTED_REFRESH_RATE//none/}"
     SMALI_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
         "smali_classes2/com/android/systemui/keyguard/KeyguardViewMediatorHelperImpl\$\$ExternalSyntheticLambda0.smali" "replace" \
         "invoke()Ljava/lang/Object;" \
-        "$SOURCE_HFR_SUPPORTED_REFRESH_RATE" \
-        "${TARGET_HFR_SUPPORTED_REFRESH_RATE//none/}"
+        "$SOURCE_LCD_CONFIG_HFR_SUPPORTED_REFRESH_RATE" \
+        "${TARGET_LCD_CONFIG_HFR_SUPPORTED_REFRESH_RATE//none/}"
 fi
-if [[ "$SOURCE_HFR_DEFAULT_REFRESH_RATE" != "$TARGET_HFR_DEFAULT_REFRESH_RATE" ]]; then
+if [[ "$SOURCE_LCD_CONFIG_HFR_DEFAULT_REFRESH_RATE" != "$TARGET_LCD_CONFIG_HFR_DEFAULT_REFRESH_RATE" ]]; then
     SMALI_PATCH "system" "system/framework/framework.jar" \
         "smali_classes6/com/samsung/android/hardware/display/RefreshRateConfig.smali" "replace" \
         "dump(Ljava/io/PrintWriter;Ljava/lang/String;Z)V" \
-        "HFR_DEFAULT_REFRESH_RATE: $SOURCE_HFR_DEFAULT_REFRESH_RATE" \
-        "HFR_DEFAULT_REFRESH_RATE: $TARGET_HFR_DEFAULT_REFRESH_RATE"
+        "HFR_DEFAULT_REFRESH_RATE: $SOURCE_LCD_CONFIG_HFR_DEFAULT_REFRESH_RATE" \
+        "HFR_DEFAULT_REFRESH_RATE: $TARGET_LCD_CONFIG_HFR_DEFAULT_REFRESH_RATE"
     SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
         "smali_classes4/com/samsung/android/settings/display/SecDisplayUtils.smali" "replace" \
         "getHighRefreshRateDefaultValue(Landroid/content/Context;I)I" \
-        "$SOURCE_HFR_DEFAULT_REFRESH_RATE" \
-        "$TARGET_HFR_DEFAULT_REFRESH_RATE"
+        "$SOURCE_LCD_CONFIG_HFR_DEFAULT_REFRESH_RATE" \
+        "$TARGET_LCD_CONFIG_HFR_DEFAULT_REFRESH_RATE"
     SMALI_PATCH "system" "system/priv-app/SettingsProvider/SettingsProvider.apk" \
         "smali/com/android/providers/settings/DatabaseHelper.smali" "replace" \
         "loadRefreshRateMode(Landroid/database/sqlite/SQLiteStatement;Ljava/lang/String;)V" \
-        "$SOURCE_HFR_DEFAULT_REFRESH_RATE" \
-        "$TARGET_HFR_DEFAULT_REFRESH_RATE"
+        "$SOURCE_LCD_CONFIG_HFR_DEFAULT_REFRESH_RATE" \
+        "$TARGET_LCD_CONFIG_HFR_DEFAULT_REFRESH_RATE"
 fi
-if [[ "$SOURCE_HFR_SEAMLESS_BRT" != "$TARGET_HFR_SEAMLESS_BRT" ]] || \
-        [[ "$SOURCE_HFR_SEAMLESS_LUX" != "$TARGET_HFR_SEAMLESS_LUX" ]]; then
-    if [[ "$TARGET_HFR_SEAMLESS_BRT" == "none" ]] && [[ "$TARGET_HFR_SEAMLESS_LUX" == "none" ]]; then
+if [[ "$SOURCE_LCD_CONFIG_SEAMLESS_BRT" != "$TARGET_LCD_CONFIG_SEAMLESS_BRT" ]] || \
+        [[ "$SOURCE_LCD_CONFIG_SEAMLESS_LUX" != "$TARGET_LCD_CONFIG_SEAMLESS_LUX" ]]; then
+    if [[ "$TARGET_LCD_CONFIG_SEAMLESS_BRT" == "none" ]] && [[ "$TARGET_LCD_CONFIG_SEAMLESS_LUX" == "none" ]]; then
         APPLY_PATCH "system" "system/framework/framework.jar" \
             "$SRC_DIR/unica/patches/product_feature/hfr/framework.jar/0001-Remove-brightness-threshold-values.patch"
     else
         SMALI_PATCH "system" "system/framework/framework.jar" \
             "smali_classes6/com/samsung/android/hardware/display/RefreshRateConfig.smali" "replace" \
             "dump(Ljava/io/PrintWriter;Ljava/lang/String;Z)V" \
-            "SEAMLESS_BRT: $SOURCE_HFR_SEAMLESS_BRT" \
-            "SEAMLESS_BRT: $TARGET_HFR_SEAMLESS_BRT"
+            "SEAMLESS_BRT: $SOURCE_LCD_CONFIG_SEAMLESS_BRT" \
+            "SEAMLESS_BRT: $TARGET_LCD_CONFIG_SEAMLESS_BRT"
         SMALI_PATCH "system" "system/framework/framework.jar" \
             "smali_classes6/com/samsung/android/hardware/display/RefreshRateConfig.smali" "replace" \
             "dump(Ljava/io/PrintWriter;Ljava/lang/String;Z)V" \
-            "SEAMLESS_LUX: $SOURCE_HFR_SEAMLESS_LUX" \
-            "SEAMLESS_LUX: $TARGET_HFR_SEAMLESS_LUX"
+            "SEAMLESS_LUX: $SOURCE_LCD_CONFIG_SEAMLESS_LUX" \
+            "SEAMLESS_LUX: $TARGET_LCD_CONFIG_SEAMLESS_LUX"
         SMALI_PATCH "system" "system/framework/framework.jar" \
             "smali_classes6/com/samsung/android/hardware/display/RefreshRateConfig.smali" "replace" \
             "getMainInstance()Lcom/samsung/android/hardware/display/RefreshRateConfig;" \
-            "$SOURCE_HFR_SEAMLESS_BRT" \
-            "$TARGET_HFR_SEAMLESS_BRT"
+            "$SOURCE_LCD_CONFIG_SEAMLESS_BRT" \
+            "$TARGET_LCD_CONFIG_SEAMLESS_BRT"
         SMALI_PATCH "system" "system/framework/framework.jar" \
             "smali_classes6/com/samsung/android/hardware/display/RefreshRateConfig.smali" "replace" \
             "getMainInstance()Lcom/samsung/android/hardware/display/RefreshRateConfig;" \
-            "$SOURCE_HFR_SEAMLESS_LUX" \
-            "$TARGET_HFR_SEAMLESS_LUX"
+            "$SOURCE_LCD_CONFIG_SEAMLESS_LUX" \
+            "$TARGET_LCD_CONFIG_SEAMLESS_LUX"
     fi
 fi
 
-if [[ "$SOURCE_MULTI_MIC_MANAGER_VERSION" != "$TARGET_MULTI_MIC_MANAGER_VERSION" ]]; then
+if [[ "$SOURCE_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION" != "$TARGET_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION" ]]; then
     SMALI_PATCH "system" "system/framework/framework.jar" \
         "smali_classes6/com/samsung/android/camera/mic/SemMultiMicManager.smali" "replace" \
         "isSupported()Z" \
-        "$SOURCE_MULTI_MIC_MANAGER_VERSION" \
-        "$TARGET_MULTI_MIC_MANAGER_VERSION"
+        "$SOURCE_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION" \
+        "$TARGET_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION"
     SMALI_PATCH "system" "system/framework/framework.jar" \
         "smali_classes6/com/samsung/android/camera/mic/SemMultiMicManager.smali" "replace" \
         "isSupported(I)Z" \
-        "$SOURCE_MULTI_MIC_MANAGER_VERSION" \
-        "$TARGET_MULTI_MIC_MANAGER_VERSION"
+        "$SOURCE_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION" \
+        "$TARGET_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION"
 fi
 
-if [[ "$SOURCE_SSRM_CONFIG_NAME" != "$TARGET_SSRM_CONFIG_NAME" ]]; then
-    SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_SYSTEM_CONFIG_SIOP_POLICY_FILENAME" "$TARGET_SSRM_CONFIG_NAME"
+if [[ "$SOURCE_DVFSAPP_CONFIG_SSRM_POLICY_FILENAME" != "$TARGET_DVFSAPP_CONFIG_SSRM_POLICY_FILENAME" ]]; then
+    SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_SYSTEM_CONFIG_SIOP_POLICY_FILENAME" "$TARGET_DVFSAPP_CONFIG_SSRM_POLICY_FILENAME"
 
     SMALI_PATCH "system" "system/framework/ssrm.jar" \
         "smali/com/android/server/ssrm/Feature.smali" "replace" \
         "<clinit>()V" \
-        "$SOURCE_SSRM_CONFIG_NAME" \
-        "$TARGET_SSRM_CONFIG_NAME"
+        "$SOURCE_DVFSAPP_CONFIG_SSRM_POLICY_FILENAME" \
+        "$TARGET_DVFSAPP_CONFIG_SSRM_POLICY_FILENAME"
     # com/sec/android/sdhms/util/Feature
     SMALI_PATCH "system" "system/priv-app/SamsungDeviceHealthManagerService/SamsungDeviceHealthManagerService.apk" \
         "smali/U1/w.smali" "replace" \
         "<clinit>()V" \
-        "$SOURCE_SSRM_CONFIG_NAME" \
-        "$TARGET_SSRM_CONFIG_NAME"
+        "$SOURCE_DVFSAPP_CONFIG_SSRM_POLICY_FILENAME" \
+        "$TARGET_DVFSAPP_CONFIG_SSRM_POLICY_FILENAME"
 fi
-if [[ "$SOURCE_DVFS_CONFIG_NAME" != "$TARGET_DVFS_CONFIG_NAME" ]]; then
+if [[ "$SOURCE_DVFSAPP_CONFIG_DVFS_POLICY_FILENAME" != "$TARGET_DVFSAPP_CONFIG_DVFS_POLICY_FILENAME" ]]; then
     SMALI_PATCH "system" "system/framework/ssrm.jar" \
         "smali/com/android/server/ssrm/Feature.smali" "replace" \
         "<clinit>()V" \
-        "$SOURCE_DVFS_CONFIG_NAME" \
-        "$TARGET_DVFS_CONFIG_NAME"
+        "$SOURCE_DVFSAPP_CONFIG_DVFS_POLICY_FILENAME" \
+        "$TARGET_DVFSAPP_CONFIG_DVFS_POLICY_FILENAME"
     # com/sec/android/sdhms/performance/PerformanceFeature
     SMALI_PATCH "system" "system/priv-app/SamsungDeviceHealthManagerService/SamsungDeviceHealthManagerService.apk" \
         "smali/r1/c.smali" "replace" \
         "<clinit>()V" \
-        "$SOURCE_DVFS_CONFIG_NAME" \
-        "$TARGET_DVFS_CONFIG_NAME"
+        "$SOURCE_DVFSAPP_CONFIG_DVFS_POLICY_FILENAME" \
+        "$TARGET_DVFSAPP_CONFIG_DVFS_POLICY_FILENAME"
     # com/sec/android/sdhms/performance/settings/PerformanceProperties
     SMALI_PATCH "system" "system/priv-app/SamsungDeviceHealthManagerService/SamsungDeviceHealthManagerService.apk" \
         "smali/z1/e.smali" "replace" \
         "<init>(Landroid/content/Context;)V" \
-        "$SOURCE_DVFS_CONFIG_NAME" \
-        "$TARGET_DVFS_CONFIG_NAME"
+        "$SOURCE_DVFSAPP_CONFIG_DVFS_POLICY_FILENAME" \
+        "$TARGET_DVFSAPP_CONFIG_DVFS_POLICY_FILENAME"
 fi
 
-if $SOURCE_IS_ESIM_SUPPORTED; then
-    if ! $TARGET_IS_ESIM_SUPPORTED; then
+if $SOURCE_COMMON_SUPPORT_EMBEDDED_SIM; then
+    if ! $TARGET_COMMON_SUPPORT_EMBEDDED_SIM; then
         SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_COMMON_CONFIG_EMBEDDED_SIM_SLOTSWITCH" --delete
         SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_COMMON_SUPPORT_EMBEDDED_SIM" --delete
     fi

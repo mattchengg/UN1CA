@@ -65,7 +65,7 @@ system/preload
 truncate -s 0 "$WORK_DIR/system/system/etc/vpl_apks_count_list.txt"
 
 # eSIM
-[[ "$TARGET_IS_ESIM_SUPPORTED" == "false" ]] && SYSTEM_DEBLOAT+="
+[[ "$TARGET_COMMON_SUPPORT_EMBEDDED_SIM" == "false" ]] && SYSTEM_DEBLOAT+="
 system/etc/permissions/privapp-permissions-com.samsung.android.app.esimkeystring.xml
 system/etc/permissions/privapp-permissions-com.samsung.euicc.xml
 system/etc/sysconfig/preinstalled-packages-com.samsung.android.app.esimkeystring.xml
@@ -75,7 +75,7 @@ system/priv-app/EuiccService
 "
 
 # SmartFPSAdjuster
-[ "$TARGET_HFR_MODE" -lt "1" ] && SYSTEM_DEBLOAT+="
+[ "$TARGET_LCD_CONFIG_HFR_MODE" -lt "1" ] && SYSTEM_DEBLOAT+="
 system/priv-app/IntelligentDynamicFpsService
 "
 

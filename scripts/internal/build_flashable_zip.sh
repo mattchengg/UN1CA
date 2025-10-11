@@ -65,7 +65,7 @@ BUILD_SUPER_EMPTY()
     # https://android.googlesource.com/platform/build/+/refs/tags/android-15.0.0_r1/tools/releasetools/build_super_image.py#85
     CMD+=" --metadata-slots \"2\""
     CMD+=" --device \"super:$TARGET_SUPER_PARTITION_SIZE\""
-    CMD+=" --group \"$TARGET_SUPER_GROUP_NAME:$TARGET_SUPER_GROUP_SIZE\""
+    CMD+=" --group \"$TARGET_SUPER_GROUP_NAME:$(GET_SUPER_GROUP_SIZE)\""
     if [ -f "$TMP_DIR/system.img" ]; then
         CMD+=" --partition \"system:readonly:0:$TARGET_SUPER_GROUP_NAME\""
     fi
@@ -136,8 +136,8 @@ GENERATE_OP_LIST()
     {
         echo "# Remove all existing dynamic partitions and groups before applying full OTA"
         echo "remove_all_groups"
-        echo "# Add group $TARGET_SUPER_GROUP_NAME with maximum size $TARGET_SUPER_GROUP_SIZE"
-        echo "add_group $TARGET_SUPER_GROUP_NAME $TARGET_SUPER_GROUP_SIZE"
+        echo "# Add group $TARGET_SUPER_GROUP_NAME with maximum size $(GET_SUPER_GROUP_SIZE)"
+        echo "add_group $TARGET_SUPER_GROUP_NAME $(GET_SUPER_GROUP_SIZE)"
         $HAS_SYSTEM && echo "# Add partition system to group $TARGET_SUPER_GROUP_NAME"
         $HAS_SYSTEM && echo "add system $TARGET_SUPER_GROUP_NAME"
         $HAS_VENDOR && echo "# Add partition vendor to group $TARGET_SUPER_GROUP_NAME"
@@ -204,8 +204,8 @@ GENERATE_OP_LIST()
         fi
     } > "$OP_LIST_FILE"
 
-    if [[ "$OCCUPIED_SPACE" -gt "$TARGET_SUPER_GROUP_SIZE" ]]; then
-        LOGE "OS size ($OCCUPIED_SPACE) is bigger than the target group size ($TARGET_SUPER_GROUP_SIZE)"
+    if [[ "$OCCUPIED_SPACE" -gt "$(GET_SUPER_GROUP_SIZE)" ]]; then
+        LOGE "OS size ($OCCUPIED_SPACE) is bigger than the target group size ($(GET_SUPER_GROUP_SIZE))"
         exit 1
     fi
 }
@@ -401,25 +401,25 @@ GENERATE_UPDATER_SCRIPT()
         if $HAS_DTBO; then
             echo    'ui_print("Full Patching dtbo.img img...");'
             echo -n 'package_extract_file("dtbo.img", "'
-            echo -n "$TARGET_BOOT_DEVICE_PATH"
+            echo -n "$TARGET_OS_BOOT_DEVICE_PATH"
             echo    '/dtbo");'
         fi
         if $HAS_INIT_BOOT; then
             echo    'ui_print("Full Patching init_boot.img img...");'
             echo -n 'package_extract_file("init_boot.img", "'
-            echo -n "$TARGET_BOOT_DEVICE_PATH"
+            echo -n "$TARGET_OS_BOOT_DEVICE_PATH"
             echo    '/init_boot");'
         fi
         if $HAS_VENDOR_BOOT; then
             echo    'ui_print("Full Patching vendor_boot.img img...");'
             echo -n 'package_extract_file("vendor_boot.img", "'
-            echo -n "$TARGET_BOOT_DEVICE_PATH"
+            echo -n "$TARGET_OS_BOOT_DEVICE_PATH"
             echo    '/vendor_boot");'
         fi
         if $HAS_BOOT; then
             echo    'ui_print("Installing boot image...");'
             echo -n 'package_extract_file("boot.img", "'
-            echo -n "$TARGET_BOOT_DEVICE_PATH"
+            echo -n "$TARGET_OS_BOOT_DEVICE_PATH"
             echo    '/boot");'
         fi
 
@@ -431,6 +431,16 @@ GENERATE_UPDATER_SCRIPT()
         echo    'ui_print("************************************************");'
         echo    'ui_print(" ");'
     } > "$SCRIPT_FILE"
+}
+
+GET_SUPER_GROUP_SIZE()
+{
+    local GROUP_NAME="$TARGET_SUPER_GROUP_NAME"
+    GROUP_NAME="$(tr "[:lower:]" "[:upper:]" <<< "$TARGET_SUPER_GROUP_NAME")"
+
+    _CHECK_NON_EMPTY_PARAM "TARGET_${GROUP_NAME}_SIZE" "${!TARGET_${GROUP_NAME}_SIZE}" || exit 1
+
+    echo "${!TARGET_${GROUP_NAME}_SIZE}"
 }
 
 PRINT_HEADER()
@@ -523,7 +533,7 @@ while IFS= read -r f; do
     PARTITION=$(basename "$f")
     IS_VALID_PARTITION_NAME "$PARTITION" || continue
 
-    "$SRC_DIR/scripts/build_fs_image.sh" "$TARGET_OS_FILE_SYSTEM" \
+    "$SRC_DIR/scripts/build_fs_image.sh" "$TARGET_OS_FILE_SYSTEM_TYPE" \
         -o "$TMP_DIR/$PARTITION.img" -m -S \
         "$WORK_DIR/$PARTITION" "$WORK_DIR/configs/file_context-$PARTITION" "$WORK_DIR/configs/fs_config-$PARTITION" || exit 1
 done < <(find "$WORK_DIR" -maxdepth 1 -type d)

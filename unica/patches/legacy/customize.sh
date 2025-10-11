@@ -1,4 +1,4 @@
-if [[ "$SOURCE_API_LEVEL" == "$TARGET_API_LEVEL" ]]; then
+if [[ "$SOURCE_PLATFORM_SDK_VERSION" == "$TARGET_PLATFORM_SDK_VERSION" ]]; then
     LOG "\033[0;33m! Nothing to do\033[0m"
     return 0
 fi
@@ -16,9 +16,9 @@ BACKPORT_SF_PROPS()
     local PROP
     local VALUE
 
-    if [ "$TARGET_API_LEVEL" -lt "34" ]; then
+    if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "34" ]; then
         PROP="ro.surface_flinger.enable_frame_rate_override"
-        VALUE="$(test "$TARGET_HFR_MODE" -gt "1" && echo "true" || echo "false")"
+        VALUE="$(test "$TARGET_LCD_CONFIG_HFR_MODE" -gt "1" && echo "true" || echo "false")"
 
         if [ ! "$(GET_PROP "vendor" "$PROP")" ]; then
             LOG "- Adding \"$PROP\" prop with \"$VALUE\" in ${FILE//$WORK_DIR/}"
@@ -26,7 +26,7 @@ BACKPORT_SF_PROPS()
         fi
     fi
 
-    if [ "$TARGET_API_LEVEL" -lt "35" ]; then
+    if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
         PROP="ro.surface_flinger.set_display_power_timer_ms"
 
         if [ "$(GET_PROP "vendor" "$PROP")" ]; then
@@ -38,7 +38,7 @@ BACKPORT_SF_PROPS()
             PROP="ro.surface_flinger.set_idle_timer_ms"
         VALUE="$(GET_PROP "vendor" "ro.surface_flinger.use_content_detection_for_refresh_rate")"
         [ ! "$VALUE" ] && \
-            VALUE="$(test "$TARGET_HFR_MODE" -gt "1" && echo "true" || echo "false")"
+            VALUE="$(test "$TARGET_LCD_CONFIG_HFR_MODE" -gt "1" && echo "true" || echo "false")"
 
         if [[ "$(sed -n "/$PROP/{x;p;d;}; x" "$FILE")" != *"use_content_detection_for_refresh_rate"* ]]; then
             if [ ! "$(GET_PROP "vendor" "ro.surface_flinger.use_content_detection_for_refresh_rate")" ]; then
@@ -76,7 +76,7 @@ BACKPORT_SF_PROPS()
 BACKPORT_SF_PROPS
 
 # Support legacy Face HAL (pre-API 34)
-if [ "$TARGET_API_LEVEL" -lt "34" ]; then
+if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "34" ]; then
     if [ ! -f "$WORK_DIR/vendor/bin/hw/vendor.samsung.hardware.biometrics.face@3.0-service" ]; then
         APPLY_PATCH "system" "system/framework/services.jar" \
             "$SRC_DIR/unica/patches/legacy/face/services.jar/0001-Fallback-to-Face-HIDL-2.0.patch"
@@ -85,7 +85,7 @@ fi
 
 # Support legacy SehLights HAL (pre-API 35)
 # - Check for [lsr wD, wS, #0x18] to determine if the newer HAL is already in place
-if [ "$TARGET_API_LEVEL" -lt "35" ]; then
+if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
     if [ -f "$WORK_DIR/vendor/bin/hw/vendor.samsung.hardware.light-service" ] && \
             ! xxd -p -c 4 "$WORK_DIR/vendor/bin/hw/vendor.samsung.hardware.light-service" | grep -q "1853$"; then
         APPLY_PATCH "system" "system/framework/services.jar" \
@@ -95,7 +95,7 @@ fi
 
 # Ensure config_num_physical_slots is configured (pre-API 36)
 # https://android.googlesource.com/platform/frameworks/opt/telephony/+/42e37234cee15c9f3fcfac0532110abfc8843b99%5E%21/#F0
-if [ "$TARGET_API_LEVEL" -lt "36" ]; then
+if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "36" ]; then
     if ! grep -q "ro.telephony.sim_slots.count" "$WORK_DIR/vendor/bin/secril_config_svc" && \
             ! grep -q -r "config_num_physical_slots" "$WORK_DIR/vendor/overlay"; then
         LOG "- Set \"ro.telephony.sim_slots.count\" prop at boot"
@@ -110,7 +110,7 @@ fi
 # Support legacy sdFAT kernel drivers (pre-API 35)
 # https://android.googlesource.com/platform/system/vold/+/refs/tags/android-16.0.0_r2/fs/Vfat.cpp#150
 # - Check for 'bogus directory:' to determine if newer sdFAT drivers are in place
-if [ "$TARGET_API_LEVEL" -lt "35" ] && \
+if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ] && \
         grep -q "SDFAT" "$WORK_DIR/kernel/boot.img" && \
         ! grep -q "bogus directory:" "$WORK_DIR/kernel/boot.img"; then
     # ",time_offset=%d" -> "NUL"
@@ -118,7 +118,7 @@ if [ "$TARGET_API_LEVEL" -lt "35" ] && \
 fi
 
 # Ensure IMAGE_CODEC_SAMSUNG support (pre-API 35)
-if [ "$TARGET_API_LEVEL" -lt "35" ]; then
+if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
     if [ "$(GET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_CAMERA_CONFIG_VENDOR_LIB_INFO")" ] && \
             [[ "$(GET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_CAMERA_CONFIG_VENDOR_LIB_INFO")" != *"image_codec.samsung"* ]]; then
         SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_CAMERA_CONFIG_VENDOR_LIB_INFO" \
@@ -170,7 +170,7 @@ if [ -f "$WORK_DIR/system/system/bin/sbauth" ] && \
 fi
 
 # Ensure PASS support (pre-API 35)
-if [ "$TARGET_API_LEVEL" -lt "35" ]; then
+if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
     if ! grep -q "sec_pass_data_file" "$WORK_DIR/vendor/etc/selinux/vendor_sepolicy.cil"; then
         SMALI_PATCH "system" "system/framework/services.jar" \
             "smali/com/android/server/StorageManagerService.smali" "return" \

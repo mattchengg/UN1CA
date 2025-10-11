@@ -30,7 +30,7 @@ for i in $TARGET_NFC_CHIPNAMES; do
         ADD_TO_WORK_DIR "$TARGET_FIRMWARE_PATH" "system" "system/lib64/libnfc_${i}_jni.so" 0 0 644 "u:object_r:system_lib_file:s0"
 
         # Workaround for pre-U libs
-        if [[ "$TARGET_API_LEVEL" -lt 34 ]]; then
+        if [[ "$TARGET_PLATFORM_SDK_VERSION" -lt 34 ]]; then
             sed -i "s/\<CoverAttached\>/coverAttached/g" "$WORK_DIR/system/system/lib64/libnfc_${i}_jni.so"
             sed -i "s/\<StartLedCover\>/startLedCover/g" "$WORK_DIR/system/system/lib64/libnfc_${i}_jni.so"
             sed -i "s/\<StopLedCover\>/stopLedCover/g" "$WORK_DIR/system/system/lib64/libnfc_${i}_jni.so"
@@ -69,12 +69,12 @@ elif [ -f "$TARGET_FIRMWARE_PATH/system/system/lib64/libstatslog_nfc_st.so" ]; t
     ADD_TO_WORK_DIR "$TARGET_FIRMWARE_PATH" "system" "system/lib64/libstatslog_nfc_st.so" 0 0 644 "u:object_r:system_lib_file:s0"
 fi
 
-if [[ "$SOURCE_ESE_CHIP_VENDOR" != "$TARGET_ESE_CHIP_VENDOR" ]] || \
-    [[ "$SOURCE_ESE_COS_NAME" != "$TARGET_ESE_COS_NAME" ]]; then
+if [[ "$SOURCE_SECURITY_CONFIG_ESE_CHIP_VENDOR" != "$TARGET_SECURITY_CONFIG_ESE_CHIP_VENDOR" ]] || \
+    [[ "$SOURCE_SECURITY_CONFIG_ESE_COS_NAME" != "$TARGET_SECURITY_CONFIG_ESE_COS_NAME" ]]; then
     DECODE_APK "system" "system/framework/framework.jar"
     DECODE_APK "system" "system/framework/services.jar"
 
-    if [[ "$TARGET_ESE_CHIP_VENDOR" == "none" ]] && [[ "$TARGET_ESE_COS_NAME" == "none" ]]; then
+    if [[ "$TARGET_SECURITY_CONFIG_ESE_CHIP_VENDOR" == "none" ]] && [[ "$TARGET_SECURITY_CONFIG_ESE_COS_NAME" == "none" ]]; then
         DELETE_FROM_WORK_DIR "system" "system/app/ESEServiceAgent"
         DELETE_FROM_WORK_DIR "system" "system/bin/sem_daemon"
         DELETE_FROM_WORK_DIR "system" "system/etc/init/sem.rc"
@@ -105,8 +105,8 @@ if [[ "$SOURCE_ESE_CHIP_VENDOR" != "$TARGET_ESE_CHIP_VENDOR" ]] || \
         system/framework/services.jar/smali_classes2/com/samsung/ucm/ucmservice/CredentialManagerService.smali
         "
         for f in $FTP; do
-            sed -i "s/\"$SOURCE_ESE_CHIP_VENDOR\"/\"$TARGET_ESE_CHIP_VENDOR\"/g" "$APKTOOL_DIR/$f"
-            sed -i "s/\"$SOURCE_ESE_COS_NAME\"/\"$TARGET_ESE_COS_NAME\"/g" "$APKTOOL_DIR/$f"
+            sed -i "s/\"$SOURCE_SECURITY_CONFIG_ESE_CHIP_VENDOR\"/\"$TARGET_SECURITY_CONFIG_ESE_CHIP_VENDOR\"/g" "$APKTOOL_DIR/$f"
+            sed -i "s/\"$SOURCE_SECURITY_CONFIG_ESE_COS_NAME\"/\"$TARGET_SECURITY_CONFIG_ESE_COS_NAME\"/g" "$APKTOOL_DIR/$f"
         done
     fi
 fi

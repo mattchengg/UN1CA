@@ -62,11 +62,11 @@ else
     source "$SRC_DIR/target/$1/config.sh" || exit 1
 fi
 
-if [ ! -f "$SRC_DIR/unica/configs/$TARGET_SINGLE_SYSTEM_IMAGE.sh" ]; then
-    LOGE "\"$TARGET_SINGLE_SYSTEM_IMAGE\" is not a valid system image"
+if [ ! -f "$SRC_DIR/unica/configs/$TARGET_OS_SINGLE_SYSTEM_IMAGE.sh" ]; then
+    LOGE "\"$TARGET_OS_SINGLE_SYSTEM_IMAGE\" is not a valid system image"
     exit 1
 else
-    source "$SRC_DIR/unica/configs/$TARGET_SINGLE_SYSTEM_IMAGE.sh" || exit 1
+    source "$SRC_DIR/unica/configs/$TARGET_OS_SINGLE_SYSTEM_IMAGE.sh" || exit 1
 fi
 
 if [ -f "$OUT_DIR/config.sh" ]; then
@@ -111,15 +111,15 @@ fi
 #   TARGET_CODENAME
 #     String containing the target device codename, it must match the `ro.product.vendor.device` prop.
 #
-#   [SOURCE/TARGET]_API_LEVEL
+#   [SOURCE/TARGET]_PLATFORM_SDK_VERSION
 #     Integer containing the SDK API level of the device firmware, it must match the `ro.build.version.sdk` prop.
 #
-#   [SOURCE/TARGET]_PRODUCT_FIRST_API_LEVEL
+#   [SOURCE/TARGET]_PRODUCT_SHIPPING_API_LEVEL
 #     Integer containing the SDK API level that the device is initially launched with,
 #     it must match the `ro.product.first_api_level` prop.
 #
-#   [SOURCE/TARGET]_VENDOR_API_LEVEL
-#     Integer containing the vendor API level, it must match the `ro.board.api_level` prop.
+#   [SOURCE/TARGET]_BOARD_API_LEVEL
+#     Integer containing the board API level, it must match the `ro.board.api_level` prop.
 #
 #   TARGET_ASSERT_MODEL
 #     If defined, the zip package will use the provided model numbers with the value in the `ro.boot.em.model` prop
@@ -128,18 +128,6 @@ fi
 #
 #     Example:
 #       `TARGET_ASSERT_MODEL=("SM-A528B" "SM-A528N")`
-#
-#   TARGET_SINGLE_SYSTEM_IMAGE
-#     String containing the target device SSI, it must match the `ro.build.product` prop.
-#     Currently, only "qssi" is supported.
-#
-#   TARGET_OS_FILE_SYSTEM
-#     String containing the target device firmware file system.
-#     Using a value different than stock will require patching the device fstab file in vendor and kernel ramdisk.
-#
-#   TARGET_BOOT_DEVICE_PATH
-#     String containing the path to the target device folder containing its block devices.
-#     Defaults to "/dev/block/bootdevice/by-name".
 #
 #   TARGET_DISABLE_AVB_SIGNING
 #     If set to true, AVB signing will be disabled.
@@ -168,18 +156,36 @@ fi
 #
 #   TARGET_SUPER_PARTITION_SIZE
 #     Integer containing the size in bytes of the target device super partition size, which can be checked using the lpdump tool.
-#     Notice this must be bigger than TARGET_SUPER_GROUP_SIZE.
+#     Notice this must be bigger than TARGET_${TARGET_SUPER_GROUP_NAME}_SIZE.
 #
 #   [SOURCE/TARGET]_SUPER_GROUP_NAME
 #     String containing the super partition group name the device uses.
 #     When TARGET_SUPER_GROUP_NAME is not set, the value in SOURCE_SUPER_GROUP_NAME is used by default.
 #
-#   TARGET_SUPER_GROUP_SIZE
+#   TARGET_${TARGET_SUPER_GROUP_NAME}_SIZE
 #     Integer containing the size in bytes of the target device super group size, which can be checked using the lpdump tool.
 #     Notice this must be smaller than TARGET_SUPER_PARTITION_SIZE.
 #
-#   [SOURCE/TARGET]_HAS_SYSTEM_EXT
-#     Boolean which describes whether the device has a separate system_ext partition.
+#   TARGET_OS_FILE_SYSTEM_TYPE
+#     String containing the target device firmware file system.
+#     Using a different value than stock will require patching the device fstab file in vendor and kernel ramdisk.
+#
+#   TARGET_OS_BUILD_SYSTEM_EXT_PARTITION
+#     If set to true, system_ext partition will be built.
+#
+#   TARGET_OS_SINGLE_SYSTEM_IMAGE
+#     String containing the target device SSI, it must match the `ro.build.product` prop.
+#     Currently, only "qssi" is supported.
+#
+#   TARGET_OS_BOOT_DEVICE_PATH
+#     String containing the path to the target device block devices.
+#     Defaults to "/dev/block/bootdevice/by-name".
+#
+#   [SOURCE/TARGET]_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION
+#     Integer containing the device RecordAlive lib version.
+#     It can be checked in the following ways:
+#       - `version` parameter in the `com.samsung.android.camera.mic.SemMultiMicManager.isSupported()` method inside `framework.jar`
+#       - Suffix number in "/vendor/lib(64)/lib_SamsungRec_*.so" lib
 #
 #   [SOURCE/TARGET]_AUDIO_SUPPORT_ACH_RINGTONE
 #     Boolean which describes whether the device supports the "Sync vibration with ringtone" feature.
@@ -201,122 +207,118 @@ fi
 #       - `SEC_AUDIO_SUPPORT_VIRTUAL_VIBRATION_SOUND` in the `com.samsung.android.audio.Rune` class inside `framework.jar` is set to true
 #       - `SUPPORT_VIRTUAL_VIBRATION_SOUND` in the `com.samsung.android.vibrator.VibRune` class inside `framework.jar` is set to true
 #
-#   [SOURCE/TARGET]_AUTO_BRIGHTNESS_TYPE
-#     Integer containing the device auto brightness type.
+#   [SOURCE/TARGET]_CAMERA_SUPPORT_CUTOUT_PROTECTION
+#     Boolean which describes whether the device supports the camera cutout protection feature.
 #     It can be checked in the following ways:
-#       - `AUTO_BRIGHTNESS_TYPE` value in the `com.android.server.power.PowerManagerUtil` class inside `services.jar`
-#       - "SEC_FLOATING_FEATURE_LCD_CONFIG_CONTROL_AUTO_BRIGHTNESS" value in floating_feature.xml
+#       - "config_enableDisplayCutoutProtection" in "res/values/bools.xml" inside `SystemUI.apk` is set to "true"
 #
-#   [SOURCE/TARGET]_DVFS_CONFIG_NAME
-#     String containing the DVFS config file name used by SDHMS.
+#   [SOURCE/TARGET]_CAMERA_SUPPORT_MASS_APP_FLAVOR
+#     Boolean which describes whether the device ships the mass Samsung Camera app flavor.
+#     It can be checked in the following ways:
+#       - `AndroidManifest.xml` of `SamsungCamera.apk` has `hal3_mass-phone-release` value
+#
+#   [SOURCE/TARGET]_DVFSAPP_CONFIG_DVFS_POLICY_FILENAME
+#     String containing the DVFS policy file name used by SDHMS.
 #     It can be checked in the following ways:
 #       - `DVFS_FILENAME` value in the `com.android.server.ssrm.Feature` class inside `ssrm.jar`
 #
-#   [SOURCE/TARGET]_ESE_CHIP_VENDOR
-#     String containing the device eSE chip vendor.
-#     Defaults to "none".
+#   [SOURCE/TARGET]_DVFSAPP_CONFIG_SSRM_POLICY_FILENAME
+#     String containing the SSRM policy file name used by SDHMS.
 #     It can be checked in the following ways:
-#       - `chipVendor` value in the `com.android.server.SemService` class inside `framework.jar`
-#       - `chipVendor` value in the `com.android.se.internal.UtilExtension` class inside `SecureElement.apk`
+#       - `SSRM_FILENAME` value in the `com.android.server.ssrm.Feature` class inside `ssrm.jar`
+#       - "SEC_FLOATING_FEATURE_SYSTEM_CONFIG_SIOP_POLICY_FILENAME" value in floating_feature.xml
 #
-#   [SOURCE/TARGET]_ESE_COS_NAME
-#     String containing the device eSE COS name.
-#     Defaults to "none".
-#     It can be checked in the following ways:
-#       - `cosName` value in the `com.android.server.SemService` class inside `framework.jar`
-#       - `cosName` value in the `com.samsung.android.service.SemService` class inside `framework.jar`
-#       - `mEseCosName` value in the `com.android.se.internal.UtilExtension` class inside `SecureElement.apk`
-#
-#   [SOURCE/TARGET]_FP_SENSOR_CONFIG
+#   [SOURCE/TARGET]_FINGERPRINT_CONFIG_SENSOR
 #     String containing the fingerprint sensor feature string.
 #     It can be checked in the following ways:
 #       - `mConfig` value in the `com.samsung.android.bio.fingerprint.SemFingerprintManager$Characteristic` class inside `framework.jar`
 #
-#   [SOURCE/TARGET]_HAS_HW_MDNIE
-#     Boolean which describes whether the device supports hardware mDNIe.
-#     It can be checked in the following ways:
-#       - `A11Y_COLOR_BOOL_SUPPORT_MDNIE_HW` value in the `android.view.accessibility.A11yRune` class inside `framework.jar`
-#
-#   [SOURCE/TARGET]_HAS_MASS_CAMERA_APP
-#     Boolean which describes whether the device ships the mass Samsung Camera app variant.
-#     It can be checked in the following ways:
-#       - `AndroidManifest.xml` of `SamsungCamera.apk` has `hal3_mass-phone-release` value
-#
-#   [SOURCE/TARGET]_HAS_QHD_DISPLAY
-#     Boolean which describes whether the device has a WQHD(+) display.
-#     It can be checked in the following ways:
-#       - `FW_DYNAMIC_RESOLUTION_CONTROL` in the `com.samsung.android.rune.CoreRune` class inside `framework.jar` is set to true
-#       - "SEC_FLOATING_FEATURE_COMMON_CONFIG_DYN_RESOLUTION_CONTROL" in floating_feature.xml is set
-#
-#   [SOURCE/TARGET]_HFR_MODE
-#     Integer containing the device variable refresh rate type.
-#     It can be checked in the following ways:
-#       - `LCD_CONFIG_HFR_MODE` value in the `com.samsung.android.hardware.secinputdev.SemInputFeatures` class inside `secinputdev-service.jar`
-#       - "SEC_FLOATING_FEATURE_LCD_CONFIG_HFR_MODE" value in floating_feature.xml
-#
-#   [SOURCE/TARGET]_HFR_SUPPORTED_REFRESH_RATE
-#     String containing the device available refresh rate profiles.
-#     Defaults to "none".
-#     It can be checked in the following ways:
-#       - "SEC_FLOATING_FEATURE_LCD_CONFIG_HFR_SUPPORTED_REFRESH_RATE" value in floating_feature.xml
-#
-#   [SOURCE/TARGET]_HFR_DEFAULT_REFRESH_RATE
-#     Integer containing the device default refresh rate.
-#     Defaults to "none".
-#     It can be checked in the following ways:
-#       - "SEC_FLOATING_FEATURE_LCD_CONFIG_HFR_DEFAULT_REFRESH_RATE" value in floating_feature.xml
-#
-#   [SOURCE/TARGET]_HFR_SEAMLESS_BRT
-#     String containing the device low/high brightness thresholds for VRR.
-#     Defaults to "none".
-#     It can be checked in the following ways:
-#       - `configBrt` value in the `com.samsung.android.hardware.display.RefreshRateConfig` class inside `framework.jar`
-#
-#   [SOURCE/TARGET]_HFR_SEAMLESS_LUX
-#     String containing the device low/high ambient lux thresholds for VRR.
-#     Defaults to "none".
-#     It can be checked in the following ways:
-#       - `configLux` value in the `com.samsung.android.hardware.display.RefreshRateConfig` class inside `framework.jar`
-#
-#   [SOURCE/TARGET]_IS_ESIM_SUPPORTED
-#     Boolean which describes whether the device has eSIM support.
-#     It can be checked in the following ways:
-#       - "SEC_FLOATING_FEATURE_COMMON_CONFIG_EMBEDDED_SIM_SLOTSWITCH" in floating_feature.xml is set
-#
-#   [SOURCE/TARGET]_MDNIE_SUPPORTED_MODES
+#   [SOURCE/TARGET]_COMMON_CONFIG_MDNIE_MODE
 #     Integer containing the device mDNIe feature bit flag.
 #     It can be checked in the following ways:
 #       - `MDNIE_SUPPORT_FUNCTION` value in the `com.samsung.android.hardware.display.SemMdnieManagerService` class inside `services.jar`
 #       - "SEC_FLOATING_FEATURE_COMMON_CONFIG_MDNIE_MODE" value in floating_feature.xml
 #
-#   [SOURCE/TARGET]_MDNIE_WEAKNESS_SOLUTION_FUNCTION
-#     Integer containing the device mDNIe color blindness feature flag.
+#   [SOURCE/TARGET]_COMMON_SUPPORT_DYN_RESOLUTION_CONTROL
+#     Boolean which describes whether the device has a WQHD(+) display.
 #     It can be checked in the following ways:
-#       - `WEAKNESS_SOLUTION_FUNCTION` value in the `com.samsung.android.hardware.display.SemMdnieManagerService` class inside `services.jar`
+#       - `FW_DYNAMIC_RESOLUTION_CONTROL` in the `com.samsung.android.rune.CoreRune` class inside `framework.jar` is set to true
+#       - "SEC_FLOATING_FEATURE_COMMON_CONFIG_DYN_RESOLUTION_CONTROL" in floating_feature.xml is set
 #
-#   [SOURCE/TARGET]_MDNIE_SUPPORT_HDR_EFFECT
+#   [SOURCE/TARGET]_COMMON_SUPPORT_EMBEDDED_SIM
+#     Boolean which describes whether the device has eSIM support.
+#     It can be checked in the following ways:
+#       - "SEC_FLOATING_FEATURE_COMMON_CONFIG_EMBEDDED_SIM_SLOTSWITCH" in floating_feature.xml is set
+#
+#   [SOURCE/TARGET]_COMMON_SUPPORT_HDR_EFFECT
 #     Boolean which describes whether the device supports the "Video brightness" feature.
-#     Defaults to true if MDNIE_SUPPORTED_MODES contains the "mSupportContentModeVideoEnhance" bit (1 << 2).
+#     Defaults to true if COMMON_CONFIG_MDNIE_MODE contains the "mSupportContentModeVideoEnhance" bit (1 << 2).
 #     It can be checked in the following ways:
 #       - `com.samsung.android.settings.usefulfeature.videoenhancer.VideoEnhancerPreferenceController.getAvailabilityStatus()`
 #         method inside `SecSettings.apk` is not UNSUPPORTED_ON_DEVICE (3)
 #       - "SEC_FLOATING_FEATURE_COMMON_SUPPORT_HDR_EFFECT" in floating_feature.xml is set to "TRUE"
 #
-#   [SOURCE/TARGET]_MULTI_MIC_MANAGER_VERSION
-#     Integer containing the device SemMultiMicManager "version".
+#   [SOURCE/TARGET]_LCD_CONFIG_COLOR_WEAKNESS_SOLUTION
+#     Integer containing the device mDNIe color blindness feature flag.
 #     It can be checked in the following ways:
-#       - `version` parameter in the `com.samsung.android.camera.mic.SemMultiMicManager.isSupported()` method inside `framework.jar`
+#       - (API 34 and below) `WEAKNESS_SOLUTION_FUNCTION` value in the `com.samsung.android.hardware.display.SemMdnieManagerService` class inside `services.jar`
+#       - (API 35 and above) `A11Y_COLOR_BOOL_SUPPORT_DMC_COLORWEAKNESS` value in the `android.view.accessibility.A11yRune` class inside `framework.jar`
 #
-#   [SOURCE/TARGET]_SSRM_CONFIG_NAME
-#     String containing the SSRM config file name used by SDHMS.
+#   [SOURCE/TARGET]_LCD_CONFIG_CONTROL_AUTO_BRIGHTNESS
+#     Integer containing the device auto brightness type.
 #     It can be checked in the following ways:
-#       - `SSRM_FILENAME` value in the `com.android.server.ssrm.Feature` class inside `ssrm.jar`
-#       - "SEC_FLOATING_FEATURE_SYSTEM_CONFIG_SIOP_POLICY_FILENAME" value in floating_feature.xml
+#       - `AUTO_BRIGHTNESS_TYPE` value in the `com.android.server.power.PowerManagerUtil` class inside `services.jar`
+#       - "SEC_FLOATING_FEATURE_LCD_CONFIG_CONTROL_AUTO_BRIGHTNESS" value in floating_feature.xml
 #
-#   [SOURCE/TARGET]_SUPPORT_CUTOUT_PROTECTION
-#     Boolean which describes whether the device supports the camera cutout protection feature.
+#   [SOURCE/TARGET]_LCD_CONFIG_HFR_DEFAULT_REFRESH_RATE
+#     Integer containing the device default refresh rate.
 #     It can be checked in the following ways:
-#       - "config_enableDisplayCutoutProtection" in "res/values/bools.xml" inside `SystemUI.apk` is set to "true"
+#       - "SEC_FLOATING_FEATURE_LCD_CONFIG_HFR_DEFAULT_REFRESH_RATE" value in floating_feature.xml
+#
+#   [SOURCE/TARGET]_LCD_CONFIG_HFR_MODE
+#     Integer containing the device variable refresh rate type.
+#     It can be checked in the following ways:
+#       - `LCD_CONFIG_HFR_MODE` value in the `com.samsung.android.hardware.secinputdev.SemInputFeatures` class inside `secinputdev-service.jar`
+#       - "SEC_FLOATING_FEATURE_LCD_CONFIG_HFR_MODE" value in floating_feature.xml
+#
+#   [SOURCE/TARGET]_LCD_CONFIG_HFR_SUPPORTED_REFRESH_RATE
+#     String containing the device available refresh rate profiles.
+#     Defaults to "none" for devices without VRR.
+#     It can be checked in the following ways:
+#       - "SEC_FLOATING_FEATURE_LCD_CONFIG_HFR_SUPPORTED_REFRESH_RATE" value in floating_feature.xml
+#
+#   [SOURCE/TARGET]_LCD_CONFIG_SEAMLESS_BRT
+#     String containing the device low/high brightness thresholds for VRR.
+#     Defaults to "none" for devices without VRR.
+#     It can be checked in the following ways:
+#       - `configBrt` value in the `com.samsung.android.hardware.display.RefreshRateConfig` class inside `framework.jar`
+#
+#   [SOURCE/TARGET]_LCD_CONFIG_SEAMLESS_LUX
+#     String containing the device low/high ambient lux thresholds for VRR.
+#     Defaults to "none" for devices without VRR.
+#     It can be checked in the following ways:
+#       - `configLux` value in the `com.samsung.android.hardware.display.RefreshRateConfig` class inside `framework.jar`
+#
+#   [SOURCE/TARGET]_LCD_SUPPORT_MDNIE_HW
+#     Boolean which describes whether the device supports hardware mDNIe.
+#     It can be checked in the following ways:
+#       - `A11Y_COLOR_BOOL_SUPPORT_MDNIE_HW` value in the `android.view.accessibility.A11yRune` class inside `framework.jar`
+#
+#   [SOURCE/TARGET]_SECURITY_CONFIG_ESE_CHIP_VENDOR
+#     String containing the device eSE chip vendor.
+#     Defaults to "none".
+#     It can be checked in the following ways:
+#       - `chipVendor` value in the `com.android.server.SemService` class inside `framework.jar`
+#       - `chipVendor` value in the `com.samsung.android.service.SemService.SemServiceManager` class inside `framework.jar`
+#       - `chipVendor` value in the `com.android.se.internal.UtilExtension` class inside `SecureElement.apk`
+#
+#   [SOURCE/TARGET]_SECURITY_CONFIG_ESE_COS_NAME
+#     String containing the device eSE cOS name.
+#     Defaults to "none".
+#     It can be checked in the following ways:
+#       - `cosName` value in the `com.android.server.SemService` class inside `framework.jar`
+#       - `cosName` value in the `com.samsung.android.service.SemService.SemServiceManager` class inside `framework.jar`
+#       - `mEseCosName` value in the `com.android.se.internal.UtilExtension` class inside `SecureElement.apk`
 {
     echo "# Automatically generated by scripts/internal/gen_config_file.sh"
     echo "ROM_IS_OFFICIAL=\"$(IS_UNICA_CERT_AVAILABLE)\""
@@ -329,9 +331,9 @@ fi
     else
         echo "SOURCE_EXTRA_FIRMWARES=\"\""
     fi
-    GET_BUILD_VAR "SOURCE_API_LEVEL"
-    GET_BUILD_VAR "SOURCE_PRODUCT_FIRST_API_LEVEL"
-    GET_BUILD_VAR "SOURCE_VENDOR_API_LEVEL"
+    GET_BUILD_VAR "SOURCE_PLATFORM_SDK_VERSION"
+    GET_BUILD_VAR "SOURCE_PRODUCT_SHIPPING_API_LEVEL"
+    GET_BUILD_VAR "SOURCE_BOARD_API_LEVEL"
     GET_BUILD_VAR "TARGET_NAME"
     GET_BUILD_VAR "TARGET_CODENAME"
     if [ "${#TARGET_ASSERT_MODEL[@]}" -ge 1 ]; then
@@ -345,12 +347,9 @@ fi
     else
         echo "TARGET_EXTRA_FIRMWARES=\"\""
     fi
-    GET_BUILD_VAR "TARGET_API_LEVEL"
-    GET_BUILD_VAR "TARGET_PRODUCT_FIRST_API_LEVEL"
-    GET_BUILD_VAR "TARGET_VENDOR_API_LEVEL"
-    GET_BUILD_VAR "TARGET_SINGLE_SYSTEM_IMAGE"
-    GET_BUILD_VAR "TARGET_OS_FILE_SYSTEM"
-    GET_BUILD_VAR "TARGET_BOOT_DEVICE_PATH" "/dev/block/bootdevice/by-name"
+    GET_BUILD_VAR "TARGET_PLATFORM_SDK_VERSION"
+    GET_BUILD_VAR "TARGET_PRODUCT_SHIPPING_API_LEVEL"
+    GET_BUILD_VAR "TARGET_BOARD_API_LEVEL"
     GET_BUILD_VAR "TARGET_DISABLE_AVB_SIGNING" "false"
     GET_BUILD_VAR "TARGET_INCLUDE_PATCHED_VBMETA" "false"
     GET_BUILD_VAR "TARGET_KEEP_ORIGINAL_SIGN" "false"
@@ -361,55 +360,57 @@ fi
     GET_BUILD_VAR "TARGET_SUPER_PARTITION_SIZE"
     GET_BUILD_VAR "SOURCE_SUPER_GROUP_NAME"
     GET_BUILD_VAR "TARGET_SUPER_GROUP_NAME" "$SOURCE_SUPER_GROUP_NAME"
-    GET_BUILD_VAR "TARGET_SUPER_GROUP_SIZE"
-    GET_BUILD_VAR "SOURCE_HAS_SYSTEM_EXT"
-    GET_BUILD_VAR "TARGET_HAS_SYSTEM_EXT"
+    GET_BUILD_VAR "TARGET_$(tr "[:lower:]" "[:upper:]" <<< "${TARGET_SUPER_GROUP_NAME:-$SOURCE_SUPER_GROUP_NAME}")_SIZE"
+    GET_BUILD_VAR "TARGET_OS_SINGLE_SYSTEM_IMAGE"
+    GET_BUILD_VAR "TARGET_OS_FILE_SYSTEM_TYPE"
+    GET_BUILD_VAR "TARGET_OS_BUILD_SYSTEM_EXT_PARTITION"
+    GET_BUILD_VAR "TARGET_OS_BOOT_DEVICE_PATH" "/dev/block/bootdevice/by-name"
+    GET_BUILD_VAR "SOURCE_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION"
+    GET_BUILD_VAR "TARGET_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION"
     GET_BUILD_VAR "SOURCE_AUDIO_SUPPORT_ACH_RINGTONE"
     GET_BUILD_VAR "TARGET_AUDIO_SUPPORT_ACH_RINGTONE"
     GET_BUILD_VAR "SOURCE_AUDIO_SUPPORT_DUAL_SPEAKER"
     GET_BUILD_VAR "TARGET_AUDIO_SUPPORT_DUAL_SPEAKER"
     GET_BUILD_VAR "SOURCE_AUDIO_SUPPORT_VIRTUAL_VIBRATION"
     GET_BUILD_VAR "TARGET_AUDIO_SUPPORT_VIRTUAL_VIBRATION"
-    GET_BUILD_VAR "SOURCE_AUTO_BRIGHTNESS_TYPE"
-    GET_BUILD_VAR "TARGET_AUTO_BRIGHTNESS_TYPE"
-    GET_BUILD_VAR "SOURCE_DVFS_CONFIG_NAME"
-    GET_BUILD_VAR "TARGET_DVFS_CONFIG_NAME"
-    GET_BUILD_VAR "SOURCE_ESE_CHIP_VENDOR" "none"
-    GET_BUILD_VAR "TARGET_ESE_CHIP_VENDOR" "none"
-    GET_BUILD_VAR "SOURCE_ESE_COS_NAME" "none"
-    GET_BUILD_VAR "TARGET_ESE_COS_NAME" "none"
-    GET_BUILD_VAR "SOURCE_FP_SENSOR_CONFIG"
-    GET_BUILD_VAR "TARGET_FP_SENSOR_CONFIG"
-    GET_BUILD_VAR "SOURCE_HAS_HW_MDNIE"
-    GET_BUILD_VAR "TARGET_HAS_HW_MDNIE"
-    GET_BUILD_VAR "SOURCE_HAS_MASS_CAMERA_APP"
-    GET_BUILD_VAR "TARGET_HAS_MASS_CAMERA_APP"
-    GET_BUILD_VAR "SOURCE_HAS_QHD_DISPLAY"
-    GET_BUILD_VAR "TARGET_HAS_QHD_DISPLAY"
-    GET_BUILD_VAR "SOURCE_HFR_MODE"
-    GET_BUILD_VAR "TARGET_HFR_MODE"
-    GET_BUILD_VAR "SOURCE_HFR_SUPPORTED_REFRESH_RATE" "none"
-    GET_BUILD_VAR "TARGET_HFR_SUPPORTED_REFRESH_RATE" "none"
-    GET_BUILD_VAR "SOURCE_HFR_DEFAULT_REFRESH_RATE" "none"
-    GET_BUILD_VAR "TARGET_HFR_DEFAULT_REFRESH_RATE" "none"
-    GET_BUILD_VAR "SOURCE_HFR_SEAMLESS_BRT" "none"
-    GET_BUILD_VAR "TARGET_HFR_SEAMLESS_BRT" "none"
-    GET_BUILD_VAR "SOURCE_HFR_SEAMLESS_LUX" "none"
-    GET_BUILD_VAR "TARGET_HFR_SEAMLESS_LUX" "none"
-    GET_BUILD_VAR "SOURCE_IS_ESIM_SUPPORTED"
-    GET_BUILD_VAR "TARGET_IS_ESIM_SUPPORTED"
-    GET_BUILD_VAR "SOURCE_MDNIE_SUPPORTED_MODES"
-    GET_BUILD_VAR "TARGET_MDNIE_SUPPORTED_MODES"
-    GET_BUILD_VAR "SOURCE_MDNIE_WEAKNESS_SOLUTION_FUNCTION"
-    GET_BUILD_VAR "TARGET_MDNIE_WEAKNESS_SOLUTION_FUNCTION"
-    GET_BUILD_VAR "SOURCE_MDNIE_SUPPORT_HDR_EFFECT" "$(test "$((SOURCE_MDNIE_SUPPORTED_MODES & 4))" != "0" && echo "true" || echo "false")"
-    GET_BUILD_VAR "TARGET_MDNIE_SUPPORT_HDR_EFFECT" "$(test "$((TARGET_MDNIE_SUPPORTED_MODES & 4))" != "0" && echo "true" || echo "false")"
-    GET_BUILD_VAR "SOURCE_MULTI_MIC_MANAGER_VERSION"
-    GET_BUILD_VAR "TARGET_MULTI_MIC_MANAGER_VERSION"
-    GET_BUILD_VAR "SOURCE_SSRM_CONFIG_NAME"
-    GET_BUILD_VAR "TARGET_SSRM_CONFIG_NAME"
-    GET_BUILD_VAR "SOURCE_SUPPORT_CUTOUT_PROTECTION" "false"
-    GET_BUILD_VAR "TARGET_SUPPORT_CUTOUT_PROTECTION" "false"
+    GET_BUILD_VAR "SOURCE_CAMERA_SUPPORT_CUTOUT_PROTECTION"
+    GET_BUILD_VAR "TARGET_CAMERA_SUPPORT_CUTOUT_PROTECTION"
+    GET_BUILD_VAR "SOURCE_CAMERA_SUPPORT_MASS_APP_FLAVOR"
+    GET_BUILD_VAR "TARGET_CAMERA_SUPPORT_MASS_APP_FLAVOR"
+    GET_BUILD_VAR "SOURCE_COMMON_CONFIG_MDNIE_MODE"
+    GET_BUILD_VAR "TARGET_COMMON_CONFIG_MDNIE_MODE"
+    GET_BUILD_VAR "SOURCE_COMMON_SUPPORT_DYN_RESOLUTION_CONTROL"
+    GET_BUILD_VAR "TARGET_COMMON_SUPPORT_DYN_RESOLUTION_CONTROL"
+    GET_BUILD_VAR "SOURCE_COMMON_SUPPORT_EMBEDDED_SIM"
+    GET_BUILD_VAR "TARGET_COMMON_SUPPORT_EMBEDDED_SIM"
+    GET_BUILD_VAR "SOURCE_COMMON_SUPPORT_HDR_EFFECT" "$(test "$((SOURCE_COMMON_CONFIG_MDNIE_MODE & 4))" != "0" && echo "true" || echo "false")"
+    GET_BUILD_VAR "TARGET_COMMON_SUPPORT_HDR_EFFECT" "$(test "$((TARGET_COMMON_CONFIG_MDNIE_MODE & 4))" != "0" && echo "true" || echo "false")"
+    GET_BUILD_VAR "SOURCE_DVFSAPP_CONFIG_DVFS_POLICY_FILENAME"
+    GET_BUILD_VAR "TARGET_DVFSAPP_CONFIG_DVFS_POLICY_FILENAME"
+    GET_BUILD_VAR "SOURCE_DVFSAPP_CONFIG_SSRM_POLICY_FILENAME"
+    GET_BUILD_VAR "TARGET_DVFSAPP_CONFIG_SSRM_POLICY_FILENAME"
+    GET_BUILD_VAR "SOURCE_FINGERPRINT_CONFIG_SENSOR"
+    GET_BUILD_VAR "TARGET_FINGERPRINT_CONFIG_SENSOR"
+    GET_BUILD_VAR "SOURCE_LCD_CONFIG_COLOR_WEAKNESS_SOLUTION"
+    GET_BUILD_VAR "TARGET_LCD_CONFIG_COLOR_WEAKNESS_SOLUTION"
+    GET_BUILD_VAR "SOURCE_LCD_CONFIG_CONTROL_AUTO_BRIGHTNESS"
+    GET_BUILD_VAR "TARGET_LCD_CONFIG_CONTROL_AUTO_BRIGHTNESS"
+    GET_BUILD_VAR "SOURCE_LCD_CONFIG_HFR_DEFAULT_REFRESH_RATE"
+    GET_BUILD_VAR "TARGET_LCD_CONFIG_HFR_DEFAULT_REFRESH_RATE"
+    GET_BUILD_VAR "SOURCE_LCD_CONFIG_HFR_MODE"
+    GET_BUILD_VAR "TARGET_LCD_CONFIG_HFR_MODE"
+    GET_BUILD_VAR "SOURCE_LCD_CONFIG_HFR_SUPPORTED_REFRESH_RATE" "$(test "$SOURCE_LCD_CONFIG_HFR_MODE" -gt "0" && echo "" || echo "none")"
+    GET_BUILD_VAR "TARGET_LCD_CONFIG_HFR_SUPPORTED_REFRESH_RATE" "$(test "$TARGET_LCD_CONFIG_HFR_MODE" -gt "0" && echo "" || echo "none")"
+    GET_BUILD_VAR "SOURCE_LCD_CONFIG_SEAMLESS_BRT" "$(test "$SOURCE_LCD_CONFIG_HFR_MODE" -gt "1" && echo "" || echo "none")"
+    GET_BUILD_VAR "TARGET_LCD_CONFIG_SEAMLESS_BRT" "$(test "$TARGET_LCD_CONFIG_HFR_MODE" -gt "1" && echo "" || echo "none")"
+    GET_BUILD_VAR "SOURCE_LCD_CONFIG_SEAMLESS_LUX" "$(test "$SOURCE_LCD_CONFIG_HFR_MODE" -gt "1" && echo "" || echo "none")"
+    GET_BUILD_VAR "TARGET_LCD_CONFIG_SEAMLESS_LUX" "$(test "$TARGET_LCD_CONFIG_HFR_MODE" -gt "1" && echo "" || echo "none")"
+    GET_BUILD_VAR "SOURCE_LCD_SUPPORT_MDNIE_HW"
+    GET_BUILD_VAR "TARGET_LCD_SUPPORT_MDNIE_HW"
+    GET_BUILD_VAR "SOURCE_SECURITY_CONFIG_ESE_CHIP_VENDOR" "none"
+    GET_BUILD_VAR "TARGET_SECURITY_CONFIG_ESE_CHIP_VENDOR" "none"
+    GET_BUILD_VAR "SOURCE_SECURITY_CONFIG_ESE_COS_NAME" "none"
+    GET_BUILD_VAR "TARGET_SECURITY_CONFIG_ESE_COS_NAME" "none"
 } > "$OUT_DIR/config.sh"
 
 exit 0
