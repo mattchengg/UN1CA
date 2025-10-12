@@ -551,5 +551,274 @@ if [ ! -f "$FW_DIR/$TARGET_FIRMWARE_PATH/vendor/etc/permissions/android.hardware
         "false"
 fi
 
+# SEC_PRODUCT_FEATURE_WLAN_CONFIG_CPU_CSTATE_DISABLE_THRESHOLD
+# SEC_PRODUCT_FEATURE_WLAN_CONFIG_DATA_ACTIVITY_AFFINITY_BOOSTER_THRESHOLD
+# SEC_PRODUCT_FEATURE_WLAN_CONFIG_L1SS_DISABLE_THRESHOLD
+if [[ "$SOURCE_WLAN_CONFIG_CPU_CSTATE_DISABLE_THRESHOLD" != "$TARGET_WLAN_CONFIG_CPU_CSTATE_DISABLE_THRESHOLD" ]] || \
+        [[ "$SOURCE_WLAN_CONFIG_DATA_ACTIVITY_AFFINITY_BOOSTER_THRESHOLD" != "$TARGET_WLAN_CONFIG_DATA_ACTIVITY_AFFINITY_BOOSTER_THRESHOLD" ]] || \
+        [[ "$SOURCE_WLAN_CONFIG_L1SS_DISABLE_THRESHOLD" != "$TARGET_WLAN_CONFIG_L1SS_DISABLE_THRESHOLD" ]]; then
+    if [[ "$SOURCE_WLAN_CONFIG_CPU_CSTATE_DISABLE_THRESHOLD" == "100" ]] && \
+            [[ "$SOURCE_WLAN_CONFIG_DATA_ACTIVITY_AFFINITY_BOOSTER_THRESHOLD" == "0" ]] && \
+            [[ "$SOURCE_WLAN_CONFIG_L1SS_DISABLE_THRESHOLD" == "0" ]]; then
+        APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
+            "$SRC_DIR/unica/patches/product_feature/wifi/thresholds/semwifi-service.jar/0001-Allow-custom-booster-thresholds-values.patch"
+        SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+            "smali/com/samsung/android/server/wifi/SemFrameworkFacade.smali" "replace" \
+            "getBoosterThresholds()[I" \
+            "CONFIG_DATA_ACTIVITY_AFFINITY_BOOSTER_THRESHOLD" \
+            "$TARGET_WLAN_CONFIG_DATA_ACTIVITY_AFFINITY_BOOSTER_THRESHOLD" | \
+            sed "s/CONFIG_DATA_ACTIVITY_AFFINITY_BOOSTER_THRESHOLD/$SOURCE_WLAN_CONFIG_DATA_ACTIVITY_AFFINITY_BOOSTER_THRESHOLD/g"
+        SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+            "smali/com/samsung/android/server/wifi/SemFrameworkFacade.smali" "replace" \
+            "getBoosterThresholds()[I" \
+            "CONFIG_CPU_CSTATE_DISABLE_THRESHOLD" \
+            "$TARGET_WLAN_CONFIG_CPU_CSTATE_DISABLE_THRESHOLD" | \
+            sed "s/CONFIG_CPU_CSTATE_DISABLE_THRESHOLD/$SOURCE_WLAN_CONFIG_CPU_CSTATE_DISABLE_THRESHOLD/g"
+        SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+            "smali/com/samsung/android/server/wifi/SemFrameworkFacade.smali" "replace" \
+            "getBoosterThresholds()[I" \
+            "CONFIG_L1SS_DISABLE_THRESHOLD" \
+            "$TARGET_WLAN_CONFIG_L1SS_DISABLE_THRESHOLD" | \
+            sed "s/CONFIG_L1SS_DISABLE_THRESHOLD/$SOURCE_WLAN_CONFIG_L1SS_DISABLE_THRESHOLD/g"
+    else
+        # TODO handle these conditions
+        LOG_MISSING_PATCHES "SOURCE_WLAN_CONFIG_CPU_CSTATE_DISABLE_THRESHOLD" "TARGET_WLAN_CONFIG_CPU_CSTATE_DISABLE_THRESHOLD" || true
+        LOG_MISSING_PATCHES "SOURCE_WLAN_CONFIG_DATA_ACTIVITY_AFFINITY_BOOSTER_THRESHOLD" "TARGET_WLAN_CONFIG_DATA_ACTIVITY_AFFINITY_BOOSTER_THRESHOLD" || true
+        LOG_MISSING_PATCHES "SOURCE_WLAN_CONFIG_L1SS_DISABLE_THRESHOLD" "TARGET_WLAN_CONFIG_L1SS_DISABLE_THRESHOLD"
+    fi
+fi
+
+# SEC_PRODUCT_FEATURE_WLAN_CONFIG_CUSTOM_BACKOFF
+if [[ "$SOURCE_WLAN_CONFIG_CUSTOM_BACKOFF" != "$TARGET_WLAN_CONFIG_CUSTOM_BACKOFF" ]]; then
+    if [[ "$SOURCE_WLAN_CONFIG_CUSTOM_BACKOFF" != "none" ]] && [[ "$TARGET_WLAN_CONFIG_CUSTOM_BACKOFF" != "none" ]]; then
+        SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+            "smali/com/samsung/android/server/wifi/SemWifiCoexManager.smali" "replaceall" \
+            "$SOURCE_WLAN_CONFIG_CUSTOM_BACKOFF" \
+            "$TARGET_WLAN_CONFIG_CUSTOM_BACKOFF"
+    elif [[ "$SOURCE_WLAN_CONFIG_CUSTOM_BACKOFF" == "none" ]] && [[ "$TARGET_WLAN_CONFIG_CUSTOM_BACKOFF" != "none" ]]; then
+        APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
+            "$SRC_DIR/unica/patches/product_feature/wifi/custom_backoff/semwifi-service.jar/0001-Allow-custom-CUSTOM_BACKOFF-value.patch"
+        SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+            "smali/com/samsung/android/server/wifi/SemWifiCoexManager.smali" "replaceall" \
+            "CONFIG_CUSTOM_BACKOFF" \
+            "$TARGET_WLAN_CONFIG_CUSTOM_BACKOFF" | \
+            sed "s/CONFIG_CUSTOM_BACKOFF/$SOURCE_WLAN_CONFIG_CUSTOM_BACKOFF/g"
+    elif [[ "$SOURCE_WLAN_CONFIG_CUSTOM_BACKOFF" != "none" ]] && [[ "$TARGET_WLAN_CONFIG_CUSTOM_BACKOFF" == "none" ]]; then
+        # TODO handle this condition
+        LOG_MISSING_PATCHES "SOURCE_WLAN_CONFIG_CUSTOM_BACKOFF" "TARGET_WLAN_CONFIG_CUSTOM_BACKOFF"
+    fi
+fi
+
+# SEC_PRODUCT_FEATURE_WLAN_SUPPORT_80211AX_6GHZ
+if ! $SOURCE_WLAN_SUPPORT_80211AX_6GHZ; then
+    if $TARGET_WLAN_SUPPORT_80211AX_6GHZ; then
+        ADD_TO_WORK_DIR "b0qxxx" "product" "overlay/SoftapOverlay6GHz/SoftapOverlay6GHz.apk" 0 0 644 "u:object_r:system_file:s0"
+
+        APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
+            "$SRC_DIR/unica/patches/product_feature/wifi/80211ax_6ghz/semwifi-service.jar/0001-Enable-80211AX_6GHZ-support.patch"
+        APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+            "$SRC_DIR/unica/patches/product_feature/wifi/80211ax_6ghz/SecSettings.apk/0001-Enable-80211AX_6GHZ-support.patch"
+        APPLY_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
+            "$SRC_DIR/unica/patches/product_feature/wifi/80211ax_6ghz/SystemUI.apk/0001-Enable-80211AX_6GHZ-support.patch"
+    fi
+else
+    if ! $TARGET_WLAN_SUPPORT_80211AX_6GHZ; then
+        # TODO handle this condition
+        LOG_MISSING_PATCHES "SOURCE_WLAN_SUPPORT_80211AX_6GHZ" "TARGET_WLAN_SUPPORT_80211AX_6GHZ"
+    fi
+fi
+
+# SEC_PRODUCT_FEATURE_WLAN_SUPPORT_MOBILEAP_6G
+if ! $SOURCE_WLAN_SUPPORT_MOBILEAP_6G && $TARGET_WLAN_SUPPORT_MOBILEAP_6G; then
+    SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+        "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replace" \
+        "showSecProductFeature()Ljava/lang/String;" \
+        "SPF_6G=false" \
+        "SPF_6G=true"
+    SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+        "smali/com/samsung/android/server/wifi/SemFrameworkFacade.smali" "return" \
+        "isSupportMobileAp6G()Z" \
+        "true"
+elif $SOURCE_WLAN_SUPPORT_MOBILEAP_6G && ! $TARGET_WLAN_SUPPORT_MOBILEAP_6G; then
+    SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+        "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replace" \
+        "showSecProductFeature()Ljava/lang/String;" \
+        "SPF_6G=true" \
+        "SPF_6G=false"
+    SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+        "smali/com/samsung/android/server/wifi/SemFrameworkFacade.smali" "return" \
+        "isSupportMobileAp6G()Z" \
+        "false"
+fi
+
+# SEC_PRODUCT_FEATURE_WLAN_SUPPORT_APE_SERVICE
+# SEC_PRODUCT_FEATURE_WLAN_CONFIG_CONNECTION_PERSONALIZATION
+if [[ "$SOURCE_WLAN_CONFIG_CONNECTION_PERSONALIZATION" != "$TARGET_WLAN_CONFIG_CONNECTION_PERSONALIZATION" ]] || \
+        [[ "$SOURCE_WLAN_SUPPORT_APE_SERVICE" != "$TARGET_WLAN_SUPPORT_APE_SERVICE" ]]; then
+    if [[ "$SOURCE_WLAN_CONFIG_CONNECTION_PERSONALIZATION" == "1" ]] && $SOURCE_WLAN_SUPPORT_APE_SERVICE; then
+        APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
+            "$SRC_DIR/unica/patches/product_feature/wifi/connection_personalization/semwifi-service.jar/0001-Allow-custom-CONNECTION_PERSONALIZATION-value.patch"
+        SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+            "smali/com/samsung/android/server/wifi/SemWifiInjector.smali" "replace" \
+            "<init>(Landroid/content/Context;)V" \
+            "CONFIG_CONNECTION_PERSONALIZATION" \
+            "$TARGET_WLAN_CONFIG_CONNECTION_PERSONALIZATION" | \
+            sed "s/CONFIG_CONNECTION_PERSONALIZATION/$SOURCE_WLAN_CONFIG_CONNECTION_PERSONALIZATION/g"
+        APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+            "$SRC_DIR/unica/patches/product_feature/wifi/connection_personalization/SecSettings.apk/0001-Allow-custom-CONNECTION_PERSONALIZATION-value.patch"
+        SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+            "smali_classes3/com/samsung/android/settings/wifi/develop/btm/BtmController.smali" "replace" \
+            "getAvailabilityStatus()I" \
+            "CONFIG_CONNECTION_PERSONALIZATION" \
+            "$TARGET_WLAN_CONFIG_CONNECTION_PERSONALIZATION" | \
+            sed "s/CONFIG_CONNECTION_PERSONALIZATION/$SOURCE_WLAN_CONFIG_CONNECTION_PERSONALIZATION/g"
+
+        if ! $TARGET_WLAN_SUPPORT_APE_SERVICE; then
+            APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
+                "$SRC_DIR/unica/patches/product_feature/wifi/ape_service/semwifi-service.jar/0001-Disable-APE_SERVICE-support.patch"
+            SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+                "smali/com/samsung/android/server/wifi/SemQboxController\$1.smali" "remove"
+            APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+                "$SRC_DIR/unica/patches/product_feature/wifi/ape_service/SecSettings.apk/0001-Disable-APE_SERVICE-support.patch"
+        fi
+    else
+        # TODO handle these conditions
+        LOG_MISSING_PATCHES "SOURCE_WLAN_CONFIG_CONNECTION_PERSONALIZATION" "TARGET_WLAN_CONFIG_CONNECTION_PERSONALIZATION" || true
+        LOG_MISSING_PATCHES "SOURCE_WLAN_SUPPORT_APE_SERVICE" "TARGET_WLAN_SUPPORT_APE_SERVICE"
+    fi
+fi
+
+# SEC_PRODUCT_FEATURE_WLAN_SUPPORT_MOBILEAP_POWER_SAVEMODE
+if $SOURCE_WLAN_SUPPORT_MOBILEAP_POWER_SAVEMODE; then
+    if ! $TARGET_WLAN_SUPPORT_MOBILEAP_POWER_SAVEMODE; then
+        APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
+            "$SRC_DIR/unica/patches/product_feature/wifi/power_savemode/semwifi-service.jar/0001-Disable-MOBILEAP_POWER_SAVEMODE-support.patch"
+        SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+            "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replace" \
+            "showSecProductFeature()Ljava/lang/String;" \
+            "SPF_POWER_SAVEMODE=true" \
+            "SPF_POWER_SAVEMODE=false"
+        SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+            "smali/com/samsung/android/server/wifi/ap/SemWifiApPowerSaveImpl\$\$ExternalSyntheticLambda0.smali" "remove"
+        SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+            "smali/com/samsung/android/server/wifi/ap/SemWifiApPowerSaveImpl\$\$ExternalSyntheticLambda1.smali" "remove"
+    fi
+else
+    if $TARGET_WLAN_SUPPORT_MOBILEAP_POWER_SAVEMODE; then
+        # TODO handle this condition
+        LOG_MISSING_PATCHES "SOURCE_WLAN_SUPPORT_MOBILEAP_POWER_SAVEMODE" "TARGET_WLAN_SUPPORT_MOBILEAP_POWER_SAVEMODE"
+    fi
+fi
+
+# SEC_PRODUCT_FEATURE_WLAN_SUPPORT_MOBILEAP_PRIORITIZE_TRAFFIC
+if $SOURCE_WLAN_SUPPORT_MOBILEAP_PRIORITIZE_TRAFFIC; then
+    if ! $TARGET_WLAN_SUPPORT_MOBILEAP_PRIORITIZE_TRAFFIC; then
+        APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
+            "$SRC_DIR/unica/patches/product_feature/wifi/prioritize_traffic/semwifi-service.jar/0001-Disable-MOBILEAP_PRIORITIZE_TRAFFIC-support.patch"
+        SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+            "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replace" \
+            "showSecProductFeature()Ljava/lang/String;" \
+            "SPF_Prio_Traffic=true" \
+            "SPF_Prio_Traffic=false"
+        APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+            "$SRC_DIR/unica/patches/product_feature/wifi/prioritize_traffic/SecSettings.apk/0001-Disable-MOBILEAP_PRIORITIZE_TRAFFIC-support.patch"
+    fi
+else
+    if $TARGET_WLAN_SUPPORT_MOBILEAP_PRIORITIZE_TRAFFIC; then
+        # TODO handle this condition
+        LOG_MISSING_PATCHES "SOURCE_WLAN_SUPPORT_MOBILEAP_PRIORITIZE_TRAFFIC" "TARGET_WLAN_SUPPORT_MOBILEAP_PRIORITIZE_TRAFFIC"
+    fi
+fi
+
+# SEC_PRODUCT_FEATURE_WLAN_SEC_SUPPORT_MOBILEAP_WIFI_CONCURRENCY
+if ! $SOURCE_WLAN_SUPPORT_MOBILEAP_WIFI_CONCURRENCY; then
+    if $TARGET_WLAN_SUPPORT_MOBILEAP_WIFI_CONCURRENCY; then
+        # Check for target flag instead as we've already took care of this SPF above
+        if ! $TARGET_WLAN_SUPPORT_MOBILEAP_POWER_SAVEMODE; then
+            APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
+                "$SRC_DIR/unica/patches/product_feature/wifi/power_savemode/semwifi-service.jar/0002-Enable-MOBILEAP_WIFI_CONCURRENCY-support.patch"
+        else
+            APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
+                "$SRC_DIR/unica/patches/product_feature/wifi/wifisharing/semwifi-service.jar/0001-Enable-MOBILEAP_WIFI_CONCURRENCY-support.patch"
+        fi
+        SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+            "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replace" \
+            "showSecProductFeature()Ljava/lang/String;" \
+            "SPF_Concurrency=false" \
+            "SPF_Concurrency=true"
+    fi
+else
+    if ! $TARGET_WLAN_SUPPORT_MOBILEAP_WIFI_CONCURRENCY; then
+        # TODO handle this condition
+        LOG_MISSING_PATCHES "SOURCE_WLAN_SUPPORT_MOBILEAP_WIFI_CONCURRENCY" "TARGET_WLAN_SUPPORT_MOBILEAP_WIFI_CONCURRENCY"
+    fi
+fi
+
+# SEC_PRODUCT_FEATURE_WLAN_SUPPORT_MOBILEAP_WIFISHARING_LITE
+if ! $SOURCE_WLAN_SUPPORT_MOBILEAP_WIFISHARING_LITE; then
+    if $TARGET_WLAN_SUPPORT_MOBILEAP_WIFISHARING_LITE; then
+        if ! $TARGET_WLAN_SUPPORT_MOBILEAP_WIFI_CONCURRENCY; then
+            ABORT "TARGET_WLAN_SUPPORT_MOBILEAP_WIFI_CONCURRENCY is required by TARGET_WLAN_SUPPORT_MOBILEAP_WIFISHARING_LITE"
+        fi
+
+        # Check for target flag instead as we've already took care of this SPF above
+        if ! $TARGET_WLAN_SUPPORT_MOBILEAP_POWER_SAVEMODE; then
+            APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
+                "$SRC_DIR/unica/patches/product_feature/wifi/power_savemode/semwifi-service.jar/0003-Enable-MOBILEAP_WIFISHARING_LITE-support.patch"
+        else
+            APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
+                "$SRC_DIR/unica/patches/product_feature/wifi/wifisharing/semwifi-service.jar/0002-Enable-MOBILEAP_WIFISHARING_LITE-support.patch"
+        fi
+        SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+            "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replace" \
+            "showSecProductFeature()Ljava/lang/String;" \
+            "SPF_WS_Lite=false" \
+            "SPF_WS_Lite=true"
+    fi
+else
+    if ! $TARGET_WLAN_SUPPORT_MOBILEAP_WIFISHARING_LITE; then
+        # TODO handle this condition
+        LOG_MISSING_PATCHES "SOURCE_WLAN_SUPPORT_MOBILEAP_WIFISHARING_LITE" "TARGET_WLAN_SUPPORT_MOBILEAP_WIFISHARING_LITE"
+    fi
+fi
+
+# SEC_PRODUCT_FEATURE_WLAN_SUPPORT_TWT_CONTROL
+# SEC_PRODUCT_FEATURE_WLAN_SUPPORT_LOWLATENCY
+if $SOURCE_WLAN_SUPPORT_TWT_CONTROL && $SOURCE_WLAN_SUPPORT_LOWLATENCY; then
+    if ! $TARGET_WLAN_SUPPORT_TWT_CONTROL; then
+        APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
+            "$SRC_DIR/unica/patches/product_feature/wifi/twt_control/semwifi-service.jar/0001-Disable-TWT_CONTROL-support.patch"
+
+        if ! $TARGET_WLAN_SUPPORT_LOWLATENCY; then
+            APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
+                "$SRC_DIR/unica/patches/product_feature/wifi/twt_control/semwifi-service.jar/0002-Disable-LOWLATENCY-support.patch"
+        fi
+    elif ! $TARGET_WLAN_SUPPORT_LOWLATENCY; then
+        APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
+            "$SRC_DIR/unica/patches/product_feature/wifi/lowlatency/semwifi-service.jar/0001-Disable-LOWLATENCY-support.patch"
+    fi
+else
+    if ! $SOURCE_WLAN_SUPPORT_TWT_CONTROL && $TARGET_WLAN_SUPPORT_TWT_CONTROL; then
+        # TODO handle this condition
+        LOG_MISSING_PATCHES "SOURCE_WLAN_SUPPORT_TWT_CONTROL" "TARGET_WLAN_SUPPORT_TWT_CONTROL"
+    elif ! $SOURCE_WLAN_SUPPORT_LOWLATENCY && $TARGET_WLAN_SUPPORT_LOWLATENCY; then
+        # TODO handle this condition
+        LOG_MISSING_PATCHES "SOURCE_WLAN_SUPPORT_LOWLATENCY" "TARGET_WLAN_SUPPORT_LOWLATENCY"
+    fi
+fi
+
+# SEC_PRODUCT_FEATURE_WLAN_SUPPORT_WIFI_TO_CELLULAR
+if ! $SOURCE_WLAN_SUPPORT_WIFI_TO_CELLULAR && $TARGET_WLAN_SUPPORT_WIFI_TO_CELLULAR; then
+    SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+        "smali/com/samsung/android/server/wifi/SemFrameworkFacade.smali" "return" \
+        "isWifiToCellularSupported()Z" \
+        "true"
+elif $SOURCE_WLAN_SUPPORT_WIFI_TO_CELLULAR && ! $TARGET_WLAN_SUPPORT_WIFI_TO_CELLULAR; then
+    SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+        "smali/com/samsung/android/server/wifi/SemFrameworkFacade.smali" "return" \
+        "isWifiToCellularSupported()Z" \
+        "false"
+fi
+
 unset TARGET_FIRMWARE_PATH
 unset -f GET_FINGERPRINT_SENSOR_TYPE LOG_MISSING_PATCHES
