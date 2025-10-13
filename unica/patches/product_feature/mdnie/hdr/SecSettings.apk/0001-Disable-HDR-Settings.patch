@@ -1,6 +1,6 @@
-From a5a38de8747915cef0a2c68987721b099db69e2b Mon Sep 17 00:00:00 2001
+From 303a513809bc25f3aaddb0aac0c37b97102bd803 Mon Sep 17 00:00:00 2001
 From: Salvo Giangreco <giangrecosalvo9@gmail.com>
-Date: Mon, 8 Sep 2025 22:12:27 +0200
+Date: Mon, 13 Oct 2025 14:51:26 +0200
 Subject: [PATCH] Disable HDR Settings
 
 ---
@@ -8,10 +8,8 @@ Subject: [PATCH] Disable HDR Settings
  .../usefulfeature/UsefulfeatureUtils.smali    |  374 ----
  ...cBrightenUpVideoPreferenceController.smali |   15 +-
  .../VideoEnhancerPreferenceController.smali   |   15 +-
- ...atureItem$$ExternalSyntheticOutline0.smali |   23 -
- .../provider/items/AdvancedFeatureItem.smali  | 1824 +++++++++--------
- 6 files changed, 969 insertions(+), 1401 deletions(-)
- delete mode 100644 smali_classes4/com/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0.smali
+ .../provider/items/AdvancedFeatureItem.smali  | 1664 ++++++++---------
+ 5 files changed, 825 insertions(+), 1362 deletions(-)
 
 diff --git a/smali_classes3/com/samsung/android/settings/usefulfeature/UsefulfeatureReset$1.smali b/smali_classes3/com/samsung/android/settings/usefulfeature/UsefulfeatureReset$1.smali
 index 75a0d9fca..3e093104a 100644
@@ -658,60 +656,11 @@ index bc15d4843..b7f123915 100644
  
      return p0
  .end method
-diff --git a/smali_classes4/com/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0.smali b/smali_classes4/com/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0.smali
-deleted file mode 100644
-index 722aa50ae..000000000
---- a/smali_classes4/com/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0.smali
-+++ /dev/null
-@@ -1,23 +0,0 @@
--.class public abstract synthetic Lcom/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0;
--.super Ljava/lang/Object;
--.source "qb/101886872 cc50e995e4fc65df429a508d912903f2f35e60315f091e679da7afd461b54de3"
--
--
--# direct methods
--.method public static m(Lcom/samsung/android/lib/episode/Scene$Builder;Ljava/lang/String;Ljava/lang/Boolean;Ljava/util/ArrayList;Ljava/lang/String;)Lcom/samsung/android/lib/episode/Scene$Builder;
--    .locals 0
--
--    invoke-virtual {p0, p2, p1}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
--
--    invoke-virtual {p0}, Lcom/samsung/android/lib/episode/Scene$Builder;->build()Lcom/samsung/android/lib/episode/Scene;
--
--    move-result-object p0
--
--    invoke-virtual {p3, p0}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
--
--    new-instance p0, Lcom/samsung/android/lib/episode/Scene$Builder;
--
--    invoke-direct {p0, p4}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
--
--    return-object p0
--.end method
 diff --git a/smali_classes4/com/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem.smali b/smali_classes4/com/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem.smali
-index 543237653..4938604d1 100644
+index 543237653..63299c46d 100644
 --- a/smali_classes4/com/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem.smali
 +++ b/smali_classes4/com/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem.smali
-@@ -922,10 +922,18 @@
- 
-     sget-object v0, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
- 
--    invoke-static {p1, v8, v0, p0, p2}, Lcom/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0;->m(Lcom/samsung/android/lib/episode/Scene$Builder;Ljava/lang/String;Ljava/lang/Boolean;Ljava/util/ArrayList;Ljava/lang/String;)Lcom/samsung/android/lib/episode/Scene$Builder;
-+    invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-+
-+    invoke-virtual {p1}, Lcom/samsung/android/lib/episode/Scene$Builder;->build()Lcom/samsung/android/lib/episode/Scene;
- 
-     move-result-object p1
- 
-+    invoke-virtual {p0, p1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
-+
-+    new-instance p1, Lcom/samsung/android/lib/episode/Scene$Builder;
-+
-+    invoke-direct {p1, p2}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
-+
-     invoke-virtual {p1, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
- 
-     invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-@@ -958,36 +966,11 @@
+@@ -958,36 +958,11 @@
      goto/16 :goto_2
  
      :pswitch_8
@@ -749,7 +698,7 @@ index 543237653..4938604d1 100644
      invoke-virtual {p1}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
  
      move-result-object p1
-@@ -996,12 +979,12 @@
+@@ -996,12 +971,12 @@
  
      goto/16 :goto_2
  
@@ -764,27 +713,7 @@ index 543237653..4938604d1 100644
      new-instance p1, Lcom/samsung/android/lib/episode/Scene$Builder;
  
      invoke-direct {p1, p2}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
-@@ -1010,10 +993,18 @@
- 
-     sget-object v0, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
- 
--    invoke-static {p1, v8, v0, p0, p2}, Lcom/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0;->m(Lcom/samsung/android/lib/episode/Scene$Builder;Ljava/lang/String;Ljava/lang/Boolean;Ljava/util/ArrayList;Ljava/lang/String;)Lcom/samsung/android/lib/episode/Scene$Builder;
-+    invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-+
-+    invoke-virtual {p1}, Lcom/samsung/android/lib/episode/Scene$Builder;->build()Lcom/samsung/android/lib/episode/Scene;
- 
-     move-result-object p1
- 
-+    invoke-virtual {p0, p1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
-+
-+    new-instance p1, Lcom/samsung/android/lib/episode/Scene$Builder;
-+
-+    invoke-direct {p1, p2}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
-+
-     invoke-virtual {p1, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
- 
-     invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-@@ -1026,7 +1017,7 @@
+@@ -1026,7 +1001,7 @@
  
      goto/16 :goto_2
  
@@ -793,27 +722,7 @@ index 543237653..4938604d1 100644
      const-string v0, "direct_call"
  
      invoke-static {p1, v0}, Lcom/samsung/android/settings/usefulfeature/UsefulfeatureUtils;->isSupportMotionFeature(Landroid/content/Context;Ljava/lang/String;)Z
-@@ -1043,10 +1034,18 @@
- 
-     sget-object v0, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
- 
--    invoke-static {p1, v8, v0, p0, p2}, Lcom/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0;->m(Lcom/samsung/android/lib/episode/Scene$Builder;Ljava/lang/String;Ljava/lang/Boolean;Ljava/util/ArrayList;Ljava/lang/String;)Lcom/samsung/android/lib/episode/Scene$Builder;
-+    invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-+
-+    invoke-virtual {p1}, Lcom/samsung/android/lib/episode/Scene$Builder;->build()Lcom/samsung/android/lib/episode/Scene;
- 
-     move-result-object p1
- 
-+    invoke-virtual {p0, p1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
-+
-+    new-instance p1, Lcom/samsung/android/lib/episode/Scene$Builder;
-+
-+    invoke-direct {p1, p2}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
-+
-     invoke-virtual {p1, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
- 
-     invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-@@ -1059,7 +1058,7 @@
+@@ -1059,7 +1034,7 @@
  
      goto/16 :goto_2
  
@@ -822,27 +731,7 @@ index 543237653..4938604d1 100644
      invoke-virtual {p1}, Landroid/content/Context;->getPackageManager()Landroid/content/pm/PackageManager;
  
      move-result-object p1
-@@ -1082,10 +1081,18 @@
- 
-     sget-object v0, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
- 
--    invoke-static {p1, v8, v0, p0, p2}, Lcom/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0;->m(Lcom/samsung/android/lib/episode/Scene$Builder;Ljava/lang/String;Ljava/lang/Boolean;Ljava/util/ArrayList;Ljava/lang/String;)Lcom/samsung/android/lib/episode/Scene$Builder;
-+    invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-+
-+    invoke-virtual {p1}, Lcom/samsung/android/lib/episode/Scene$Builder;->build()Lcom/samsung/android/lib/episode/Scene;
- 
-     move-result-object p1
- 
-+    invoke-virtual {p0, p1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
-+
-+    new-instance p1, Lcom/samsung/android/lib/episode/Scene$Builder;
-+
-+    invoke-direct {p1, p2}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
-+
-     const-string v1, "com.samsung"
- 
-     invoke-virtual {p1, v1, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
-@@ -1100,7 +1107,7 @@
+@@ -1100,7 +1075,7 @@
  
      goto/16 :goto_2
  
@@ -851,27 +740,7 @@ index 543237653..4938604d1 100644
      new-instance p1, Lcom/samsung/android/lib/episode/Scene$Builder;
  
      invoke-direct {p1, p2}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
-@@ -1109,10 +1116,18 @@
- 
-     sget-object v0, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
- 
--    invoke-static {p1, v8, v0, p0, p2}, Lcom/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0;->m(Lcom/samsung/android/lib/episode/Scene$Builder;Ljava/lang/String;Ljava/lang/Boolean;Ljava/util/ArrayList;Ljava/lang/String;)Lcom/samsung/android/lib/episode/Scene$Builder;
-+    invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-+
-+    invoke-virtual {p1}, Lcom/samsung/android/lib/episode/Scene$Builder;->build()Lcom/samsung/android/lib/episode/Scene;
- 
-     move-result-object p1
- 
-+    invoke-virtual {p0, p1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
-+
-+    new-instance p1, Lcom/samsung/android/lib/episode/Scene$Builder;
-+
-+    invoke-direct {p1, p2}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
-+
-     invoke-virtual {p1, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
- 
-     invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-@@ -1125,7 +1140,7 @@
+@@ -1125,7 +1100,7 @@
  
      goto/16 :goto_2
  
@@ -880,27 +749,7 @@ index 543237653..4938604d1 100644
      invoke-static {}, Lcom/samsung/android/settings/Rune;->supportDoubleTapMenu()Z
  
      move-result p1
-@@ -1140,10 +1155,18 @@
- 
-     sget-object v0, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
- 
--    invoke-static {p1, v8, v0, p0, p2}, Lcom/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0;->m(Lcom/samsung/android/lib/episode/Scene$Builder;Ljava/lang/String;Ljava/lang/Boolean;Ljava/util/ArrayList;Ljava/lang/String;)Lcom/samsung/android/lib/episode/Scene$Builder;
-+    invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-+
-+    invoke-virtual {p1}, Lcom/samsung/android/lib/episode/Scene$Builder;->build()Lcom/samsung/android/lib/episode/Scene;
- 
-     move-result-object p1
- 
-+    invoke-virtual {p0, p1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
-+
-+    new-instance p1, Lcom/samsung/android/lib/episode/Scene$Builder;
-+
-+    invoke-direct {p1, p2}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
-+
-     invoke-virtual {p1, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
- 
-     invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-@@ -1156,22 +1179,22 @@
+@@ -1156,22 +1131,22 @@
  
      goto/16 :goto_2
  
@@ -927,7 +776,7 @@ index 543237653..4938604d1 100644
      invoke-virtual {p1}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
  
      move-result-object p1
-@@ -1180,7 +1203,7 @@
+@@ -1180,7 +1155,7 @@
  
      goto/16 :goto_2
  
@@ -936,7 +785,7 @@ index 543237653..4938604d1 100644
      invoke-static {}, Lcom/android/settings/Utils;->isTablet()Z
  
      move-result p1
-@@ -1197,7 +1220,7 @@
+@@ -1197,7 +1172,7 @@
  
      goto/16 :goto_2
  
@@ -945,7 +794,7 @@ index 543237653..4938604d1 100644
      invoke-virtual {p1}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
  
      move-result-object p1
-@@ -1206,12 +1229,12 @@
+@@ -1206,12 +1181,12 @@
  
      goto/16 :goto_2
  
@@ -960,27 +809,7 @@ index 543237653..4938604d1 100644
      invoke-static {p1}, Lcom/samsung/android/settings/Rune;->supportLiftToWakeSetting(Landroid/content/Context;)Z
  
      move-result p1
-@@ -1226,10 +1249,18 @@
- 
-     sget-object v0, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
- 
--    invoke-static {p1, v8, v0, p0, p2}, Lcom/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0;->m(Lcom/samsung/android/lib/episode/Scene$Builder;Ljava/lang/String;Ljava/lang/Boolean;Ljava/util/ArrayList;Ljava/lang/String;)Lcom/samsung/android/lib/episode/Scene$Builder;
-+    invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-+
-+    invoke-virtual {p1}, Lcom/samsung/android/lib/episode/Scene$Builder;->build()Lcom/samsung/android/lib/episode/Scene;
- 
-     move-result-object p1
- 
-+    invoke-virtual {p0, p1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
-+
-+    new-instance p1, Lcom/samsung/android/lib/episode/Scene$Builder;
-+
-+    invoke-direct {p1, p2}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
-+
-     invoke-virtual {p1, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
- 
-     invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-@@ -1242,17 +1273,17 @@
+@@ -1242,17 +1217,17 @@
  
      goto/16 :goto_2
  
@@ -1001,27 +830,7 @@ index 543237653..4938604d1 100644
      new-instance p1, Lcom/samsung/android/lib/episode/Scene$Builder;
  
      invoke-direct {p1, p2}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
-@@ -1261,10 +1292,18 @@
- 
-     sget-object v0, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
- 
--    invoke-static {p1, v8, v0, p0, p2}, Lcom/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0;->m(Lcom/samsung/android/lib/episode/Scene$Builder;Ljava/lang/String;Ljava/lang/Boolean;Ljava/util/ArrayList;Ljava/lang/String;)Lcom/samsung/android/lib/episode/Scene$Builder;
-+    invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-+
-+    invoke-virtual {p1}, Lcom/samsung/android/lib/episode/Scene$Builder;->build()Lcom/samsung/android/lib/episode/Scene;
- 
-     move-result-object p1
- 
-+    invoke-virtual {p0, p1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
-+
-+    new-instance p1, Lcom/samsung/android/lib/episode/Scene$Builder;
-+
-+    invoke-direct {p1, p2}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
-+
-     invoke-virtual {p1, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
- 
-     invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-@@ -1277,7 +1316,7 @@
+@@ -1277,7 +1252,7 @@
  
      goto/16 :goto_2
  
@@ -1030,27 +839,7 @@ index 543237653..4938604d1 100644
      invoke-static {p1}, Lcom/samsung/android/settings/accessories/AccessoriesUtils;->hasCoverSettingCoverOrientation(Landroid/content/Context;)Z
  
      move-result p1
-@@ -1292,10 +1331,18 @@
- 
-     sget-object v0, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
- 
--    invoke-static {p1, v8, v0, p0, p2}, Lcom/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0;->m(Lcom/samsung/android/lib/episode/Scene$Builder;Ljava/lang/String;Ljava/lang/Boolean;Ljava/util/ArrayList;Ljava/lang/String;)Lcom/samsung/android/lib/episode/Scene$Builder;
-+    invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-+
-+    invoke-virtual {p1}, Lcom/samsung/android/lib/episode/Scene$Builder;->build()Lcom/samsung/android/lib/episode/Scene;
- 
-     move-result-object p1
- 
-+    invoke-virtual {p0, p1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
-+
-+    new-instance p1, Lcom/samsung/android/lib/episode/Scene$Builder;
-+
-+    invoke-direct {p1, p2}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
-+
-     invoke-virtual {p1, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
- 
-     invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-@@ -1308,7 +1355,7 @@
+@@ -1308,7 +1283,7 @@
  
      goto/16 :goto_2
  
@@ -1059,27 +848,7 @@ index 543237653..4938604d1 100644
      sget-boolean p1, Lcom/samsung/android/settings/usefulfeature/UsefulfeatureUtils;->mAccessibilityEnabled:Z
  
      invoke-static {}, Lcom/android/settings/Utils;->isTablet()Z
-@@ -1333,10 +1380,18 @@
- 
-     sget-object v6, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
- 
--    invoke-static {p1, v8, v6, p0, p2}, Lcom/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0;->m(Lcom/samsung/android/lib/episode/Scene$Builder;Ljava/lang/String;Ljava/lang/Boolean;Ljava/util/ArrayList;Ljava/lang/String;)Lcom/samsung/android/lib/episode/Scene$Builder;
-+    invoke-virtual {p1, v6, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-+
-+    invoke-virtual {p1}, Lcom/samsung/android/lib/episode/Scene$Builder;->build()Lcom/samsung/android/lib/episode/Scene;
- 
-     move-result-object p1
- 
-+    invoke-virtual {p0, p1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
-+
-+    new-instance p1, Lcom/samsung/android/lib/episode/Scene$Builder;
-+
-+    invoke-direct {p1, p2}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
-+
-     invoke-virtual {p1, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
- 
-     invoke-virtual {p1, v6, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-@@ -1353,12 +1408,12 @@
+@@ -1353,12 +1328,12 @@
  
      goto/16 :goto_2
  
@@ -1094,27 +863,7 @@ index 543237653..4938604d1 100644
      const-string/jumbo v0, "palm_swipe_to_capture"
  
      invoke-static {p1, v0}, Lcom/samsung/android/settings/usefulfeature/UsefulfeatureUtils;->isSupportMotionFeature(Landroid/content/Context;Ljava/lang/String;)Z
-@@ -1375,10 +1430,18 @@
- 
-     sget-object v0, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
- 
--    invoke-static {p1, v8, v0, p0, p2}, Lcom/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0;->m(Lcom/samsung/android/lib/episode/Scene$Builder;Ljava/lang/String;Ljava/lang/Boolean;Ljava/util/ArrayList;Ljava/lang/String;)Lcom/samsung/android/lib/episode/Scene$Builder;
-+    invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-+
-+    invoke-virtual {p1}, Lcom/samsung/android/lib/episode/Scene$Builder;->build()Lcom/samsung/android/lib/episode/Scene;
- 
-     move-result-object p1
- 
-+    invoke-virtual {p0, p1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
-+
-+    new-instance p1, Lcom/samsung/android/lib/episode/Scene$Builder;
-+
-+    invoke-direct {p1, p2}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
-+
-     invoke-virtual {p1, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
- 
-     invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-@@ -1391,7 +1454,7 @@
+@@ -1391,7 +1366,7 @@
  
      goto/16 :goto_2
  
@@ -1123,27 +872,7 @@ index 543237653..4938604d1 100644
      const-string/jumbo v0, "smart_alert"
  
      invoke-static {p1, v0}, Lcom/samsung/android/settings/usefulfeature/UsefulfeatureUtils;->isSupportMotionFeature(Landroid/content/Context;Ljava/lang/String;)Z
-@@ -1408,10 +1471,18 @@
- 
-     sget-object v0, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
- 
--    invoke-static {p1, v8, v0, p0, p2}, Lcom/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0;->m(Lcom/samsung/android/lib/episode/Scene$Builder;Ljava/lang/String;Ljava/lang/Boolean;Ljava/util/ArrayList;Ljava/lang/String;)Lcom/samsung/android/lib/episode/Scene$Builder;
-+    invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-+
-+    invoke-virtual {p1}, Lcom/samsung/android/lib/episode/Scene$Builder;->build()Lcom/samsung/android/lib/episode/Scene;
- 
-     move-result-object p1
- 
-+    invoke-virtual {p0, p1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
-+
-+    new-instance p1, Lcom/samsung/android/lib/episode/Scene$Builder;
-+
-+    invoke-direct {p1, p2}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
-+
-     invoke-virtual {p1, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
- 
-     invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-@@ -1424,7 +1495,7 @@
+@@ -1424,7 +1399,7 @@
  
      goto/16 :goto_2
  
@@ -1152,27 +881,7 @@ index 543237653..4938604d1 100644
      invoke-static {p1}, Lcom/samsung/android/settings/usefulfeature/UsefulfeatureUtils;->hasFeatureAutoScreenTurnOn(Landroid/content/Context;)Z
  
      move-result v0
-@@ -1452,10 +1523,18 @@
- 
-     sget-object v0, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
- 
--    invoke-static {p1, v8, v0, p0, p2}, Lcom/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0;->m(Lcom/samsung/android/lib/episode/Scene$Builder;Ljava/lang/String;Ljava/lang/Boolean;Ljava/util/ArrayList;Ljava/lang/String;)Lcom/samsung/android/lib/episode/Scene$Builder;
-+    invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-+
-+    invoke-virtual {p1}, Lcom/samsung/android/lib/episode/Scene$Builder;->build()Lcom/samsung/android/lib/episode/Scene;
- 
-     move-result-object p1
- 
-+    invoke-virtual {p0, p1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
-+
-+    new-instance p1, Lcom/samsung/android/lib/episode/Scene$Builder;
-+
-+    invoke-direct {p1, p2}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
-+
-     invoke-virtual {p1, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
- 
-     invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-@@ -1468,14 +1547,14 @@
+@@ -1468,14 +1443,14 @@
  
      goto/16 :goto_2
  
@@ -1189,27 +898,7 @@ index 543237653..4938604d1 100644
      new-instance p1, Lcom/samsung/android/lib/episode/Scene$Builder;
  
      invoke-direct {p1, p2}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
-@@ -1484,10 +1563,18 @@
- 
-     sget-object v0, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
- 
--    invoke-static {p1, v8, v0, p0, p2}, Lcom/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0;->m(Lcom/samsung/android/lib/episode/Scene$Builder;Ljava/lang/String;Ljava/lang/Boolean;Ljava/util/ArrayList;Ljava/lang/String;)Lcom/samsung/android/lib/episode/Scene$Builder;
-+    invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-+
-+    invoke-virtual {p1}, Lcom/samsung/android/lib/episode/Scene$Builder;->build()Lcom/samsung/android/lib/episode/Scene;
- 
-     move-result-object p1
- 
-+    invoke-virtual {p0, p1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
-+
-+    new-instance p1, Lcom/samsung/android/lib/episode/Scene$Builder;
-+
-+    invoke-direct {p1, p2}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
-+
-     invoke-virtual {p1, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
- 
-     invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-@@ -1498,9 +1585,9 @@
+@@ -1498,9 +1473,9 @@
  
      invoke-virtual {p0, p1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
  
@@ -1221,27 +910,7 @@ index 543237653..4938604d1 100644
      const-string v0, "easy_mute"
  
      invoke-static {p1, v0}, Lcom/samsung/android/settings/usefulfeature/UsefulfeatureUtils;->isSupportMotionFeature(Landroid/content/Context;Ljava/lang/String;)Z
-@@ -1525,10 +1612,18 @@
- 
-     sget-object v6, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
- 
--    invoke-static {p1, v8, v6, p0, p2}, Lcom/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0;->m(Lcom/samsung/android/lib/episode/Scene$Builder;Ljava/lang/String;Ljava/lang/Boolean;Ljava/util/ArrayList;Ljava/lang/String;)Lcom/samsung/android/lib/episode/Scene$Builder;
-+    invoke-virtual {p1, v6, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-+
-+    invoke-virtual {p1}, Lcom/samsung/android/lib/episode/Scene$Builder;->build()Lcom/samsung/android/lib/episode/Scene;
- 
-     move-result-object p1
- 
-+    invoke-virtual {p0, p1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
-+
-+    new-instance p1, Lcom/samsung/android/lib/episode/Scene$Builder;
-+
-+    invoke-direct {p1, p2}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
-+
-     invoke-virtual {p1, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
- 
-     invoke-virtual {p1, v6, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-@@ -1545,12 +1640,12 @@
+@@ -1545,12 +1520,12 @@
  
      goto :goto_2
  
@@ -1256,7 +925,7 @@ index 543237653..4938604d1 100644
      invoke-static {}, Lcom/android/settings/Utils;->isTablet()Z
  
      move-result p1
-@@ -1561,17 +1656,17 @@
+@@ -1561,17 +1536,17 @@
  
      goto :goto_2
  
@@ -1277,27 +946,7 @@ index 543237653..4938604d1 100644
      invoke-static {p1}, Lcom/samsung/android/settings/Rune;->supportFingerPrint(Landroid/content/Context;)Z
  
      move-result p1
-@@ -1586,10 +1681,18 @@
- 
-     sget-object v0, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
- 
--    invoke-static {p1, v8, v0, p0, p2}, Lcom/samsung/android/settings/eternal/provider/items/AdvancedFeatureItem$$ExternalSyntheticOutline0;->m(Lcom/samsung/android/lib/episode/Scene$Builder;Ljava/lang/String;Ljava/lang/Boolean;Ljava/util/ArrayList;Ljava/lang/String;)Lcom/samsung/android/lib/episode/Scene$Builder;
-+    invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-+
-+    invoke-virtual {p1}, Lcom/samsung/android/lib/episode/Scene$Builder;->build()Lcom/samsung/android/lib/episode/Scene;
- 
-     move-result-object p1
- 
-+    invoke-virtual {p0, p1}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
-+
-+    new-instance p1, Lcom/samsung/android/lib/episode/Scene$Builder;
-+
-+    invoke-direct {p1, p2}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
-+
-     invoke-virtual {p1, v3, v2}, Lcom/samsung/android/lib/episode/Scene$Builder;->setValue(Ljava/lang/Object;Z)V
- 
-     invoke-virtual {p1, v0, v8}, Lcom/samsung/android/lib/episode/Scene$Builder;->addAttribute(Ljava/lang/Object;Ljava/lang/String;)V
-@@ -1602,12 +1705,12 @@
+@@ -1602,12 +1577,12 @@
  
      goto :goto_2
  
@@ -1312,7 +961,7 @@ index 543237653..4938604d1 100644
      invoke-virtual {p0}, Ljava/util/ArrayList;->size()I
  
      move-result p1
-@@ -1696,7 +1799,6 @@
+@@ -1696,7 +1671,6 @@
  
      :pswitch_data_0
      .packed-switch 0x0
@@ -1320,7 +969,7 @@ index 543237653..4938604d1 100644
          :pswitch_29
          :pswitch_28
          :pswitch_27
-@@ -1710,14 +1812,14 @@
+@@ -1710,14 +1684,14 @@
          :pswitch_1f
          :pswitch_1e
          :pswitch_1d
@@ -1338,7 +987,7 @@ index 543237653..4938604d1 100644
          :pswitch_17
          :pswitch_16
          :pswitch_15
-@@ -1734,8 +1836,9 @@
+@@ -1734,8 +1708,9 @@
          :pswitch_a
          :pswitch_9
          :pswitch_8
@@ -1349,7 +998,7 @@ index 543237653..4938604d1 100644
          :pswitch_6
          :pswitch_5
          :pswitch_4
-@@ -1743,8 +1846,8 @@
+@@ -1743,8 +1718,8 @@
          :pswitch_2
          :pswitch_1
          :pswitch_0
@@ -1360,16 +1009,16 @@ index 543237653..4938604d1 100644
      .end packed-switch
  .end method
  
-@@ -1759,799 +1862,799 @@
+@@ -1759,799 +1734,799 @@
  
      const-string/jumbo v5, "unknown key : "
  
 -    new-instance v6, Lcom/samsung/android/lib/episode/Scene$Builder;
 +    const-string v6, "Device not support Video enhancer - "
++
++    new-instance v7, Lcom/samsung/android/lib/episode/Scene$Builder;
  
 -    invoke-direct {v6, v1}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
-+    new-instance v7, Lcom/samsung/android/lib/episode/Scene$Builder;
-+
 +    invoke-direct {v7, v1}, Lcom/samsung/android/lib/episode/Scene$Builder;-><init>(Ljava/lang/String;)V
  
      invoke-virtual {v0}, Landroid/content/Context;->getContentResolver()Landroid/content/ContentResolver;
@@ -2465,7 +2114,7 @@ index 543237653..4938604d1 100644
  
      packed-switch v20, :pswitch_data_0
  
-@@ -2562,14 +2665,14 @@
+@@ -2562,14 +2537,14 @@
  
      invoke-static {v4, v0}, Lcom/samsung/android/settings/Log;->d(Ljava/lang/String;Ljava/lang/String;)V
  
@@ -2482,7 +2131,7 @@ index 543237653..4938604d1 100644
  
      invoke-static/range {p1 .. p2}, Lcom/samsung/android/settings/usefulfeature/UsefulfeatureUtils;->getDarkModeAppsPackagesInfo(Landroid/content/Context;Lcom/samsung/android/lib/episode/SourceInfo;)Ljava/lang/String;
  
-@@ -2579,43 +2682,43 @@
+@@ -2579,43 +2554,43 @@
  
      const/4 v1, 0x1
  
@@ -2534,7 +2183,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -2623,7 +2726,7 @@
+@@ -2623,7 +2598,7 @@
  
      move-result-object v1
  
@@ -2543,7 +2192,7 @@ index 543237653..4938604d1 100644
  
      if-nez v0, :cond_2
  
-@@ -2635,26 +2738,26 @@
+@@ -2635,26 +2610,26 @@
      const/4 v3, 0x0
  
      :goto_2
@@ -2575,7 +2224,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -2662,7 +2765,7 @@
+@@ -2662,7 +2637,7 @@
  
      move-result-object v2
  
@@ -2584,7 +2233,7 @@ index 543237653..4938604d1 100644
  
      if-ne v1, v0, :cond_3
  
-@@ -2674,26 +2777,26 @@
+@@ -2674,26 +2649,26 @@
      const/4 v3, 0x0
  
      :goto_3
@@ -2616,7 +2265,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -2701,7 +2804,7 @@
+@@ -2701,7 +2676,7 @@
  
      move-result-object v1
  
@@ -2625,7 +2274,7 @@ index 543237653..4938604d1 100644
  
      if-nez v0, :cond_4
  
-@@ -2713,9 +2816,9 @@
+@@ -2713,9 +2688,9 @@
      const/4 v3, 0x0
  
      :goto_4
@@ -2637,7 +2286,7 @@ index 543237653..4938604d1 100644
  
      :pswitch_6
      invoke-static {}, Lcom/android/settings/Utils;->isTablet()Z
-@@ -2728,18 +2831,18 @@
+@@ -2728,18 +2703,18 @@
  
      const v1, 0x1fc34
  
@@ -2659,7 +2308,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -2747,7 +2850,7 @@
+@@ -2747,7 +2722,7 @@
  
      move-result-object v1
  
@@ -2668,7 +2317,7 @@ index 543237653..4938604d1 100644
  
      if-nez v0, :cond_6
  
-@@ -2759,20 +2862,20 @@
+@@ -2759,20 +2734,20 @@
      const/4 v3, 0x0
  
      :goto_5
@@ -2693,7 +2342,7 @@ index 543237653..4938604d1 100644
  
      invoke-static {}, Lcom/samsung/android/multiwindow/MultiWindowManager;->getInstance()Lcom/samsung/android/multiwindow/MultiWindowManager;
  
-@@ -2786,35 +2889,35 @@
+@@ -2786,35 +2761,35 @@
  
      move-result-object v1
  
@@ -2736,7 +2385,7 @@ index 543237653..4938604d1 100644
  
      :pswitch_c
      invoke-static {}, Lcom/android/settings/Utils;->isTablet()Z
-@@ -2825,7 +2928,7 @@
+@@ -2825,7 +2800,7 @@
  
      sget-object v0, Lcom/samsung/android/settings/Rune;->COMMON_CONFIG_PACKAGE_NAME_SMART_MANAGER:Ljava/lang/String;
  
@@ -2745,7 +2394,7 @@ index 543237653..4938604d1 100644
  
      :cond_7
      invoke-static {v0}, Lcom/samsung/android/settings/usefulfeature/UsefulfeatureUtils;->getAppSplitViewPackagesInfo(Landroid/content/Context;)Ljava/lang/String;
-@@ -2836,19 +2939,21 @@
+@@ -2836,19 +2811,21 @@
  
      const/4 v1, 0x1
  
@@ -2772,7 +2421,7 @@ index 543237653..4938604d1 100644
  
      :pswitch_e
      sget-object v1, Lcom/samsung/android/settings/Rune;->COMMON_CONFIG_PACKAGE_NAME_SMART_MANAGER:Ljava/lang/String;
-@@ -2857,30 +2962,30 @@
+@@ -2857,30 +2834,30 @@
  
      move-result v1
  
@@ -2809,7 +2458,7 @@ index 543237653..4938604d1 100644
  
      invoke-static {v0}, Lcom/samsung/android/settings/usefulfeature/UsefulfeatureUtils;->getAutoRotatePackagesInfo(Landroid/content/Context;)Ljava/lang/String;
  
-@@ -2888,7 +2993,7 @@
+@@ -2888,7 +2865,7 @@
  
      const/4 v1, 0x1
  
@@ -2818,7 +2467,7 @@ index 543237653..4938604d1 100644
  
      if-nez v0, :cond_9
  
-@@ -2900,31 +3005,31 @@
+@@ -2900,31 +2877,31 @@
      const/4 v3, 0x0
  
      :goto_6
@@ -2856,7 +2505,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -2932,7 +3037,7 @@
+@@ -2932,7 +2909,7 @@
  
      move-result-object v1
  
@@ -2865,7 +2514,7 @@ index 543237653..4938604d1 100644
  
      if-nez v0, :cond_a
  
-@@ -2944,16 +3049,16 @@
+@@ -2944,16 +2921,16 @@
      const/4 v3, 0x0
  
      :goto_7
@@ -2885,7 +2534,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -2961,7 +3066,7 @@
+@@ -2961,7 +2938,7 @@
  
      move-result-object v1
  
@@ -2894,7 +2543,7 @@ index 543237653..4938604d1 100644
  
      if-nez v0, :cond_b
  
-@@ -2973,9 +3078,9 @@
+@@ -2973,9 +2950,9 @@
      const/4 v3, 0x0
  
      :goto_8
@@ -2906,7 +2555,7 @@ index 543237653..4938604d1 100644
  
      :pswitch_13
      invoke-virtual {v0}, Landroid/content/Context;->getPackageManager()Landroid/content/pm/PackageManager;
-@@ -2988,7 +3093,7 @@
+@@ -2988,7 +2965,7 @@
  
      move-result v1
  
@@ -2915,7 +2564,7 @@ index 543237653..4938604d1 100644
  
      invoke-virtual {v0}, Landroid/content/Context;->getContentResolver()Landroid/content/ContentResolver;
  
-@@ -3004,22 +3109,22 @@
+@@ -3004,22 +2981,22 @@
  
      move-result-object v0
  
@@ -2942,7 +2591,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -3027,9 +3132,9 @@
+@@ -3027,9 +3004,9 @@
  
      move-result-object v0
  
@@ -2954,7 +2603,7 @@ index 543237653..4938604d1 100644
  
      :pswitch_15
      invoke-static {}, Lcom/samsung/android/feature/SemFloatingFeature;->getInstance()Lcom/samsung/android/feature/SemFloatingFeature;
-@@ -3052,7 +3157,7 @@
+@@ -3052,7 +3029,7 @@
  
      move/from16 v2, v16
  
@@ -2963,7 +2612,7 @@ index 543237653..4938604d1 100644
  
      :cond_c
      invoke-static {v0}, Lcom/samsung/android/settings/multidevices/continuity/ContinuitySettings;->getContinuitySettingValue(Landroid/content/Context;)Z
-@@ -3063,7 +3168,7 @@
+@@ -3063,7 +3040,7 @@
  
      move-result-object v1
  
@@ -2972,7 +2621,7 @@ index 543237653..4938604d1 100644
  
      const/4 v1, 0x1
  
-@@ -3077,28 +3182,28 @@
+@@ -3077,28 +3054,28 @@
      const/4 v3, 0x0
  
      :goto_9
@@ -3006,7 +2655,7 @@ index 543237653..4938604d1 100644
  
      move-result-object v3
  
-@@ -3106,11 +3211,11 @@
+@@ -3106,11 +3083,11 @@
  
      move-result-object v5
  
@@ -3020,7 +2669,7 @@ index 543237653..4938604d1 100644
  
      invoke-static {v0}, Lcom/samsung/android/settings/usefulfeature/UsefulfeatureUtils;->hasVzwPttEnable(Landroid/content/Context;)Z
  
-@@ -3118,7 +3223,7 @@
+@@ -3118,7 +3095,7 @@
  
      if-eqz v5, :cond_e
  
@@ -3029,7 +2678,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -3134,7 +3239,7 @@
+@@ -3134,7 +3111,7 @@
  
      if-eqz v5, :cond_f
  
@@ -3038,7 +2687,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -3143,11 +3248,11 @@
+@@ -3143,11 +3120,11 @@
      :cond_f
      invoke-static {v0}, Lcom/samsung/android/settings/usefulfeature/UsefulfeatureUtils;->hasBMCPttEnable(Landroid/content/Context;)Z
  
@@ -3053,7 +2702,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -3160,7 +3265,7 @@
+@@ -3160,7 +3137,7 @@
  
      if-eqz v0, :cond_11
  
@@ -3062,7 +2711,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -3186,35 +3291,35 @@
+@@ -3186,35 +3163,35 @@
      const/4 v3, 0x0
  
      :goto_c
@@ -3105,7 +2754,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -3229,7 +3334,7 @@
+@@ -3229,7 +3206,7 @@
  
      move-result-object v1
  
@@ -3114,7 +2763,7 @@ index 543237653..4938604d1 100644
  
      if-nez v0, :cond_14
  
-@@ -3241,9 +3346,9 @@
+@@ -3241,9 +3218,9 @@
      const/4 v3, 0x0
  
      :goto_d
@@ -3126,7 +2775,7 @@ index 543237653..4938604d1 100644
  
      :pswitch_1b
      sget-boolean v0, Lcom/samsung/android/settings/Rune;->FEATURE_SIDE_BUTTON_SUPPORT_AI_AGENT_APP:Z
-@@ -3254,20 +3359,20 @@
+@@ -3254,20 +3231,20 @@
  
      if-nez v1, :cond_15
  
@@ -3151,7 +2800,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -3277,15 +3382,15 @@
+@@ -3277,15 +3254,15 @@
  
      move-result-object v1
  
@@ -3170,7 +2819,7 @@ index 543237653..4938604d1 100644
  
      const/4 v3, 0x1
  
-@@ -3295,20 +3400,20 @@
+@@ -3295,20 +3272,20 @@
      const/4 v3, 0x0
  
      :goto_f
@@ -3195,7 +2844,7 @@ index 543237653..4938604d1 100644
  
      move-result-object v1
  
-@@ -3316,76 +3421,72 @@
+@@ -3316,76 +3293,72 @@
  
      if-ne v0, v2, :cond_18
  
@@ -3293,7 +2942,7 @@ index 543237653..4938604d1 100644
  
      const/4 v3, 0x1
  
-@@ -3395,20 +3496,20 @@
+@@ -3395,20 +3368,20 @@
      const/4 v3, 0x0
  
      :goto_12
@@ -3319,7 +2968,7 @@ index 543237653..4938604d1 100644
  
      move-result v3
  
-@@ -3416,27 +3517,27 @@
+@@ -3416,27 +3389,27 @@
  
      move-result-object v1
  
@@ -3353,7 +3002,7 @@ index 543237653..4938604d1 100644
  
      invoke-static {v0, v1}, Lcom/android/settings/Utils;->hasPackage(Landroid/content/Context;Ljava/lang/String;)Z
  
-@@ -3462,82 +3563,82 @@
+@@ -3462,82 +3435,82 @@
      const/4 v3, 0x0
  
      :goto_14
@@ -3375,16 +3024,16 @@ index 543237653..4938604d1 100644
      move-object/from16 v5, v30
  
 -    move-object/from16 v2, v31
+-
+-    sget-object v12, Lcom/samsung/android/settings/Rune;->COMMON_CONFIG_PACKAGE_NAME_SMART_MANAGER:Ljava/lang/String;
 +    move-object/from16 v3, v31
  
--    sget-object v12, Lcom/samsung/android/settings/Rune;->COMMON_CONFIG_PACKAGE_NAME_SMART_MANAGER:Ljava/lang/String;
+-    const/4 v12, 0x0
 +    move-object/from16 v2, v32
  
--    const/4 v12, 0x0
+-    invoke-static {v7, v5, v12}, Landroid/provider/Settings$Global;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
 +    sget-object v9, Lcom/samsung/android/settings/Rune;->COMMON_CONFIG_PACKAGE_NAME_SMART_MANAGER:Ljava/lang/String;
  
--    invoke-static {v7, v5, v12}, Landroid/provider/Settings$Global;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
--
 -    move-result v5
 +    const/4 v9, 0x0
  
@@ -3472,7 +3121,7 @@ index 543237653..4938604d1 100644
  
      move-result v2
  
-@@ -3557,23 +3658,23 @@
+@@ -3557,23 +3530,23 @@
      const/4 v0, 0x1
  
      :goto_15
@@ -3501,7 +3150,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -3587,28 +3688,28 @@
+@@ -3587,28 +3560,28 @@
      const/4 v3, 0x0
  
      :goto_16
@@ -3535,7 +3184,7 @@ index 543237653..4938604d1 100644
  
      move-result-object v3
  
-@@ -3616,11 +3717,11 @@
+@@ -3616,11 +3589,11 @@
  
      move-result-object v5
  
@@ -3549,7 +3198,7 @@ index 543237653..4938604d1 100644
  
      invoke-static {v0}, Lcom/samsung/android/settings/usefulfeature/UsefulfeatureUtils;->hasVzwPttEnable(Landroid/content/Context;)Z
  
-@@ -3628,7 +3729,7 @@
+@@ -3628,7 +3601,7 @@
  
      if-eqz v5, :cond_1f
  
@@ -3558,7 +3207,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -3644,7 +3745,7 @@
+@@ -3644,7 +3617,7 @@
  
      if-eqz v5, :cond_20
  
@@ -3567,7 +3216,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -3653,11 +3754,11 @@
+@@ -3653,11 +3626,11 @@
      :cond_20
      invoke-static {v0}, Lcom/samsung/android/settings/usefulfeature/UsefulfeatureUtils;->hasBMCPttEnable(Landroid/content/Context;)Z
  
@@ -3582,7 +3231,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -3670,7 +3771,7 @@
+@@ -3670,7 +3643,7 @@
  
      if-eqz v0, :cond_22
  
@@ -3591,7 +3240,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -3696,28 +3797,28 @@
+@@ -3696,28 +3669,28 @@
      const/4 v3, 0x0
  
      :goto_19
@@ -3625,7 +3274,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -3725,7 +3826,7 @@
+@@ -3725,7 +3698,7 @@
  
      move-result-object v2
  
@@ -3634,7 +3283,7 @@ index 543237653..4938604d1 100644
  
      if-ne v1, v0, :cond_24
  
-@@ -3737,22 +3838,22 @@
+@@ -3737,22 +3710,22 @@
      const/4 v3, 0x0
  
      :goto_1a
@@ -3661,7 +3310,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -3760,7 +3861,7 @@
+@@ -3760,7 +3733,7 @@
  
      move-result-object v1
  
@@ -3670,7 +3319,7 @@ index 543237653..4938604d1 100644
  
      if-nez v0, :cond_25
  
-@@ -3772,24 +3873,24 @@
+@@ -3772,24 +3745,24 @@
      const/4 v3, 0x0
  
      :goto_1b
@@ -3700,7 +3349,7 @@ index 543237653..4938604d1 100644
  
      invoke-static {}, Lcom/samsung/android/settings/usefulfeature/UsefulfeatureUtils;->hasXcoverTopKeySetting()V
  
-@@ -3801,24 +3902,24 @@
+@@ -3801,24 +3774,24 @@
  
      move-result v0
  
@@ -3730,7 +3379,7 @@ index 543237653..4938604d1 100644
  
      invoke-static {}, Lcom/samsung/android/settings/usefulfeature/UsefulfeatureUtils;->hasXcoverTopKeySetting()V
  
-@@ -3830,67 +3931,33 @@
+@@ -3830,67 +3803,33 @@
  
      move-result v0
  
@@ -3807,7 +3456,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -3898,40 +3965,40 @@
+@@ -3898,40 +3837,40 @@
  
      move-result-object v1
  
@@ -3859,7 +3508,7 @@ index 543237653..4938604d1 100644
  
      move-result v2
  
-@@ -3939,13 +4006,13 @@
+@@ -3939,13 +3878,13 @@
  
      move-result-object v3
  
@@ -3875,7 +3524,7 @@ index 543237653..4938604d1 100644
  
      const-string/jumbo v0, "supportSpay"
  
-@@ -3953,45 +4020,45 @@
+@@ -3953,45 +3892,45 @@
  
      move-result-object v3
  
@@ -3934,7 +3583,7 @@ index 543237653..4938604d1 100644
  
      move-result v2
  
-@@ -3999,7 +4066,7 @@
+@@ -3999,7 +3938,7 @@
  
      move-result-object v1
  
@@ -3943,7 +3592,7 @@ index 543237653..4938604d1 100644
  
      const-string/jumbo v1, "wakeupType"
  
-@@ -4007,7 +4074,7 @@
+@@ -4007,7 +3946,7 @@
  
      move-result-object v3
  
@@ -3952,7 +3601,7 @@ index 543237653..4938604d1 100644
  
      invoke-static {}, Lcom/samsung/android/feature/SemFloatingFeature;->getInstance()Lcom/samsung/android/feature/SemFloatingFeature;
  
-@@ -4023,7 +4090,7 @@
+@@ -4023,7 +3962,7 @@
  
      move-result v3
  
@@ -3961,7 +3610,7 @@ index 543237653..4938604d1 100644
  
      const-string v3, "DefaultOn"
  
-@@ -4037,51 +4104,51 @@
+@@ -4037,51 +3976,51 @@
  
      move-result v1
  
@@ -4029,7 +3678,7 @@ index 543237653..4938604d1 100644
  
      move-result v1
  
-@@ -4089,7 +4156,7 @@
+@@ -4089,7 +4028,7 @@
  
      move-result-object v2
  
@@ -4038,7 +3687,7 @@ index 543237653..4938604d1 100644
  
      invoke-static {}, Lcom/samsung/android/feature/SemFloatingFeature;->getInstance()Lcom/samsung/android/feature/SemFloatingFeature;
  
-@@ -4105,15 +4172,15 @@
+@@ -4105,15 +4044,15 @@
  
      const/4 v3, 0x0
  
@@ -4058,7 +3707,7 @@ index 543237653..4938604d1 100644
  
      move-object/from16 v9, v23
  
-@@ -4139,8 +4206,8 @@
+@@ -4139,8 +4078,8 @@
  
      const/4 v10, 0x0
  
@@ -4069,7 +3718,7 @@ index 543237653..4938604d1 100644
  
      invoke-interface {v0, v8}, Ljava/util/List;->get(I)Ljava/lang/Object;
  
-@@ -4154,26 +4221,26 @@
+@@ -4154,26 +4093,26 @@
  
      const/4 v12, 0x5
  
@@ -4103,7 +3752,7 @@ index 543237653..4938604d1 100644
  
      invoke-static {}, Lcom/samsung/android/feature/SemCscFeature;->getInstance()Lcom/samsung/android/feature/SemCscFeature;
  
-@@ -4191,57 +4258,57 @@
+@@ -4191,57 +4130,57 @@
  
      move-result v0
  
@@ -4184,7 +3833,7 @@ index 543237653..4938604d1 100644
  
      move-object/from16 v5, v25
  
-@@ -4251,7 +4318,7 @@
+@@ -4251,7 +4190,7 @@
  
      const/4 v2, 0x1
  
@@ -4193,7 +3842,7 @@ index 543237653..4938604d1 100644
  
      move-result v1
  
-@@ -4259,7 +4326,7 @@
+@@ -4259,7 +4198,7 @@
  
      move-result-object v2
  
@@ -4202,7 +3851,7 @@ index 543237653..4938604d1 100644
  
      invoke-static {}, Lcom/samsung/android/feature/SemFloatingFeature;->getInstance()Lcom/samsung/android/feature/SemFloatingFeature;
  
-@@ -4271,13 +4338,13 @@
+@@ -4271,13 +4210,13 @@
  
      const/4 v3, 0x0
  
@@ -4219,7 +3868,7 @@ index 543237653..4938604d1 100644
  
      invoke-virtual {v0, v9}, Landroid/content/Context;->getSystemService(Ljava/lang/String;)Ljava/lang/Object;
  
-@@ -4301,8 +4368,8 @@
+@@ -4301,8 +4240,8 @@
  
      const/4 v10, 0x0
  
@@ -4230,7 +3879,7 @@ index 543237653..4938604d1 100644
  
      invoke-interface {v0, v8}, Ljava/util/List;->get(I)Ljava/lang/Object;
  
-@@ -4316,73 +4383,73 @@
+@@ -4316,73 +4255,73 @@
  
      const/4 v12, 0x5
  
@@ -4329,7 +3978,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -4390,32 +4457,32 @@
+@@ -4390,32 +4329,32 @@
  
      move-result-object v1
  
@@ -4371,7 +4020,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -4423,48 +4490,48 @@
+@@ -4423,48 +4362,48 @@
  
      move-result-object v2
  
@@ -4432,7 +4081,7 @@ index 543237653..4938604d1 100644
  
      move-result v3
  
-@@ -4472,7 +4539,7 @@
+@@ -4472,7 +4411,7 @@
  
      move-result-object v1
  
@@ -4441,7 +4090,7 @@ index 543237653..4938604d1 100644
  
      const-string/jumbo v1, "palmTouch"
  
-@@ -4480,7 +4547,7 @@
+@@ -4480,7 +4419,7 @@
  
      move-result-object v5
  
@@ -4450,7 +4099,7 @@ index 543237653..4938604d1 100644
  
      const-string/jumbo v1, "turnOver"
  
-@@ -4488,7 +4555,7 @@
+@@ -4488,7 +4427,7 @@
  
      move-result-object v5
  
@@ -4459,7 +4108,7 @@ index 543237653..4938604d1 100644
  
      invoke-static {}, Lcom/samsung/android/feature/SemFloatingFeature;->getInstance()Lcom/samsung/android/feature/SemFloatingFeature;
  
-@@ -4504,46 +4571,46 @@
+@@ -4504,46 +4443,46 @@
  
      move-result-object v5
  
@@ -4519,7 +4168,7 @@ index 543237653..4938604d1 100644
  
      move-result v1
  
-@@ -4551,7 +4618,7 @@
+@@ -4551,7 +4490,7 @@
  
      move-result-object v2
  
@@ -4528,7 +4177,7 @@ index 543237653..4938604d1 100644
  
      invoke-virtual {v0}, Landroid/content/Context;->getPackageManager()Landroid/content/pm/PackageManager;
  
-@@ -4563,50 +4630,50 @@
+@@ -4563,50 +4502,50 @@
  
      move-result v2
  
@@ -4593,7 +4242,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -4614,7 +4681,7 @@
+@@ -4614,7 +4553,7 @@
  
      move-result-object v1
  
@@ -4602,7 +4251,7 @@ index 543237653..4938604d1 100644
  
      const-string v1, "VZW"
  
-@@ -4624,7 +4691,7 @@
+@@ -4624,7 +4563,7 @@
  
      move-result v1
  
@@ -4611,7 +4260,7 @@ index 543237653..4938604d1 100644
  
      const-string v1, "VPP"
  
-@@ -4632,7 +4699,7 @@
+@@ -4632,7 +4571,7 @@
  
      move-result v1
  
@@ -4620,7 +4269,7 @@ index 543237653..4938604d1 100644
  
      move-object/from16 v1, v21
  
-@@ -4640,35 +4707,35 @@
+@@ -4640,35 +4579,35 @@
  
      move-result v1
  
@@ -4670,7 +4319,7 @@ index 543237653..4938604d1 100644
      move-object/from16 v1, v21
  
      move-object/from16 v2, v22
-@@ -4679,13 +4746,13 @@
+@@ -4679,13 +4618,13 @@
  
      move-result v0
  
@@ -4686,7 +4335,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -4693,7 +4760,7 @@
+@@ -4693,7 +4632,7 @@
  
      move-result-object v3
  
@@ -4695,7 +4344,7 @@ index 543237653..4938604d1 100644
  
      invoke-virtual {v1, v2}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
  
-@@ -4701,26 +4768,26 @@
+@@ -4701,26 +4640,26 @@
  
      xor-int/2addr v1, v11
  
@@ -4730,7 +4379,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -4728,28 +4795,28 @@
+@@ -4728,28 +4667,28 @@
  
      move-result-object v1
  
@@ -4768,7 +4417,7 @@ index 543237653..4938604d1 100644
  
      invoke-virtual {v0}, Landroid/content/Context;->getPackageManager()Landroid/content/pm/PackageManager;
  
-@@ -4761,14 +4828,14 @@
+@@ -4761,14 +4700,14 @@
  
      move-result v0
  
@@ -4786,7 +4435,7 @@ index 543237653..4938604d1 100644
  
      move-result v0
  
-@@ -4776,25 +4843,25 @@
+@@ -4776,25 +4715,25 @@
  
      move-result-object v2
  
@@ -4820,7 +4469,7 @@ index 543237653..4938604d1 100644
      invoke-virtual {v0}, Ljava/lang/Exception;->getStackTrace()[Ljava/lang/StackTraceElement;
  
      move-result-object v0
-@@ -4809,10 +4876,9 @@
+@@ -4809,10 +4748,9 @@
  
      invoke-static {v4, v0}, Lcom/samsung/android/settings/Log;->e(Ljava/lang/String;Ljava/lang/String;)V
  
@@ -4834,7 +4483,7 @@ index 543237653..4938604d1 100644
  
      :sswitch_data_0
      .sparse-switch
-@@ -4873,7 +4939,6 @@
+@@ -4873,7 +4811,6 @@
  
      :pswitch_data_0
      .packed-switch 0x0
@@ -4842,7 +4491,7 @@ index 543237653..4938604d1 100644
          :pswitch_33
          :pswitch_32
          :pswitch_31
-@@ -4888,6 +4953,7 @@
+@@ -4888,6 +4825,7 @@
          :pswitch_28
          :pswitch_27
          :pswitch_26
@@ -4850,7 +4499,7 @@ index 543237653..4938604d1 100644
          :pswitch_25
          :pswitch_24
          :pswitch_23
-@@ -7073,22 +7139,20 @@
+@@ -7073,22 +7011,20 @@
      goto/16 :goto_10
  
      :pswitch_25

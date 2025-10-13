@@ -1,8 +1,9 @@
-From 971d17a8377b10cdca772284acb122176a2cd147 Mon Sep 17 00:00:00 2001
+From 3d9992772d1996167985c89e9f8f3b55fee44746 Mon Sep 17 00:00:00 2001
 From: Salvo Giangreco <giangrecosalvo9@gmail.com>
-Date: Mon, 8 Sep 2025 22:41:17 +0200
+Date: Mon, 13 Oct 2025 14:39:35 +0200
 Subject: [PATCH] Add side fingerprint sensor support
 
+UN1CA: this patch is not complete! Please check unica/patches/product_feature/customize.sh for more info.
 ---
  .../BiometricsDisclaimerActivity.smali        |  85 +-
  .../BiometricsRadioButtonPreference.smali     | 164 +---
@@ -19,16 +20,12 @@ Subject: [PATCH] Add side fingerprint sensor support
  ...fulFeature$$ExternalSyntheticLambda1.smali | 176 ++--
  ...fulFeature$$ExternalSyntheticLambda2.smali | 148 ++++
  ...fulFeature$$ExternalSyntheticLambda3.smali |  44 +-
- ...fulFeature$$ExternalSyntheticLambda4.smali | 150 ----
- ...ulFeature$$ExternalSyntheticLambda6.smali} |   6 +-
- .../SuwFingerprintUsefulFeature$1.smali       |  66 --
+ ...fulFeature$$ExternalSyntheticLambda6.smali |  42 +
  .../SuwFingerprintUsefulFeature.smali         | 468 +++++------
  .../provider/items/BiometricsItem.smali       | 291 +++----
- 20 files changed, 1576 insertions(+), 2880 deletions(-)
+ 18 files changed, 1615 insertions(+), 2661 deletions(-)
  create mode 100644 smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda2.smali
- delete mode 100644 smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda4.smali
- rename smali_classes4/com/samsung/android/settings/biometrics/fingerprint/{SuwFingerprintUsefulFeature$$ExternalSyntheticLambda9.smali => SuwFingerprintUsefulFeature$$ExternalSyntheticLambda6.smali} (91%)
- delete mode 100644 smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$1.smali
+ create mode 100644 smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda6.smali
 
 diff --git a/smali_classes4/com/samsung/android/settings/biometrics/BiometricsDisclaimerActivity.smali b/smali_classes4/com/samsung/android/settings/biometrics/BiometricsDisclaimerActivity.smali
 index 499ee0114..e17b87a05 100644
@@ -5913,265 +5910,54 @@ index 8dcaacd80..6960fce80 100644
 -        :pswitch_0
 -    .end packed-switch
  .end method
-diff --git a/smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda4.smali b/smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda4.smali
-deleted file mode 100644
-index 17ffd746b..000000000
---- a/smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda4.smali
-+++ /dev/null
-@@ -1,150 +0,0 @@
--.class public final synthetic Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda4;
--.super Ljava/lang/Object;
--.source "qb/101886872 cc50e995e4fc65df429a508d912903f2f35e60315f091e679da7afd461b54de3"
--
--# interfaces
--.implements Landroid/widget/CompoundButton$OnCheckedChangeListener;
--
--
--# instance fields
--.field public final synthetic f$0:Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;
--
--.field public final synthetic f$1:Lcom/android/internal/widget/LockPatternUtils;
--
--
--# direct methods
--.method public synthetic constructor <init>(Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;Lcom/android/internal/widget/LockPatternUtils;)V
--    .locals 0
--
--    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
--
--    iput-object p1, p0, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda4;->f$0:Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;
--
--    iput-object p2, p0, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda4;->f$1:Lcom/android/internal/widget/LockPatternUtils;
--
--    return-void
--.end method
--
--
--# virtual methods
--.method public final onCheckedChanged(Landroid/widget/CompoundButton;Z)V
--    .locals 2
--
--    iget-object p1, p0, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda4;->f$0:Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;
--
--    iget-object p0, p0, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda4;->f$1:Lcom/android/internal/widget/LockPatternUtils;
--
--    sget v0, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->$r8$clinit:I
--
--    if-eqz p2, :cond_0
--
--    const v0, 0x7f1422eb
--
--    goto :goto_0
--
--    :cond_0
--    const v0, 0x7f1422ea
--
--    :goto_0
--    iget-object v1, p1, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->mFingerUnlockSwitch:Landroid/widget/Switch;
--
--    invoke-virtual {p1, v0}, Landroid/app/Activity;->getString(I)Ljava/lang/String;
--
--    move-result-object v0
--
--    invoke-virtual {v1, v0}, Landroid/widget/Switch;->announceForAccessibility(Ljava/lang/CharSequence;)V
--
--    new-instance v0, Ljava/lang/StringBuilder;
--
--    const-string v1, "fpst_suw_useful_set_unlock: "
--
--    invoke-direct {v0, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
--
--    invoke-virtual {v0, p2}, Ljava/lang/StringBuilder;->append(I)Ljava/lang/StringBuilder;
--
--    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
--
--    move-result-object v0
--
--    const-string v1, "BMST"
--
--    invoke-static {v1, v0}, Landroid/util/Log;->w(Ljava/lang/String;Ljava/lang/String;)I
--
--    if-eqz p2, :cond_1
--
--    iget-object v0, p1, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->mContext:Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;
--
--    iget v1, p1, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->mUserId:I
--
--    invoke-static {v1, v0, p0}, Lcom/samsung/android/settings/biometrics/fingerprint/FingerprintSettingsUtils;->setFingerprintLock(ILandroid/content/Context;Lcom/android/internal/widget/LockPatternUtils;)V
--
--    goto :goto_1
--
--    :cond_1
--    iget-object v0, p1, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->mContext:Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;
--
--    iget v1, p1, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->mUserId:I
--
--    invoke-static {v1, v0, p0}, Lcom/samsung/android/settings/biometrics/fingerprint/FingerprintSettingsUtils;->removeFingerprintLock(ILandroid/content/Context;Lcom/android/internal/widget/LockPatternUtils;)V
--
--    :goto_1
--    iget-object p0, p1, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->mAlwaysOnType:Landroid/view/View;
--
--    invoke-static {p0, p2}, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->setViewEnable$1(Landroid/view/View;Z)V
--
--    iget-object p0, p1, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->mAlwaysOn:Landroid/view/View;
--
--    invoke-static {p0, p2}, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->setViewEnable$1(Landroid/view/View;Z)V
--
--    iget-object p0, p1, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->mAlwaysOnSwitch:Landroid/widget/Switch;
--
--    invoke-static {p0, p2}, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->setViewEnable$1(Landroid/widget/Switch;Z)V
--
--    iget-object p0, p1, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->mStayOnLockScreen:Landroid/view/View;
--
--    invoke-static {p0, p2}, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->setViewEnable$1(Landroid/view/View;Z)V
--
--    iget-object p0, p1, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->mStayOnLockScreenSwitch:Landroid/widget/Switch;
--
--    invoke-static {p0, p2}, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->setViewEnable$1(Landroid/widget/Switch;Z)V
--
--    if-eqz p2, :cond_2
--
--    iget-object p0, p1, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->mAlwaysOnSwitch:Landroid/widget/Switch;
--
--    invoke-virtual {p0}, Landroid/widget/Switch;->isChecked()Z
--
--    move-result p0
--
--    if-eqz p0, :cond_2
--
--    const/4 p0, 0x1
--
--    goto :goto_2
--
--    :cond_2
--    const/4 p0, 0x0
--
--    :goto_2
--    iget-object v0, p1, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->mScreenOffIcon:Landroid/view/View;
--
--    invoke-static {v0, p0}, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->setViewEnable$1(Landroid/view/View;Z)V
--
--    iget-object v0, p1, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->mScreenOffIconSwitch:Landroid/widget/Switch;
--
--    invoke-static {v0, p0}, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->setViewEnable$1(Landroid/widget/Switch;Z)V
--
--    iget-object v0, p1, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->mScreenOffIconAod:Landroid/view/View;
--
--    invoke-static {v0, p0}, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->setViewEnable$1(Landroid/view/View;Z)V
--
--    iget-object p0, p1, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->mFingerEffect:Landroid/view/View;
--
--    invoke-static {p0, p2}, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->setViewEnable$1(Landroid/view/View;Z)V
--
--    iget-object p0, p1, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->mFingerEffectSwitch:Landroid/widget/Switch;
--
--    invoke-static {p0, p2}, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->setViewEnable$1(Landroid/widget/Switch;Z)V
--
--    return-void
--.end method
-diff --git a/smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda9.smali b/smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda6.smali
-similarity index 91%
-rename from smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda9.smali
-rename to smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda6.smali
-index fb2ac8ce1..c27ca2cc0 100644
---- a/smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda9.smali
+diff --git a/smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda6.smali b/smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda6.smali
+new file mode 100644
+index 000000000..c27ca2cc0
+--- /dev/null
 +++ b/smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda6.smali
-@@ -1,4 +1,4 @@
--.class public final synthetic Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda9;
+@@ -0,0 +1,42 @@
 +.class public final synthetic Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda6;
- .super Ljava/lang/Object;
- .source "qb/101886872 cc50e995e4fc65df429a508d912903f2f35e60315f091e679da7afd461b54de3"
- 
-@@ -16,7 +16,7 @@
- 
-     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
- 
--    iput-object p1, p0, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda9;->f$0:Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;
++.super Ljava/lang/Object;
++.source "qb/101886872 cc50e995e4fc65df429a508d912903f2f35e60315f091e679da7afd461b54de3"
++
++# interfaces
++.implements Landroidx/activity/result/ActivityResultCallback;
++
++
++# instance fields
++.field public final synthetic f$0:Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;
++
++
++# direct methods
++.method public synthetic constructor <init>(Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;)V
++    .locals 0
++
++    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
++
 +    iput-object p1, p0, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda6;->f$0:Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;
- 
-     return-void
- .end method
-@@ -32,7 +32,7 @@
- 
-     const/4 p1, -0x1
- 
--    iget-object p0, p0, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda9;->f$0:Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;
++
++    return-void
++.end method
++
++
++# virtual methods
++.method public final onActivityResult(Ljava/lang/Object;)V
++    .locals 0
++
++    check-cast p1, Landroidx/activity/result/ActivityResult;
++
++    sget p1, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->$r8$clinit:I
++
++    const/4 p1, -0x1
++
 +    iget-object p0, p0, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$$ExternalSyntheticLambda6;->f$0:Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;
- 
-     invoke-virtual {p0, p1}, Landroid/app/Activity;->setResult(I)V
- 
-diff --git a/smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$1.smali b/smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$1.smali
-deleted file mode 100644
-index 0d2f60e4e..000000000
---- a/smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$1.smali
-+++ /dev/null
-@@ -1,66 +0,0 @@
--.class public final Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$1;
--.super Ljava/lang/Object;
--.source "qb/101886872 cc50e995e4fc65df429a508d912903f2f35e60315f091e679da7afd461b54de3"
--
--# interfaces
--.implements Landroid/widget/AdapterView$OnItemSelectedListener;
--
--
--# instance fields
--.field public final synthetic this$0:Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;
--
--.field public final synthetic val$mScreenOffIconAodArray:[Ljava/lang/String;
--
--
--# direct methods
--.method public constructor <init>(Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;[Ljava/lang/String;)V
--    .locals 0
--
--    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
--
--    iput-object p1, p0, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$1;->this$0:Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;
--
--    iput-object p2, p0, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$1;->val$mScreenOffIconAodArray:[Ljava/lang/String;
--
--    return-void
--.end method
--
--
--# virtual methods
--.method public final onItemSelected(Landroid/widget/AdapterView;Landroid/view/View;IJ)V
--    .locals 0
--
--    iget-object p1, p0, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$1;->this$0:Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;
--
--    iget-object p2, p1, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->mContext:Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;
--
--    iget-object p4, p0, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$1;->val$mScreenOffIconAodArray:[Ljava/lang/String;
--
--    array-length p4, p4
--
--    add-int/lit8 p4, p4, -0x1
--
--    sub-int/2addr p4, p3
--
--    iget p1, p1, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->mUserId:I
--
--    invoke-static {p2, p4, p1}, Lcom/samsung/android/settings/biometrics/fingerprint/FingerprintSettingsUtils;->setFingerprintScreenOffIconAodValue(Landroid/content/Context;II)V
--
--    iget-object p1, p0, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$1;->this$0:Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;
--
--    iget-object p1, p1, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature;->mScreenOffIconAodSummary:Landroid/widget/TextView;
--
--    iget-object p0, p0, Lcom/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature$1;->val$mScreenOffIconAodArray:[Ljava/lang/String;
--
--    aget-object p0, p0, p3
--
--    invoke-virtual {p1, p0}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
--
--    return-void
--.end method
--
--.method public final onNothingSelected(Landroid/widget/AdapterView;)V
--    .locals 0
--
--    return-void
--.end method
++
++    invoke-virtual {p0, p1}, Landroid/app/Activity;->setResult(I)V
++
++    invoke-virtual {p0}, Landroid/app/Activity;->finish()V
++
++    return-void
++.end method
 diff --git a/smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature.smali b/smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature.smali
 index 7310fb717..d4d86ef7d 100644
 --- a/smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature.smali

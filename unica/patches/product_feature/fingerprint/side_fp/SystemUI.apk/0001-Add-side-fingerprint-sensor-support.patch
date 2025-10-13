@@ -1,8 +1,9 @@
-From 5f40c9bdb86179cc053ecb57f7bdec830cc15eb9 Mon Sep 17 00:00:00 2001
+From 559fb98d4d7967275216fda5de719c70a45ef7c1 Mon Sep 17 00:00:00 2001
 From: Salvo Giangreco <giangrecosalvo9@gmail.com>
-Date: Wed, 27 Aug 2025 19:00:58 +0200
+Date: Mon, 13 Oct 2025 14:44:50 +0200
 Subject: [PATCH] Add side fingerprint sensor support
 
+UN1CA: this patch is not complete! Please check unica/patches/product_feature/customize.sh for more info.
 ---
  .../DualDarInnerLockScreenController.smali    |  126 +-
  .../KeyguardArrowViewController.smali         |   57 +-
@@ -18,13 +19,12 @@ Subject: [PATCH] Add side fingerprint sensor support
  .../keyguard/KeyguardSecUpdateMonitor.smali   |   18 +-
  ...nitorImpl$$ExternalSyntheticLambda11.smali |   23 +-
  ...nitorImpl$$ExternalSyntheticLambda14.smali |   13 +-
- ...itorImpl$$ExternalSyntheticLambda23.smali} |   10 +-
+ ...nitorImpl$$ExternalSyntheticLambda23.smali |   92 +
  ...nitorImpl$$ExternalSyntheticLambda27.smali |   97 +
  ...nitorImpl$$ExternalSyntheticLambda28.smali |   58 +-
- ...nitorImpl$$ExternalSyntheticLambda29.smali |   76 -
- ...itorImpl$$ExternalSyntheticLambda32.smali} |   22 +-
- ...itorImpl$$ExternalSyntheticLambda39.smali} |   18 +-
- ...itorImpl$$ExternalSyntheticLambda41.smali} |   10 +-
+ ...nitorImpl$$ExternalSyntheticLambda32.smali |  112 +
+ ...nitorImpl$$ExternalSyntheticLambda39.smali |   86 +
+ ...nitorImpl$$ExternalSyntheticLambda41.smali |   42 +
  ...onitorImpl$$ExternalSyntheticLambda9.smali |   17 +-
  .../KeyguardSecUpdateMonitorImpl$1.smali      |    4 +-
  .../KeyguardSecUpdateMonitorImpl.smali        | 4104 +++++++----------
@@ -62,13 +62,12 @@ Subject: [PATCH] Add side fingerprint sensor support
  .../SecStatusBarKeyguardViewManager$3.smali   |   20 +-
  .../android/systemui/util/DeviceState.smali   |  152 +-
  .../android/systemui/util/DeviceType.smali    |   24 +-
- 58 files changed, 4423 insertions(+), 6538 deletions(-)
- rename smali/com/android/keyguard/{KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda24.smali => KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda23.smali} (92%)
+ 57 files changed, 4725 insertions(+), 6432 deletions(-)
+ create mode 100644 smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda23.smali
  create mode 100644 smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda27.smali
- delete mode 100644 smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda29.smali
- rename smali/com/android/keyguard/{KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda33.smali => KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda32.smali} (86%)
- rename smali/com/android/keyguard/{KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda40.smali => KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda39.smali} (84%)
- rename smali/com/android/keyguard/{KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda42.smali => KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda41.smali} (81%)
+ create mode 100644 smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda32.smali
+ create mode 100644 smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda39.smali
+ create mode 100644 smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda41.smali
 
 diff --git a/smali/com/android/keyguard/DualDarInnerLockScreenController.smali b/smali/com/android/keyguard/DualDarInnerLockScreenController.smali
 index a760e2128..b007b2a65 100644
@@ -3000,43 +2999,104 @@ index d44c073d8..5a96910bc 100644
      sget-object p1, Lcom/android/systemui/deviceentry/shared/FaceAuthUiEvent;->FACE_AUTH_UPDATED_COCKTAIL_BAR_SHOWING_CHANGED:Lcom/android/systemui/deviceentry/shared/FaceAuthUiEvent;
  
      invoke-virtual {p0, v0, p1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->updateFaceListeningState(ILcom/android/systemui/deviceentry/shared/FaceAuthUiEvent;)V
-diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda24.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda23.smali
-similarity index 92%
-rename from smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda24.smali
-rename to smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda23.smali
-index 42ffe706a..135827665 100644
---- a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda24.smali
+diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda23.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda23.smali
+new file mode 100644
+index 000000000..135827665
+--- /dev/null
 +++ b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda23.smali
-@@ -1,4 +1,4 @@
--.class public final synthetic Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda24;
+@@ -0,0 +1,92 @@
 +.class public final synthetic Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda23;
- .super Ljava/lang/Object;
- .source "qb/101886872 05bd3f759fde43bd963747fc6c20c848fb5367a8195771ce140d1171a6d7ee1b"
- 
-@@ -16,9 +16,9 @@
- .method public synthetic constructor <init>(ZI)V
-     .locals 0
- 
--    iput p2, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda24;->$r8$classId:I
++.super Ljava/lang/Object;
++.source "qb/101886872 05bd3f759fde43bd963747fc6c20c848fb5367a8195771ce140d1171a6d7ee1b"
++
++# interfaces
++.implements Ljava/util/function/Consumer;
++
++
++# instance fields
++.field public final synthetic $r8$classId:I
++
++.field public final synthetic f$0:Z
++
++
++# direct methods
++.method public synthetic constructor <init>(ZI)V
++    .locals 0
++
 +    iput p2, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda23;->$r8$classId:I
- 
--    iput-boolean p1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda24;->f$0:Z
++
 +    iput-boolean p1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda23;->f$0:Z
- 
-     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
- 
-@@ -30,9 +30,9 @@
- .method public final accept(Ljava/lang/Object;)V
-     .locals 1
- 
--    iget v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda24;->$r8$classId:I
++
++    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
++
++    return-void
++.end method
++
++
++# virtual methods
++.method public final accept(Ljava/lang/Object;)V
++    .locals 1
++
 +    iget v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda23;->$r8$classId:I
- 
--    iget-boolean p0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda24;->f$0:Z
++
 +    iget-boolean p0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda23;->f$0:Z
- 
-     check-cast p1, Lcom/android/keyguard/KeyguardUpdateMonitorCallback;
- 
++
++    check-cast p1, Lcom/android/keyguard/KeyguardUpdateMonitorCallback;
++
++    packed-switch v0, :pswitch_data_0
++
++    sget-object v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->sFaceManager:Lcom/samsung/android/bio/face/SemBioFaceManager;
++
++    invoke-virtual {p1, p0}, Lcom/android/keyguard/KeyguardUpdateMonitorCallback;->onUSBRestrictionChanged(Z)V
++
++    return-void
++
++    :pswitch_0
++    sget-object v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->sFaceManager:Lcom/samsung/android/bio/face/SemBioFaceManager;
++
++    invoke-virtual {p1, p0}, Lcom/android/keyguard/KeyguardUpdateMonitorCallback;->onPrimaryBouncerVisibilityChanged(Z)V
++
++    return-void
++
++    :pswitch_1
++    sget-object v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->sFaceManager:Lcom/samsung/android/bio/face/SemBioFaceManager;
++
++    invoke-virtual {p1, p0}, Lcom/android/keyguard/KeyguardUpdateMonitorCallback;->onTableModeChanged(Z)V
++
++    return-void
++
++    :pswitch_2
++    sget-object v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->sFaceManager:Lcom/samsung/android/bio/face/SemBioFaceManager;
++
++    invoke-virtual {p1, p0}, Lcom/android/keyguard/KeyguardUpdateMonitorCallback;->onFaceWidgetFullscreenModeChanged(Z)V
++
++    return-void
++
++    :pswitch_3
++    sget-object v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->sFaceManager:Lcom/samsung/android/bio/face/SemBioFaceManager;
++
++    invoke-virtual {p1, p0}, Lcom/android/keyguard/KeyguardUpdateMonitorCallback;->onKeyguardVisibilityChanged(Z)V
++
++    return-void
++
++    :pswitch_4
++    sget-object v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->sFaceManager:Lcom/samsung/android/bio/face/SemBioFaceManager;
++
++    invoke-virtual {p1, p0}, Lcom/android/keyguard/KeyguardUpdateMonitorCallback;->onFaceUnlockOptionChanged(Z)V
++
++    return-void
++
++    nop
++
++    :pswitch_data_0
++    .packed-switch 0x0
++        :pswitch_4
++        :pswitch_3
++        :pswitch_2
++        :pswitch_1
++        :pswitch_0
++    .end packed-switch
++.end method
 diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda27.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda27.smali
 new file mode 100644
 index 000000000..faf21ecbf
@@ -3236,241 +3296,264 @@ index 924a9ddcc..abc64db18 100644
 +        :pswitch_0
 +    .end packed-switch
  .end method
-diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda29.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda29.smali
-deleted file mode 100644
-index 19a9b2d5d..000000000
---- a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda29.smali
-+++ /dev/null
-@@ -1,76 +0,0 @@
--.class public final synthetic Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda29;
--.super Ljava/lang/Object;
--.source "qb/101886872 05bd3f759fde43bd963747fc6c20c848fb5367a8195771ce140d1171a6d7ee1b"
--
--# interfaces
--.implements Ljava/util/function/Consumer;
--
--
--# instance fields
--.field public final synthetic $r8$classId:I
--
--.field public final synthetic f$0:I
--
--.field public final synthetic f$1:Ljava/lang/String;
--
--
--# direct methods
--.method public synthetic constructor <init>(ILjava/lang/String;I)V
--    .locals 0
--
--    iput p3, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda29;->$r8$classId:I
--
--    iput p1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda29;->f$0:I
--
--    iput-object p2, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda29;->f$1:Ljava/lang/String;
--
--    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
--
--    return-void
--.end method
--
--
--# virtual methods
--.method public final accept(Ljava/lang/Object;)V
--    .locals 2
--
--    iget v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda29;->$r8$classId:I
--
--    packed-switch v0, :pswitch_data_0
--
--    iget v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda29;->f$0:I
--
--    iget-object p0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda29;->f$1:Ljava/lang/String;
--
--    check-cast p1, Lcom/android/keyguard/KeyguardUpdateMonitorCallback;
--
--    sget-object v1, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->sFaceManager:Lcom/samsung/android/bio/face/SemBioFaceManager;
--
--    sget-object v1, Landroid/hardware/biometrics/BiometricSourceType;->FACE:Landroid/hardware/biometrics/BiometricSourceType;
--
--    invoke-virtual {p1, v0, p0, v1}, Lcom/android/keyguard/KeyguardUpdateMonitorCallback;->onBiometricError(ILjava/lang/String;Landroid/hardware/biometrics/BiometricSourceType;)V
--
--    return-void
--
--    :pswitch_0
--    iget v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda29;->f$0:I
--
--    iget-object p0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda29;->f$1:Ljava/lang/String;
--
--    check-cast p1, Lcom/android/keyguard/KeyguardUpdateMonitorCallback;
--
--    sget-object v1, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->sFaceManager:Lcom/samsung/android/bio/face/SemBioFaceManager;
--
--    sget-object v1, Landroid/hardware/biometrics/BiometricSourceType;->FINGERPRINT:Landroid/hardware/biometrics/BiometricSourceType;
--
--    invoke-virtual {p1, v0, p0, v1}, Lcom/android/keyguard/KeyguardUpdateMonitorCallback;->onBiometricHelp(ILjava/lang/String;Landroid/hardware/biometrics/BiometricSourceType;)V
--
--    return-void
--
--    nop
--
--    :pswitch_data_0
--    .packed-switch 0x0
--        :pswitch_0
--    .end packed-switch
--.end method
-diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda33.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda32.smali
-similarity index 86%
-rename from smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda33.smali
-rename to smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda32.smali
-index 977be60c7..b036a20f9 100644
---- a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda33.smali
+diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda32.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda32.smali
+new file mode 100644
+index 000000000..b036a20f9
+--- /dev/null
 +++ b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda32.smali
-@@ -1,4 +1,4 @@
--.class public final synthetic Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda33;
+@@ -0,0 +1,112 @@
 +.class public final synthetic Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda32;
- .super Ljava/lang/Object;
- .source "qb/101886872 05bd3f759fde43bd963747fc6c20c848fb5367a8195771ce140d1171a6d7ee1b"
- 
-@@ -24,15 +24,15 @@
- 
-     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
- 
--    iput-object p1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda33;->f$0:Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;
++.super Ljava/lang/Object;
++.source "qb/101886872 05bd3f759fde43bd963747fc6c20c848fb5367a8195771ce140d1171a6d7ee1b"
++
++# interfaces
++.implements Ljava/lang/Runnable;
++
++
++# instance fields
++.field public final synthetic f$0:Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;
++
++.field public final synthetic f$1:Z
++
++.field public final synthetic f$2:Z
++
++.field public final synthetic f$3:Z
++
++.field public final synthetic f$4:Z
++
++
++# direct methods
++.method public synthetic constructor <init>(Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;ZZZZ)V
++    .locals 0
++
++    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
++
 +    iput-object p1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda32;->f$0:Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;
- 
--    iput-boolean p2, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda33;->f$1:Z
++
 +    iput-boolean p2, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda32;->f$1:Z
- 
--    iput-boolean p3, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda33;->f$2:Z
++
 +    iput-boolean p3, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda32;->f$2:Z
- 
--    iput-boolean p4, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda33;->f$3:Z
++
 +    iput-boolean p4, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda32;->f$3:Z
- 
--    iput-boolean p5, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda33;->f$4:Z
++
 +    iput-boolean p5, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda32;->f$4:Z
- 
-     return-void
- .end method
-@@ -42,15 +42,15 @@
- .method public final run()V
-     .locals 6
- 
--    iget-object v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda33;->f$0:Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;
++
++    return-void
++.end method
++
++
++# virtual methods
++.method public final run()V
++    .locals 6
++
 +    iget-object v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda32;->f$0:Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;
- 
--    iget-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda33;->f$1:Z
++
 +    iget-boolean v1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda32;->f$1:Z
- 
--    iget-boolean v2, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda33;->f$2:Z
++
 +    iget-boolean v2, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda32;->f$2:Z
- 
--    iget-boolean v3, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda33;->f$3:Z
++
 +    iget-boolean v3, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda32;->f$3:Z
- 
--    iget-boolean p0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda33;->f$4:Z
++
 +    iget-boolean p0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda32;->f$4:Z
- 
-     sget-object v4, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->sFaceManager:Lcom/samsung/android/bio/face/SemBioFaceManager;
- 
-diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda40.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda39.smali
-similarity index 84%
-rename from smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda40.smali
-rename to smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda39.smali
-index 37a0b239c..add44c2e4 100644
---- a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda40.smali
++
++    sget-object v4, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->sFaceManager:Lcom/samsung/android/bio/face/SemBioFaceManager;
++
++    invoke-virtual {v0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
++
++    new-instance v4, Landroid/content/Intent;
++
++    const-string v5, "com.samsung.keyguard.KEYGUARD_STATE_UPDATE"
++
++    invoke-direct {v4, v5}, Landroid/content/Intent;-><init>(Ljava/lang/String;)V
++
++    const-string/jumbo v5, "showing"
++
++    invoke-virtual {v4, v5, v1}, Landroid/content/Intent;->putExtra(Ljava/lang/String;Z)Landroid/content/Intent;
++
++    const-string v1, "occluded"
++
++    invoke-virtual {v4, v1, v2}, Landroid/content/Intent;->putExtra(Ljava/lang/String;Z)Landroid/content/Intent;
++
++    const-string v1, "bouncerShowing"
++
++    invoke-virtual {v4, v1, v3}, Landroid/content/Intent;->putExtra(Ljava/lang/String;Z)Landroid/content/Intent;
++
++    const-string v1, "bouncerModeChanging"
++
++    invoke-virtual {v4, v1, p0}, Landroid/content/Intent;->putExtra(Ljava/lang/String;Z)Landroid/content/Intent;
++
++    const-string/jumbo p0, "timeStamp"
++
++    invoke-static {}, Ljava/lang/System;->currentTimeMillis()J
++
++    move-result-wide v1
++
++    invoke-virtual {v4, p0, v1, v2}, Landroid/content/Intent;->putExtra(Ljava/lang/String;J)Landroid/content/Intent;
++
++    new-instance p0, Ljava/lang/StringBuilder;
++
++    const-string v1, "broadcast intent= "
++
++    invoke-direct {p0, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
++
++    invoke-virtual {p0, v4}, Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;
++
++    invoke-virtual {p0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
++
++    move-result-object p0
++
++    const-string v1, "KeyguardUpdateMonitor"
++
++    invoke-static {v1, p0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
++
++    iget-object p0, v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->mContext:Landroid/content/Context;
++
++    sget-object v0, Landroid/os/UserHandle;->ALL:Landroid/os/UserHandle;
++
++    invoke-virtual {p0, v4, v0}, Landroid/content/Context;->sendBroadcastAsUser(Landroid/content/Intent;Landroid/os/UserHandle;)V
++
++    return-void
++.end method
+diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda39.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda39.smali
+new file mode 100644
+index 000000000..add44c2e4
+--- /dev/null
 +++ b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda39.smali
-@@ -1,4 +1,4 @@
--.class public final synthetic Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda40;
+@@ -0,0 +1,86 @@
 +.class public final synthetic Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda39;
- .super Ljava/lang/Object;
- .source "qb/101886872 05bd3f759fde43bd963747fc6c20c848fb5367a8195771ce140d1171a6d7ee1b"
- 
-@@ -18,11 +18,11 @@
- .method public synthetic constructor <init>(IZLjava/lang/Object;)V
-     .locals 0
- 
--    iput p1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda40;->$r8$classId:I
++.super Ljava/lang/Object;
++.source "qb/101886872 05bd3f759fde43bd963747fc6c20c848fb5367a8195771ce140d1171a6d7ee1b"
++
++# interfaces
++.implements Ljava/util/function/Consumer;
++
++
++# instance fields
++.field public final synthetic $r8$classId:I
++
++.field public final synthetic f$0:Ljava/lang/Object;
++
++.field public final synthetic f$1:Z
++
++
++# direct methods
++.method public synthetic constructor <init>(IZLjava/lang/Object;)V
++    .locals 0
++
 +    iput p1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda39;->$r8$classId:I
- 
--    iput-object p3, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda40;->f$0:Ljava/lang/Object;
++
 +    iput-object p3, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda39;->f$0:Ljava/lang/Object;
- 
--    iput-boolean p2, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda40;->f$1:Z
++
 +    iput-boolean p2, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda39;->f$1:Z
- 
-     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
- 
-@@ -34,15 +34,15 @@
- .method public final accept(Ljava/lang/Object;)V
-     .locals 2
- 
--    iget v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda40;->$r8$classId:I
++
++    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
++
++    return-void
++.end method
++
++
++# virtual methods
++.method public final accept(Ljava/lang/Object;)V
++    .locals 2
++
 +    iget v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda39;->$r8$classId:I
- 
-     packed-switch v0, :pswitch_data_0
- 
--    iget-object v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda40;->f$0:Ljava/lang/Object;
++
++    packed-switch v0, :pswitch_data_0
++
 +    iget-object v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda39;->f$0:Ljava/lang/Object;
- 
-     check-cast v0, Ljava/lang/String;
- 
--    iget-boolean p0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda40;->f$1:Z
++
++    check-cast v0, Ljava/lang/String;
++
 +    iget-boolean p0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda39;->f$1:Z
- 
-     check-cast p1, Lcom/android/keyguard/KeyguardUpdateMonitorCallback;
- 
-@@ -53,11 +53,11 @@
-     return-void
- 
-     :pswitch_0
--    iget-object v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda40;->f$0:Ljava/lang/Object;
++
++    check-cast p1, Lcom/android/keyguard/KeyguardUpdateMonitorCallback;
++
++    sget-object v1, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->sFaceManager:Lcom/samsung/android/bio/face/SemBioFaceManager;
++
++    invoke-virtual {p1, v0, p0}, Lcom/android/keyguard/KeyguardUpdateMonitorCallback;->onPackageRemoved(Ljava/lang/String;Z)V
++
++    return-void
++
++    :pswitch_0
 +    iget-object v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda39;->f$0:Ljava/lang/Object;
- 
-     check-cast v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;
- 
--    iget-boolean p0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda40;->f$1:Z
++
++    check-cast v0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;
++
 +    iget-boolean p0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda39;->f$1:Z
- 
-     check-cast p1, Lcom/android/keyguard/KeyguardUpdateMonitorCallback;
- 
-diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda42.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda41.smali
-similarity index 81%
-rename from smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda42.smali
-rename to smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda41.smali
-index fcf4f8ffc..2cea7ed0b 100644
---- a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda42.smali
++
++    check-cast p1, Lcom/android/keyguard/KeyguardUpdateMonitorCallback;
++
++    sget-object v1, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->sFaceManager:Lcom/samsung/android/bio/face/SemBioFaceManager;
++
++    iget-object v0, v0, Lcom/android/keyguard/KeyguardUpdateMonitor;->mUserTracker:Lcom/android/systemui/settings/UserTracker;
++
++    check-cast v0, Lcom/android/systemui/settings/UserTrackerImpl;
++
++    invoke-virtual {v0}, Lcom/android/systemui/settings/UserTrackerImpl;->getUserId()I
++
++    move-result v0
++
++    sget-object v1, Landroid/hardware/biometrics/BiometricSourceType;->FACE:Landroid/hardware/biometrics/BiometricSourceType;
++
++    invoke-virtual {p1, v0, v1, p0}, Lcom/android/keyguard/KeyguardUpdateMonitorCallback;->onBiometricAuthenticated(ILandroid/hardware/biometrics/BiometricSourceType;Z)V
++
++    return-void
++
++    nop
++
++    :pswitch_data_0
++    .packed-switch 0x0
++        :pswitch_0
++    .end packed-switch
++.end method
+diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda41.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda41.smali
+new file mode 100644
+index 000000000..2cea7ed0b
+--- /dev/null
 +++ b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda41.smali
-@@ -1,4 +1,4 @@
--.class public final synthetic Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda42;
+@@ -0,0 +1,42 @@
 +.class public final synthetic Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda41;
- .super Ljava/lang/Object;
- .source "qb/101886872 05bd3f759fde43bd963747fc6c20c848fb5367a8195771ce140d1171a6d7ee1b"
- 
-@@ -18,9 +18,9 @@
- 
-     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
- 
--    iput-object p1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda42;->f$0:Ljava/util/function/Consumer;
++.super Ljava/lang/Object;
++.source "qb/101886872 05bd3f759fde43bd963747fc6c20c848fb5367a8195771ce140d1171a6d7ee1b"
++
++# interfaces
++.implements Ljava/lang/Runnable;
++
++
++# instance fields
++.field public final synthetic f$0:Ljava/util/function/Consumer;
++
++.field public final synthetic f$1:Lcom/android/keyguard/KeyguardUpdateMonitorCallback;
++
++
++# direct methods
++.method public synthetic constructor <init>(Ljava/util/function/Consumer;Lcom/android/keyguard/KeyguardUpdateMonitorCallback;)V
++    .locals 0
++
++    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
++
 +    iput-object p1, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda41;->f$0:Ljava/util/function/Consumer;
- 
--    iput-object p2, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda42;->f$1:Lcom/android/keyguard/KeyguardUpdateMonitorCallback;
++
 +    iput-object p2, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda41;->f$1:Lcom/android/keyguard/KeyguardUpdateMonitorCallback;
- 
-     return-void
- .end method
-@@ -30,9 +30,9 @@
- .method public final run()V
-     .locals 2
- 
--    iget-object v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda42;->f$0:Ljava/util/function/Consumer;
++
++    return-void
++.end method
++
++
++# virtual methods
++.method public final run()V
++    .locals 2
++
 +    iget-object v0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda41;->f$0:Ljava/util/function/Consumer;
- 
--    iget-object p0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda42;->f$1:Lcom/android/keyguard/KeyguardUpdateMonitorCallback;
++
 +    iget-object p0, p0, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda41;->f$1:Lcom/android/keyguard/KeyguardUpdateMonitorCallback;
- 
-     sget-object v1, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->sFaceManager:Lcom/samsung/android/bio/face/SemBioFaceManager;
- 
++
++    sget-object v1, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->sFaceManager:Lcom/samsung/android/bio/face/SemBioFaceManager;
++
++    invoke-interface {v0, p0}, Ljava/util/function/Consumer;->accept(Ljava/lang/Object;)V
++
++    return-void
++.end method
 diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda9.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda9.smali
 index af35f3d71..d89e79828 100644
 --- a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda9.smali

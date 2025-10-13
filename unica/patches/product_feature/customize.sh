@@ -164,6 +164,16 @@ if ! $SOURCE_COMMON_SUPPORT_DYN_RESOLUTION_CONTROL; then
             "$SRC_DIR/unica/patches/product_feature/resolution/gamemanager.jar/0001-Enable-dynamic-resolution-control.patch"
         APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
             "$SRC_DIR/unica/patches/product_feature/resolution/SecSettings.apk/0001-Enable-dynamic-resolution-control.patch"
+        SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+            "smali_classes2/com/android/settings/Utils\$\$ExternalSyntheticLambda2.smali" "remove"
+        SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+            "smali_classes2/com/android/settings/applications/manageapplications/ManageApplications\$ApplicationsAdapter\$\$ExternalSyntheticLambda3.smali" "remove"
+        SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+            "smali_classes2/com/android/settings/applications/manageapplications/ManageApplications\$ApplicationsAdapter\$\$ExternalSyntheticLambda7.smali" "remove"
+        SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+            "smali_classes2/com/android/settings/applications/manageapplications/ManageApplications\$ApplicationsAdapter\$\$ExternalSyntheticLambda9.smali" "remove"
+        SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+            "smali_classes2/com/android/settings/applications/manageapplications/ManageApplications\$ApplicationsAdapter\$\$ExternalSyntheticOutline0.smali" "remove"
         APPLY_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
             "$SRC_DIR/unica/patches/product_feature/resolution/SystemUI.apk/0001-Enable-dynamic-resolution-control.patch"
     fi
@@ -271,17 +281,17 @@ if [[ "$SOURCE_FINGERPRINT_CONFIG_SENSOR" != "$TARGET_FINGERPRINT_CONFIG_SENSOR"
                 ADD_TO_WORK_DIR "r11sxxx" "system" "system/priv-app/BiometricSetting/BiometricSetting.apk" 0 0 644 "u:object_r:system_file:s0"
 
                 APPLY_PATCH "system" "system/framework/framework.jar" \
-                    "$SRC_DIR/unica/patches/product_feature/fingerprint/framework.jar/0001-Add-optical-FOD-support.patch"
+                    "$SRC_DIR/unica/patches/product_feature/fingerprint/optical_fod/framework.jar/0001-Add-optical-FOD-support.patch"
                 APPLY_PATCH "system" "system/framework/services.jar" \
-                    "$SRC_DIR/unica/patches/product_feature/fingerprint/services.jar/0001-Add-optical-FOD-support.patch"
+                    "$SRC_DIR/unica/patches/product_feature/fingerprint/optical_fod/services.jar/0001-Add-optical-FOD-support.patch"
                 APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
-                    "$SRC_DIR/unica/patches/product_feature/fingerprint/SecSettings.apk/0001-Add-optical-FOD-support.patch"
+                    "$SRC_DIR/unica/patches/product_feature/fingerprint/optical_fod/SecSettings.apk/0001-Add-optical-FOD-support.patch"
                 APPLY_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
-                    "$SRC_DIR/unica/patches/product_feature/fingerprint/SystemUI.apk/0001-Add-optical-FOD-support.patch"
+                    "$SRC_DIR/unica/patches/product_feature/fingerprint/optical_fod/SystemUI.apk/0001-Add-optical-FOD-support.patch"
 
                 if [[ "$TARGET_FINGERPRINT_CONFIG_SENSOR" == *"no_delay_in_screen_off"* ]]; then
                     APPLY_PATCH "system" "system/priv-app/BiometricSetting/BiometricSetting.apk" \
-                        "$SRC_DIR/unica/patches/product_feature/fingerprint/BiometricSetting.apk/0001-Enable-FP_FEATURE_NO_DELAY_IN_SCREEN_OFF.patch"
+                        "$SRC_DIR/unica/patches/product_feature/fingerprint/optical_fod/BiometricSetting.apk/0001-Enable-FP_FEATURE_NO_DELAY_IN_SCREEN_OFF.patch"
                 fi
 
                 if [[ "$TARGET_FINGERPRINT_CONFIG_SENSOR" == *"transition_effect_on"* ]]; then
@@ -300,17 +310,33 @@ if [[ "$SOURCE_FINGERPRINT_CONFIG_SENSOR" != "$TARGET_FINGERPRINT_CONFIG_SENSOR"
                 ADD_TO_WORK_DIR "b5qxxx" "system" "system/priv-app/BiometricSetting/BiometricSetting.apk" 0 0 644 "u:object_r:system_file:s0"
 
                 APPLY_PATCH "system" "system/framework/framework.jar" \
-                    "$SRC_DIR/unica/patches/product_feature/fingerprint/framework.jar/0001-Add-side-fingerprint-sensor-support.patch"
+                    "$SRC_DIR/unica/patches/product_feature/fingerprint/side_fp/framework.jar/0001-Add-side-fingerprint-sensor-support.patch"
                 APPLY_PATCH "system" "system/framework/services.jar" \
-                    "$SRC_DIR/unica/patches/product_feature/fingerprint/services.jar/0001-Add-side-fingerprint-sensor-support.patch"
+                    "$SRC_DIR/unica/patches/product_feature/fingerprint/side_fp/services.jar/0001-Add-side-fingerprint-sensor-support.patch"
                 APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
-                    "$SRC_DIR/unica/patches/product_feature/fingerprint/SecSettings.apk/0001-Add-side-fingerprint-sensor-support.patch"
+                    "$SRC_DIR/unica/patches/product_feature/fingerprint/side_fp/SecSettings.apk/0001-Add-side-fingerprint-sensor-support.patch"
+                SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+                    "smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature\$\$ExternalSyntheticLambda4.smali" "remove"
+                SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+                    "smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature\$\$ExternalSyntheticLambda9.smali" "remove"
+                SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+                    "smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature\$1.smali" "remove"
                 APPLY_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
-                    "$SRC_DIR/unica/patches/product_feature/fingerprint/SystemUI.apk/0001-Add-side-fingerprint-sensor-support.patch"
+                    "$SRC_DIR/unica/patches/product_feature/fingerprint/side_fp/SystemUI.apk/0001-Add-side-fingerprint-sensor-support.patch"
+                SMALI_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
+                    "smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl\$\$ExternalSyntheticLambda24.smali" "remove"
+                SMALI_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
+                    "smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl\$\$ExternalSyntheticLambda29.smali" "remove"
+                SMALI_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
+                    "smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl\$\$ExternalSyntheticLambda33.smali" "remove"
+                SMALI_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
+                    "smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl\$\$ExternalSyntheticLambda40.smali" "remove"
+                SMALI_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
+                    "smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl\$\$ExternalSyntheticLambda42.smali" "remove"
 
                 if [[ "$TARGET_FINGERPRINT_CONFIG_SENSOR" == *"navi=1"* ]]; then
                     APPLY_PATCH "system" "system/framework/services.jar" \
-                        "$SRC_DIR/unica/patches/product_feature/fingerprint/services.jar/0002-Enable-FP_FEATURE_GESTURE_MODE.patch"
+                        "$SRC_DIR/unica/patches/product_feature/fingerprint/side_fp/services.jar/0002-Enable-FP_FEATURE_GESTURE_MODE.patch"
                 elif [[ "$TARGET_FINGERPRINT_CONFIG_SENSOR" == *"swipe_enroll"* ]] || \
                         [[ "$TARGET_FINGERPRINT_CONFIG_SENSOR" == *"wof_off"* ]]; then
                     # TODO handle these conditions

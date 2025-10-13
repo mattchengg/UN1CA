@@ -1,23 +1,21 @@
-From 8087d81d3f16625ab0d93daad06d9fdcd9104747 Mon Sep 17 00:00:00 2001
+From 73ce3d7fb3df20c832117e0c843ea0d5a5df12ce Mon Sep 17 00:00:00 2001
 From: Salvo Giangreco <giangrecosalvo9@gmail.com>
-Date: Mon, 6 Oct 2025 21:37:23 +0200
+Date: Mon, 13 Oct 2025 14:55:01 +0200
 Subject: [PATCH] Enable dynamic resolution control
 
+UN1CA: this patch is not complete! Please check unica/patches/product_feature/customize.sh for more info.
 ---
  .../coroutines/JobSupport$Finishing.smali     |    2 +-
  .../android/settings/DisplaySettings$3.smali  |   24 +
  .../android/settings/DisplaySettings$4.smali  |  246 ++-
- .../Utils$$ExternalSyntheticLambda2.smali     |   70 -
  .../Utils$$ExternalSyntheticLambda3.smali     |   54 +-
  .../Utils$$ExternalSyntheticLambda4.smali     |   38 +
  .../Utils$$ExternalSyntheticOutline0.smali    |   18 +
  .../com/android/settings/Utils.smali          |  128 +-
  ...onsAdapter$$ExternalSyntheticLambda1.smali |  222 +++
  ...onsAdapter$$ExternalSyntheticLambda2.smali |  211 +--
- ...onsAdapter$$ExternalSyntheticLambda3.smali |  159 --
- ...nsAdapter$$ExternalSyntheticLambda6.smali} |   14 +-
- ...nsAdapter$$ExternalSyntheticLambda8.smali} |   22 +-
- ...nsAdapter$$ExternalSyntheticOutline0.smali |   23 -
+ ...onsAdapter$$ExternalSyntheticLambda6.smali |  108 ++
+ ...onsAdapter$$ExternalSyntheticLambda8.smali |   80 +
  ...nageApplications$ApplicationsAdapter.smali |   30 +-
  .../biometrics/BiometricEnrollActivity.smali  |    2 +-
  ...ilsAmbientVolumePreferenceController.smali |    2 +-
@@ -64,14 +62,11 @@ Subject: [PATCH] Enable dynamic resolution control
  .../eternal/provider/items/DisplayItem.smali  | 1353 +++++++++--------
  ...elSamsungAccountPreferenceController.smali |    4 +-
  .../settings/lockscreen/LockUtils.smali       |    2 +-
- 60 files changed, 2432 insertions(+), 1813 deletions(-)
- delete mode 100644 smali_classes2/com/android/settings/Utils$$ExternalSyntheticLambda2.smali
+ 57 files changed, 2602 insertions(+), 1543 deletions(-)
  create mode 100644 smali_classes2/com/android/settings/Utils$$ExternalSyntheticLambda4.smali
  create mode 100644 smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda1.smali
- delete mode 100644 smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda3.smali
- rename smali_classes2/com/android/settings/applications/manageapplications/{ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda7.smali => ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda6.smali} (93%)
- rename smali_classes2/com/android/settings/applications/manageapplications/{ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda9.smali => ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda8.smali} (85%)
- delete mode 100644 smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticOutline0.smali
+ create mode 100644 smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda6.smali
+ create mode 100644 smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda8.smali
 
 diff --git a/smali/kotlinx/coroutines/JobSupport$Finishing.smali b/smali/kotlinx/coroutines/JobSupport$Finishing.smali
 index 6461ea33a..7c6bff796 100644
@@ -860,82 +855,6 @@ index 3bef1ca6d..ecc7dc018 100644
      :array_0
      .array-data 4
          0x3f000000    # 0.5f
-diff --git a/smali_classes2/com/android/settings/Utils$$ExternalSyntheticLambda2.smali b/smali_classes2/com/android/settings/Utils$$ExternalSyntheticLambda2.smali
-deleted file mode 100644
-index 66112d7cb..000000000
---- a/smali_classes2/com/android/settings/Utils$$ExternalSyntheticLambda2.smali
-+++ /dev/null
-@@ -1,70 +0,0 @@
--.class public final synthetic Lcom/android/settings/Utils$$ExternalSyntheticLambda2;
--.super Ljava/lang/Object;
--.source "qb/101886872 cc50e995e4fc65df429a508d912903f2f35e60315f091e679da7afd461b54de3"
--
--# interfaces
--.implements Landroidx/core/view/OnApplyWindowInsetsListener;
--
--
--# instance fields
--.field public final synthetic f$0:Landroidx/fragment/app/FragmentActivity;
--
--
--# direct methods
--.method public synthetic constructor <init>(Landroidx/fragment/app/FragmentActivity;)V
--    .locals 0
--
--    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
--
--    iput-object p1, p0, Lcom/android/settings/Utils$$ExternalSyntheticLambda2;->f$0:Landroidx/fragment/app/FragmentActivity;
--
--    return-void
--.end method
--
--
--# virtual methods
--.method public final onApplyWindowInsets(Landroid/view/View;Landroidx/core/view/WindowInsetsCompat;)Landroidx/core/view/WindowInsetsCompat;
--    .locals 2
--
--    iget-object p2, p2, Landroidx/core/view/WindowInsetsCompat;->mImpl:Landroidx/core/view/WindowInsetsCompat$Impl;
--
--    const/16 v0, 0x8f
--
--    invoke-virtual {p2, v0}, Landroidx/core/view/WindowInsetsCompat$Impl;->getInsets(I)Landroidx/core/graphics/Insets;
--
--    move-result-object p2
--
--    iget-object p0, p0, Lcom/android/settings/Utils$$ExternalSyntheticLambda2;->f$0:Landroidx/fragment/app/FragmentActivity;
--
--    invoke-virtual {p0}, Landroid/app/Activity;->getWindow()Landroid/view/Window;
--
--    move-result-object p0
--
--    invoke-virtual {p0}, Landroid/view/Window;->getDecorView()Landroid/view/View;
--
--    move-result-object p0
--
--    invoke-virtual {p0}, Landroid/view/View;->getRootWindowInsets()Landroid/view/WindowInsets;
--
--    move-result-object p0
--
--    const/4 v0, 0x5
--
--    invoke-virtual {p0, v0}, Landroid/view/WindowInsets;->getInsets(I)Landroid/graphics/Insets;
--
--    move-result-object p0
--
--    iget p0, p0, Landroid/graphics/Insets;->top:I
--
--    iget v0, p2, Landroidx/core/graphics/Insets;->left:I
--
--    iget v1, p2, Landroidx/core/graphics/Insets;->right:I
--
--    iget p2, p2, Landroidx/core/graphics/Insets;->bottom:I
--
--    invoke-virtual {p1, v0, p0, v1, p2}, Landroid/view/View;->setPadding(IIII)V
--
--    sget-object p0, Landroidx/core/view/WindowInsetsCompat;->CONSUMED:Landroidx/core/view/WindowInsetsCompat;
--
--    return-object p0
--.end method
 diff --git a/smali_classes2/com/android/settings/Utils$$ExternalSyntheticLambda3.smali b/smali_classes2/com/android/settings/Utils$$ExternalSyntheticLambda3.smali
 index df95f152c..b142cc910 100644
 --- a/smali_classes2/com/android/settings/Utils$$ExternalSyntheticLambda3.smali
@@ -1823,312 +1742,206 @@ index 7135a80ef..7a1e42450 100644
 +        :pswitch_0
 +    .end packed-switch
  .end method
-diff --git a/smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda3.smali b/smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda3.smali
-deleted file mode 100644
-index 427d5d5ac..000000000
---- a/smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda3.smali
-+++ /dev/null
-@@ -1,159 +0,0 @@
--.class public final synthetic Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda3;
--.super Ljava/lang/Object;
--.source "qb/101886872 cc50e995e4fc65df429a508d912903f2f35e60315f091e679da7afd461b54de3"
--
--# interfaces
--.implements Ljava/lang/Runnable;
--
--
--# instance fields
--.field public final synthetic $r8$classId:I
--
--.field public final synthetic f$0:Ljava/lang/Object;
--
--
--# direct methods
--.method public synthetic constructor <init>(ILjava/lang/Object;)V
--    .locals 0
--
--    iput p1, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda3;->$r8$classId:I
--
--    iput-object p2, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda3;->f$0:Ljava/lang/Object;
--
--    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
--
--    return-void
--.end method
--
--
--# virtual methods
--.method public final run()V
--    .locals 3
--
--    iget v0, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda3;->$r8$classId:I
--
--    iget-object p0, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda3;->f$0:Ljava/lang/Object;
--
--    packed-switch v0, :pswitch_data_0
--
--    check-cast p0, Lcom/android/settings/applications/manageapplications/ApplicationViewHolder;
--
--    iget-object v0, p0, Landroidx/recyclerview/widget/RecyclerView$ViewHolder;->itemView:Landroid/view/View;
--
--    invoke-virtual {v0}, Landroid/view/View;->isPressed()Z
--
--    move-result v0
--
--    if-eqz v0, :cond_0
--
--    iget-object p0, p0, Landroidx/recyclerview/widget/RecyclerView$ViewHolder;->itemView:Landroid/view/View;
--
--    const/4 v0, 0x0
--
--    invoke-virtual {p0, v0}, Landroid/view/View;->setPressed(Z)V
--
--    :cond_0
--    return-void
--
--    :pswitch_0
--    check-cast p0, Landroid/widget/LinearLayout;
--
--    const/4 v0, 0x0
--
--    invoke-virtual {p0, v0}, Landroid/widget/LinearLayout;->setPressed(Z)V
--
--    return-void
--
--    :pswitch_1
--    check-cast p0, Landroid/widget/LinearLayout;
--
--    invoke-virtual {p0}, Landroid/widget/LinearLayout;->getBackground()Landroid/graphics/drawable/Drawable;
--
--    move-result-object v0
--
--    if-eqz v0, :cond_1
--
--    invoke-virtual {p0}, Landroid/widget/LinearLayout;->getWidth()I
--
--    move-result v0
--
--    div-int/lit8 v0, v0, 0x2
--
--    invoke-virtual {p0}, Landroid/widget/LinearLayout;->getHeight()I
--
--    move-result v1
--
--    div-int/lit8 v1, v1, 0x2
--
--    invoke-virtual {p0}, Landroid/widget/LinearLayout;->getBackground()Landroid/graphics/drawable/Drawable;
--
--    move-result-object v2
--
--    int-to-float v0, v0
--
--    int-to-float v1, v1
--
--    invoke-virtual {v2, v0, v1}, Landroid/graphics/drawable/Drawable;->setHotspot(FF)V
--
--    :cond_1
--    const/4 v0, 0x1
--
--    invoke-virtual {p0, v0}, Landroid/widget/LinearLayout;->setPressed(Z)V
--
--    return-void
--
--    :pswitch_2
--    check-cast p0, Landroid/widget/LinearLayout;
--
--    const/4 v0, 0x0
--
--    invoke-virtual {p0, v0}, Landroid/widget/LinearLayout;->setPressed(Z)V
--
--    return-void
--
--    :pswitch_3
--    check-cast p0, Landroid/widget/LinearLayout;
--
--    invoke-virtual {p0}, Landroid/widget/LinearLayout;->getBackground()Landroid/graphics/drawable/Drawable;
--
--    move-result-object v0
--
--    if-eqz v0, :cond_2
--
--    invoke-virtual {p0}, Landroid/widget/LinearLayout;->getWidth()I
--
--    move-result v0
--
--    div-int/lit8 v0, v0, 0x2
--
--    invoke-virtual {p0}, Landroid/widget/LinearLayout;->getHeight()I
--
--    move-result v1
--
--    div-int/lit8 v1, v1, 0x2
--
--    invoke-virtual {p0}, Landroid/widget/LinearLayout;->getBackground()Landroid/graphics/drawable/Drawable;
--
--    move-result-object v2
--
--    int-to-float v0, v0
--
--    int-to-float v1, v1
--
--    invoke-virtual {v2, v0, v1}, Landroid/graphics/drawable/Drawable;->setHotspot(FF)V
--
--    :cond_2
--    const/4 v0, 0x1
--
--    invoke-virtual {p0, v0}, Landroid/widget/LinearLayout;->setPressed(Z)V
--
--    return-void
--
--    :pswitch_data_0
--    .packed-switch 0x0
--        :pswitch_3
--        :pswitch_2
--        :pswitch_1
--        :pswitch_0
--    .end packed-switch
--.end method
-diff --git a/smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda7.smali b/smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda6.smali
-similarity index 93%
-rename from smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda7.smali
-rename to smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda6.smali
-index 7d3fc69af..139441834 100644
---- a/smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda7.smali
+diff --git a/smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda6.smali b/smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda6.smali
+new file mode 100644
+index 000000000..139441834
+--- /dev/null
 +++ b/smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda6.smali
-@@ -1,4 +1,4 @@
--.class public final synthetic Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda7;
+@@ -0,0 +1,108 @@
 +.class public final synthetic Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda6;
- .super Ljava/lang/Object;
- .source "qb/101886872 cc50e995e4fc65df429a508d912903f2f35e60315f091e679da7afd461b54de3"
- 
-@@ -20,11 +20,11 @@
- 
-     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
- 
--    iput-object p1, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda7;->f$0:Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter;
++.super Ljava/lang/Object;
++.source "qb/101886872 cc50e995e4fc65df429a508d912903f2f35e60315f091e679da7afd461b54de3"
++
++# interfaces
++.implements Ljava/lang/Runnable;
++
++
++# instance fields
++.field public final synthetic f$0:Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter;
++
++.field public final synthetic f$1:I
++
++.field public final synthetic f$2:Lcom/android/settings/applications/manageapplications/ApplicationViewHolder;
++
++
++# direct methods
++.method public synthetic constructor <init>(Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter;ILcom/android/settings/applications/manageapplications/ApplicationViewHolder;)V
++    .locals 0
++
++    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
++
 +    iput-object p1, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda6;->f$0:Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter;
- 
--    iput p2, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda7;->f$1:I
++
 +    iput p2, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda6;->f$1:I
- 
--    iput-object p3, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda7;->f$2:Lcom/android/settings/applications/manageapplications/ApplicationViewHolder;
++
 +    iput-object p3, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda6;->f$2:Lcom/android/settings/applications/manageapplications/ApplicationViewHolder;
- 
-     return-void
- .end method
-@@ -34,11 +34,11 @@
- .method public final run()V
-     .locals 5
- 
--    iget-object v0, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda7;->f$0:Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter;
++
++    return-void
++.end method
++
++
++# virtual methods
++.method public final run()V
++    .locals 5
++
 +    iget-object v0, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda6;->f$0:Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter;
- 
--    iget v1, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda7;->f$1:I
++
 +    iget v1, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda6;->f$1:I
- 
--    iget-object p0, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda7;->f$2:Lcom/android/settings/applications/manageapplications/ApplicationViewHolder;
++
 +    iget-object p0, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda6;->f$2:Lcom/android/settings/applications/manageapplications/ApplicationViewHolder;
- 
-     iget v2, v0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter;->mHighlightTargetPosition:I
- 
-diff --git a/smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda9.smali b/smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda8.smali
-similarity index 85%
-rename from smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda9.smali
-rename to smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda8.smali
-index 9b468d88a..c7d1514f4 100644
---- a/smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda9.smali
++
++    iget v2, v0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter;->mHighlightTargetPosition:I
++
++    const/4 v3, -0x1
++
++    if-eq v2, v3, :cond_1
++
++    iget-object v2, v0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter;->mManageApplications:Lcom/android/settings/applications/manageapplications/ManageApplications;
++
++    iget v2, v2, Lcom/android/settings/applications/manageapplications/ManageApplications;->mUpdatedListCount:I
++
++    if-ne v1, v2, :cond_1
++
++    iget-object v1, p0, Landroidx/recyclerview/widget/RecyclerView$ViewHolder;->itemView:Landroid/view/View;
++
++    invoke-virtual {v1}, Landroid/view/View;->getBackground()Landroid/graphics/drawable/Drawable;
++
++    move-result-object v1
++
++    if-eqz v1, :cond_0
++
++    iget-object v1, p0, Landroidx/recyclerview/widget/RecyclerView$ViewHolder;->itemView:Landroid/view/View;
++
++    invoke-virtual {v1}, Landroid/view/View;->getWidth()I
++
++    move-result v1
++
++    div-int/lit8 v1, v1, 0x2
++
++    iget-object v2, p0, Landroidx/recyclerview/widget/RecyclerView$ViewHolder;->itemView:Landroid/view/View;
++
++    invoke-virtual {v2}, Landroid/view/View;->getHeight()I
++
++    move-result v2
++
++    div-int/lit8 v2, v2, 0x2
++
++    iget-object v4, p0, Landroidx/recyclerview/widget/RecyclerView$ViewHolder;->itemView:Landroid/view/View;
++
++    invoke-virtual {v4}, Landroid/view/View;->getBackground()Landroid/graphics/drawable/Drawable;
++
++    move-result-object v4
++
++    int-to-float v1, v1
++
++    int-to-float v2, v2
++
++    invoke-virtual {v4, v1, v2}, Landroid/graphics/drawable/Drawable;->setHotspot(FF)V
++
++    :cond_0
++    iget-object p0, p0, Landroidx/recyclerview/widget/RecyclerView$ViewHolder;->itemView:Landroid/view/View;
++
++    const/4 v1, 0x1
++
++    invoke-virtual {p0, v1}, Landroid/view/View;->setPressed(Z)V
++
++    iput v3, v0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter;->mHighlightTargetPosition:I
++
++    iget-object p0, v0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter;->mManageApplications:Lcom/android/settings/applications/manageapplications/ManageApplications;
++
++    const/4 v0, 0x0
++
++    iput-object v0, p0, Lcom/android/settings/applications/manageapplications/ManageApplications;->mHighlightTargetPackageName:Ljava/lang/String;
++
++    :cond_1
++    return-void
++.end method
+diff --git a/smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda8.smali b/smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda8.smali
+new file mode 100644
+index 000000000..c7d1514f4
+--- /dev/null
 +++ b/smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda8.smali
-@@ -1,4 +1,4 @@
--.class public final synthetic Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda9;
+@@ -0,0 +1,80 @@
 +.class public final synthetic Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda8;
- .super Ljava/lang/Object;
- .source "qb/101886872 cc50e995e4fc65df429a508d912903f2f35e60315f091e679da7afd461b54de3"
- 
-@@ -18,11 +18,11 @@
- .method public synthetic constructor <init>(Lcom/android/settings/applications/manageapplications/ApplicationViewHolder;Landroid/graphics/drawable/Drawable;I)V
-     .locals 0
- 
--    iput p3, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda9;->$r8$classId:I
++.super Ljava/lang/Object;
++.source "qb/101886872 cc50e995e4fc65df429a508d912903f2f35e60315f091e679da7afd461b54de3"
++
++# interfaces
++.implements Ljava/lang/Runnable;
++
++
++# instance fields
++.field public final synthetic $r8$classId:I
++
++.field public final synthetic f$0:Lcom/android/settings/applications/manageapplications/ApplicationViewHolder;
++
++.field public final synthetic f$1:Landroid/graphics/drawable/Drawable;
++
++
++# direct methods
++.method public synthetic constructor <init>(Lcom/android/settings/applications/manageapplications/ApplicationViewHolder;Landroid/graphics/drawable/Drawable;I)V
++    .locals 0
++
 +    iput p3, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda8;->$r8$classId:I
- 
--    iput-object p1, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda9;->f$0:Lcom/android/settings/applications/manageapplications/ApplicationViewHolder;
++
 +    iput-object p1, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda8;->f$0:Lcom/android/settings/applications/manageapplications/ApplicationViewHolder;
- 
--    iput-object p2, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda9;->f$1:Landroid/graphics/drawable/Drawable;
++
 +    iput-object p2, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda8;->f$1:Landroid/graphics/drawable/Drawable;
- 
-     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
- 
-@@ -34,13 +34,13 @@
- .method public final run()V
-     .locals 1
- 
--    iget v0, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda9;->$r8$classId:I
++
++    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
++
++    return-void
++.end method
++
++
++# virtual methods
++.method public final run()V
++    .locals 1
++
 +    iget v0, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda8;->$r8$classId:I
- 
-     packed-switch v0, :pswitch_data_0
- 
--    iget-object v0, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda9;->f$0:Lcom/android/settings/applications/manageapplications/ApplicationViewHolder;
++
++    packed-switch v0, :pswitch_data_0
++
 +    iget-object v0, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda8;->f$0:Lcom/android/settings/applications/manageapplications/ApplicationViewHolder;
- 
--    iget-object p0, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda9;->f$1:Landroid/graphics/drawable/Drawable;
++
 +    iget-object p0, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda8;->f$1:Landroid/graphics/drawable/Drawable;
- 
-     iget-object v0, v0, Lcom/android/settings/applications/manageapplications/ApplicationViewHolder;->mAppIcon:Landroid/widget/ImageView;
- 
-@@ -49,9 +49,9 @@
-     return-void
- 
-     :pswitch_0
--    iget-object v0, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda9;->f$0:Lcom/android/settings/applications/manageapplications/ApplicationViewHolder;
++
++    iget-object v0, v0, Lcom/android/settings/applications/manageapplications/ApplicationViewHolder;->mAppIcon:Landroid/widget/ImageView;
++
++    invoke-virtual {v0, p0}, Landroid/widget/ImageView;->setImageDrawable(Landroid/graphics/drawable/Drawable;)V
++
++    return-void
++
++    :pswitch_0
 +    iget-object v0, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda8;->f$0:Lcom/android/settings/applications/manageapplications/ApplicationViewHolder;
- 
--    iget-object p0, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda9;->f$1:Landroid/graphics/drawable/Drawable;
++
 +    iget-object p0, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda8;->f$1:Landroid/graphics/drawable/Drawable;
- 
-     iget-object v0, v0, Lcom/android/settings/applications/manageapplications/ApplicationViewHolder;->mAppIcon:Landroid/widget/ImageView;
- 
-@@ -60,9 +60,9 @@
-     return-void
- 
-     :pswitch_1
--    iget-object v0, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda9;->f$0:Lcom/android/settings/applications/manageapplications/ApplicationViewHolder;
++
++    iget-object v0, v0, Lcom/android/settings/applications/manageapplications/ApplicationViewHolder;->mAppIcon:Landroid/widget/ImageView;
++
++    invoke-virtual {v0, p0}, Landroid/widget/ImageView;->setImageDrawable(Landroid/graphics/drawable/Drawable;)V
++
++    return-void
++
++    :pswitch_1
 +    iget-object v0, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda8;->f$0:Lcom/android/settings/applications/manageapplications/ApplicationViewHolder;
- 
--    iget-object p0, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda9;->f$1:Landroid/graphics/drawable/Drawable;
++
 +    iget-object p0, p0, Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticLambda8;->f$1:Landroid/graphics/drawable/Drawable;
- 
-     iget-object v0, v0, Lcom/android/settings/applications/manageapplications/ApplicationViewHolder;->mAppIcon:Landroid/widget/ImageView;
- 
-diff --git a/smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticOutline0.smali b/smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticOutline0.smali
-deleted file mode 100644
-index d2b276b1d..000000000
---- a/smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticOutline0.smali
-+++ /dev/null
-@@ -1,23 +0,0 @@
--.class public abstract synthetic Lcom/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter$$ExternalSyntheticOutline0;
--.super Ljava/lang/Object;
--.source "qb/101886872 cc50e995e4fc65df429a508d912903f2f35e60315f091e679da7afd461b54de3"
--
--
--# direct methods
--.method public static m(Ljava/lang/String;ZLjava/lang/String;ZLjava/lang/String;)Ljava/lang/StringBuilder;
--    .locals 1
--
--    new-instance v0, Ljava/lang/StringBuilder;
--
--    invoke-direct {v0, p0}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
--
--    invoke-virtual {v0, p1}, Ljava/lang/StringBuilder;->append(Z)Ljava/lang/StringBuilder;
--
--    invoke-virtual {v0, p2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
--
--    invoke-virtual {v0, p3}, Ljava/lang/StringBuilder;->append(Z)Ljava/lang/StringBuilder;
--
--    invoke-virtual {v0, p4}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
--
--    return-object v0
--.end method
++
++    iget-object v0, v0, Lcom/android/settings/applications/manageapplications/ApplicationViewHolder;->mAppIcon:Landroid/widget/ImageView;
++
++    invoke-virtual {v0, p0}, Landroid/widget/ImageView;->setImageDrawable(Landroid/graphics/drawable/Drawable;)V
++
++    return-void
++
++    nop
++
++    :pswitch_data_0
++    .packed-switch 0x0
++        :pswitch_1
++        :pswitch_0
++    .end packed-switch
++.end method
 diff --git a/smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter.smali b/smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter.smali
 index aca35c8ed..09a3ac86f 100644
 --- a/smali_classes2/com/android/settings/applications/manageapplications/ManageApplications$ApplicationsAdapter.smali
