@@ -546,6 +546,28 @@ else
     fi
 fi
 
+# SEC_PRODUCT_FEATURE_RIL_FEATURES
+if [[ "$SOURCE_RIL_FEATURES" != "$TARGET_RIL_FEATURES" ]]; then
+    if [[ "$SOURCE_RIL_FEATURES" != "none" ]]; then
+        SMALI_PATCH "system" "system/framework/framework.jar" \
+            "smali_classes4/com/android/internal/telephony/TelephonyFeatures.smali" "replaceall" \
+            "$SOURCE_RIL_FEATURES" \
+            "${TARGET_RIL_FEATURES//none/}"
+        SMALI_PATCH "system" "system/framework/telephony-common.jar" \
+            "smali/com/android/internal/telephony/TelephonyLogger.smali" "replace" \
+            "dump(Ljava/io/FileDescriptor;Ljava/io/PrintWriter;[Ljava/lang/String;)V" \
+            "$SOURCE_RIL_FEATURES" \
+            "${TARGET_RIL_FEATURES//none/}"
+        SMALI_PATCH "system" "system/priv-app/TeleService/TeleService.apk" \
+            "smali/com/samsung/telephony/model/feature/tag/SamsungProductFeatureTag.smali" "replaceall" \
+            "$SOURCE_RIL_FEATURES" \
+            "${TARGET_RIL_FEATURES//none/}"
+    else
+        # TODO handle this condition
+        LOG_MISSING_PATCHES "SOURCE_RIL_FEATURES" "TARGET_RIL_FEATURES"
+    fi
+fi
+
 # SEC_PRODUCT_FEATURE_SECURITY_SUPPORT_STRONGBOX
 TARGET_FIRMWARE_PATH="$(cut -d "/" -f 1 -s <<< "$TARGET_FIRMWARE")_$(cut -d "/" -f 2 -s <<< "$TARGET_FIRMWARE")"
 

@@ -304,6 +304,12 @@ fi
 #     It can be checked in the following ways:
 #       - `A11Y_COLOR_BOOL_SUPPORT_MDNIE_HW` value in the `android.view.accessibility.A11yRune` class inside `framework.jar`
 #
+#   [SOURCE/TARGET]_RIL_FEATURES
+#     String containing the device RIL feature string.
+#     Defaults to "none".
+#     It can be checked in the following ways:
+#     - `RIL_FEATURES` value in the `com.android.internal.telephony.TelephonyFeatures` class inside `framework.jar`
+#
 #   [SOURCE/TARGET]_SECURITY_CONFIG_ESE_CHIP_VENDOR
 #     String containing the device eSE chip vendor.
 #     Defaults to "none".
@@ -452,6 +458,8 @@ fi
     GET_BUILD_VAR "TARGET_LCD_CONFIG_SEAMLESS_LUX" "$(test "$TARGET_LCD_CONFIG_HFR_MODE" -gt "1" && echo "" || echo "none")"
     GET_BUILD_VAR "SOURCE_LCD_SUPPORT_MDNIE_HW"
     GET_BUILD_VAR "TARGET_LCD_SUPPORT_MDNIE_HW"
+    GET_BUILD_VAR "SOURCE_RIL_FEATURES" "none"
+    GET_BUILD_VAR "TARGET_RIL_FEATURES" "none"
     GET_BUILD_VAR "SOURCE_SECURITY_CONFIG_ESE_CHIP_VENDOR" "none"
     GET_BUILD_VAR "TARGET_SECURITY_CONFIG_ESE_CHIP_VENDOR" "none"
     GET_BUILD_VAR "SOURCE_SECURITY_CONFIG_ESE_COS_NAME" "none"
