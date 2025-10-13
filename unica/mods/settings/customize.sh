@@ -16,21 +16,21 @@ while IFS= read -r f; do
     if [ ! -f "$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/$f" ]; then
         LOG "- Adding \"$f\" to /system/system/priv-app/SecSettings.apk"
         EVAL "mkdir -p \"$(dirname "$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/$f")\""
-        EVAL "cp -a \"$SRC_DIR/unica/mods/settings/SecSettings.apk/${f//\$/\\$}\" \"$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/${f//\$/\\$}\""
+        EVAL "cp -a \"$MODPATH/SecSettings.apk/${f//\$/\\$}\" \"$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/${f//\$/\\$}\""
     else
         LOG "- Patching \"$f\" in /system/system/priv-app/SecSettings.apk"
         if [[ "$f" == *"res/values"* ]]; then
             PATCH_INST="/<\/resources>/i"
-            CONTENT="$(sed -e "/?xml/d" -e "/resources>/d" "$SRC_DIR/unica/mods/settings/SecSettings.apk/$f")"
+            CONTENT="$(sed -e "/?xml/d" -e "/resources>/d" "$MODPATH/SecSettings.apk/$f")"
         else
-            PATCH_INST="$(head -n 1 "$SRC_DIR/unica/mods/settings/SecSettings.apk/$f")"
-            CONTENT="$(tail -n +2 "$SRC_DIR/unica/mods/settings/SecSettings.apk/$f")"
+            PATCH_INST="$(head -n 1 "$MODPATH/SecSettings.apk/$f")"
+            CONTENT="$(tail -n +2 "$MODPATH/SecSettings.apk/$f")"
         fi
         CONTENT="$(sed -e "s/\"/\\\\\"/g" -e "s/\\$/\\\\$/g" -e "s/ /\\\ /g" <<< "$CONTENT")"
         CONTENT="$(sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g' <<< "$CONTENT")"
         EVAL "sed -i \"$PATCH_INST $CONTENT\" \"$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/$f\""
     fi
-done < <(find "$SRC_DIR/unica/mods/settings/SecSettings.apk" -type f)
+done < <(find "$MODPATH/SecSettings.apk" -type f)
 
 # Mark UN1CA Settings fragments as "valid"
 SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \

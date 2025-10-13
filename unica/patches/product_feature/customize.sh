@@ -86,7 +86,7 @@ fi
 if $SOURCE_AUDIO_SUPPORT_ACH_RINGTONE; then
     if ! $TARGET_AUDIO_SUPPORT_ACH_RINGTONE; then
         APPLY_PATCH "system" "system/framework/framework.jar" \
-            "$SRC_DIR/unica/patches/product_feature/audio/ach/framework.jar/0001-Disable-ACH-ringtone-support.patch"
+            "$MODPATH/audio/ach/framework.jar/0001-Disable-ACH-ringtone-support.patch"
     fi
 else
     if $TARGET_AUDIO_SUPPORT_ACH_RINGTONE; then
@@ -101,9 +101,9 @@ if $SOURCE_AUDIO_SUPPORT_DUAL_SPEAKER; then
         SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_AUDIO_SUPPORT_DUAL_SPEAKER" --delete
 
         APPLY_PATCH "system" "system/framework/framework.jar" \
-            "$SRC_DIR/unica/patches/product_feature/audio/dual_speaker/framework.jar/0001-Disable-dual-speaker-support.patch"
+            "$MODPATH/audio/dual_speaker/framework.jar/0001-Disable-dual-speaker-support.patch"
         APPLY_PATCH "system" "system/framework/services.jar" \
-            "$SRC_DIR/unica/patches/product_feature/audio/dual_speaker/services.jar/0001-Disable-dual-speaker-support.patch"
+            "$MODPATH/audio/dual_speaker/services.jar/0001-Disable-dual-speaker-support.patch"
     fi
 else
     if $TARGET_AUDIO_SUPPORT_DUAL_SPEAKER; then
@@ -116,9 +116,9 @@ fi
 if $SOURCE_AUDIO_SUPPORT_VIRTUAL_VIBRATION; then
     if ! $TARGET_AUDIO_SUPPORT_VIRTUAL_VIBRATION; then
         APPLY_PATCH "system" "system/framework/framework.jar" \
-            "$SRC_DIR/unica/patches/product_feature/audio/virtual_vib/framework.jar/0001-Disable-virtual-vibration-support.patch"
+            "$MODPATH/audio/virtual_vib/framework.jar/0001-Disable-virtual-vibration-support.patch"
         APPLY_PATCH "system" "system/framework/services.jar" \
-            "$SRC_DIR/unica/patches/product_feature/audio/virtual_vib/services.jar/0001-Disable-virtual-vibration-support.patch"
+            "$MODPATH/audio/virtual_vib/services.jar/0001-Disable-virtual-vibration-support.patch"
         SMALI_PATCH "system" "system/framework/services.jar" \
             "smali/com/android/server/audio/BtHelper\$\$ExternalSyntheticLambda0.smali" "remove"
         SMALI_PATCH "system" "system/framework/services.jar" \
@@ -126,9 +126,9 @@ if $SOURCE_AUDIO_SUPPORT_VIRTUAL_VIBRATION; then
         SMALI_PATCH "system" "system/framework/services.jar" \
             "smali_classes2/com/android/server/vibrator/VirtualVibSoundHelper.smali" "remove"
         APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
-            "$SRC_DIR/unica/patches/product_feature/audio/virtual_vib/SecSettings.apk/0001-Disable-virtual-vibration-support.patch"
+            "$MODPATH/audio/virtual_vib/SecSettings.apk/0001-Disable-virtual-vibration-support.patch"
         APPLY_PATCH "system" "system/priv-app/SettingsProvider/SettingsProvider.apk" \
-            "$SRC_DIR/unica/patches/product_feature/audio/virtual_vib/SettingsProvider.apk/0001-Disable-virtual-vibration-support.patch"
+            "$MODPATH/audio/virtual_vib/SettingsProvider.apk/0001-Disable-virtual-vibration-support.patch"
     fi
 else
     if $TARGET_AUDIO_SUPPORT_VIRTUAL_VIBRATION; then
@@ -159,11 +159,11 @@ if ! $SOURCE_COMMON_SUPPORT_DYN_RESOLUTION_CONTROL; then
         ADD_TO_WORK_DIR "b0qxxx" "system" "system/lib64/libgui.so" 0 0 644 "u:object_r:system_lib_file:s0"
 
         APPLY_PATCH "system" "system/framework/framework.jar" \
-            "$SRC_DIR/unica/patches/product_feature/resolution/framework.jar/0001-Enable-dynamic-resolution-control.patch"
+            "$MODPATH/resolution/framework.jar/0001-Enable-dynamic-resolution-control.patch"
         APPLY_PATCH "system" "system/framework/gamemanager.jar" \
-            "$SRC_DIR/unica/patches/product_feature/resolution/gamemanager.jar/0001-Enable-dynamic-resolution-control.patch"
+            "$MODPATH/resolution/gamemanager.jar/0001-Enable-dynamic-resolution-control.patch"
         APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
-            "$SRC_DIR/unica/patches/product_feature/resolution/SecSettings.apk/0001-Enable-dynamic-resolution-control.patch"
+            "$MODPATH/resolution/SecSettings.apk/0001-Enable-dynamic-resolution-control.patch"
         SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
             "smali_classes2/com/android/settings/Utils\$\$ExternalSyntheticLambda2.smali" "remove"
         SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
@@ -175,7 +175,7 @@ if ! $SOURCE_COMMON_SUPPORT_DYN_RESOLUTION_CONTROL; then
         SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
             "smali_classes2/com/android/settings/applications/manageapplications/ManageApplications\$ApplicationsAdapter\$\$ExternalSyntheticOutline0.smali" "remove"
         APPLY_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
-            "$SRC_DIR/unica/patches/product_feature/resolution/SystemUI.apk/0001-Enable-dynamic-resolution-control.patch"
+            "$MODPATH/resolution/SystemUI.apk/0001-Enable-dynamic-resolution-control.patch"
     fi
 else
     if ! $TARGET_COMMON_SUPPORT_DYN_RESOLUTION_CONTROL; then
@@ -202,9 +202,9 @@ if $SOURCE_COMMON_SUPPORT_HDR_EFFECT; then
         SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_COMMON_SUPPORT_HDR_EFFECT" --delete
 
         APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
-            "$SRC_DIR/unica/patches/product_feature/mdnie/hdr/SecSettings.apk/0001-Disable-HDR-Settings.patch"
+            "$MODPATH/mdnie/hdr/SecSettings.apk/0001-Disable-HDR-Settings.patch"
         APPLY_PATCH "system" "system/priv-app/SettingsProvider/SettingsProvider.apk" \
-            "$SRC_DIR/unica/patches/product_feature/mdnie/hdr/SettingsProvider.apk/0001-Disable-HDR-Settings.patch"
+            "$MODPATH/mdnie/hdr/SettingsProvider.apk/0001-Disable-HDR-Settings.patch"
     fi
 else
     if $TARGET_COMMON_SUPPORT_HDR_EFFECT; then
@@ -243,17 +243,17 @@ if [[ "$SOURCE_FINGERPRINT_CONFIG_SENSOR" != "$TARGET_FINGERPRINT_CONFIG_SENSOR"
                 ADD_TO_WORK_DIR "r11sxxx" "system" "system/priv-app/BiometricSetting/BiometricSetting.apk" 0 0 644 "u:object_r:system_file:s0"
 
                 APPLY_PATCH "system" "system/framework/framework.jar" \
-                    "$SRC_DIR/unica/patches/product_feature/fingerprint/optical_fod/framework.jar/0001-Add-optical-FOD-support.patch"
+                    "$MODPATH/fingerprint/optical_fod/framework.jar/0001-Add-optical-FOD-support.patch"
                 APPLY_PATCH "system" "system/framework/services.jar" \
-                    "$SRC_DIR/unica/patches/product_feature/fingerprint/optical_fod/services.jar/0001-Add-optical-FOD-support.patch"
+                    "$MODPATH/fingerprint/optical_fod/services.jar/0001-Add-optical-FOD-support.patch"
                 APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
-                    "$SRC_DIR/unica/patches/product_feature/fingerprint/optical_fod/SecSettings.apk/0001-Add-optical-FOD-support.patch"
+                    "$MODPATH/fingerprint/optical_fod/SecSettings.apk/0001-Add-optical-FOD-support.patch"
                 APPLY_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
-                    "$SRC_DIR/unica/patches/product_feature/fingerprint/optical_fod/SystemUI.apk/0001-Add-optical-FOD-support.patch"
+                    "$MODPATH/fingerprint/optical_fod/SystemUI.apk/0001-Add-optical-FOD-support.patch"
 
                 if [[ "$TARGET_FINGERPRINT_CONFIG_SENSOR" == *"no_delay_in_screen_off"* ]]; then
                     APPLY_PATCH "system" "system/priv-app/BiometricSetting/BiometricSetting.apk" \
-                        "$SRC_DIR/unica/patches/product_feature/fingerprint/optical_fod/BiometricSetting.apk/0001-Enable-FP_FEATURE_NO_DELAY_IN_SCREEN_OFF.patch"
+                        "$MODPATH/fingerprint/optical_fod/BiometricSetting.apk/0001-Enable-FP_FEATURE_NO_DELAY_IN_SCREEN_OFF.patch"
                 fi
 
                 if [[ "$TARGET_FINGERPRINT_CONFIG_SENSOR" == *"transition_effect_on"* ]]; then
@@ -272,11 +272,11 @@ if [[ "$SOURCE_FINGERPRINT_CONFIG_SENSOR" != "$TARGET_FINGERPRINT_CONFIG_SENSOR"
                 ADD_TO_WORK_DIR "b5qxxx" "system" "system/priv-app/BiometricSetting/BiometricSetting.apk" 0 0 644 "u:object_r:system_file:s0"
 
                 APPLY_PATCH "system" "system/framework/framework.jar" \
-                    "$SRC_DIR/unica/patches/product_feature/fingerprint/side_fp/framework.jar/0001-Add-side-fingerprint-sensor-support.patch"
+                    "$MODPATH/fingerprint/side_fp/framework.jar/0001-Add-side-fingerprint-sensor-support.patch"
                 APPLY_PATCH "system" "system/framework/services.jar" \
-                    "$SRC_DIR/unica/patches/product_feature/fingerprint/side_fp/services.jar/0001-Add-side-fingerprint-sensor-support.patch"
+                    "$MODPATH/fingerprint/side_fp/services.jar/0001-Add-side-fingerprint-sensor-support.patch"
                 APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
-                    "$SRC_DIR/unica/patches/product_feature/fingerprint/side_fp/SecSettings.apk/0001-Add-side-fingerprint-sensor-support.patch"
+                    "$MODPATH/fingerprint/side_fp/SecSettings.apk/0001-Add-side-fingerprint-sensor-support.patch"
                 SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
                     "smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature\$\$ExternalSyntheticLambda4.smali" "remove"
                 SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
@@ -284,7 +284,7 @@ if [[ "$SOURCE_FINGERPRINT_CONFIG_SENSOR" != "$TARGET_FINGERPRINT_CONFIG_SENSOR"
                 SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
                     "smali_classes4/com/samsung/android/settings/biometrics/fingerprint/SuwFingerprintUsefulFeature\$1.smali" "remove"
                 APPLY_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
-                    "$SRC_DIR/unica/patches/product_feature/fingerprint/side_fp/SystemUI.apk/0001-Add-side-fingerprint-sensor-support.patch"
+                    "$MODPATH/fingerprint/side_fp/SystemUI.apk/0001-Add-side-fingerprint-sensor-support.patch"
                 SMALI_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
                     "smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl\$\$ExternalSyntheticLambda24.smali" "remove"
                 SMALI_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
@@ -298,7 +298,7 @@ if [[ "$SOURCE_FINGERPRINT_CONFIG_SENSOR" != "$TARGET_FINGERPRINT_CONFIG_SENSOR"
 
                 if [[ "$TARGET_FINGERPRINT_CONFIG_SENSOR" == *"navi=1"* ]]; then
                     APPLY_PATCH "system" "system/framework/services.jar" \
-                        "$SRC_DIR/unica/patches/product_feature/fingerprint/side_fp/services.jar/0002-Enable-FP_FEATURE_GESTURE_MODE.patch"
+                        "$MODPATH/fingerprint/side_fp/services.jar/0002-Enable-FP_FEATURE_GESTURE_MODE.patch"
                 elif [[ "$TARGET_FINGERPRINT_CONFIG_SENSOR" == *"swipe_enroll"* ]] || \
                         [[ "$TARGET_FINGERPRINT_CONFIG_SENSOR" == *"wof_off"* ]]; then
                     # TODO handle these conditions
@@ -351,7 +351,7 @@ if [[ "$SOURCE_LCD_CONFIG_SEAMLESS_BRT" != "$TARGET_LCD_CONFIG_SEAMLESS_BRT" ]] 
     if [[ "$SOURCE_LCD_CONFIG_SEAMLESS_BRT" != "none" ]] && [[ "$SOURCE_LCD_CONFIG_SEAMLESS_LUX" != "none" ]] && \
             [[ "$TARGET_LCD_CONFIG_SEAMLESS_BRT" == "none" ]] && [[ "$TARGET_LCD_CONFIG_SEAMLESS_LUX" == "none" ]]; then
         APPLY_PATCH "system" "system/framework/framework.jar" \
-            "$SRC_DIR/unica/patches/product_feature/hfr/framework.jar/0001-Remove-brightness-threshold-values.patch"
+            "$MODPATH/hfr/framework.jar/0001-Remove-brightness-threshold-values.patch"
     elif [[ "$SOURCE_LCD_CONFIG_SEAMLESS_BRT" != "none" ]] && [[ "$SOURCE_LCD_CONFIG_SEAMLESS_LUX" != "none" ]] && \
             [[ "$TARGET_LCD_CONFIG_SEAMLESS_BRT" != "none" ]] && [[ "$TARGET_LCD_CONFIG_SEAMLESS_LUX" != "none" ]]; then
         SMALI_PATCH "system" "system/framework/framework.jar" \
@@ -533,13 +533,13 @@ if $SOURCE_LCD_SUPPORT_MDNIE_HW && [[ "$SOURCE_LCD_CONFIG_COLOR_WEAKNESS_SOLUTIO
         SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_LCD_SUPPORT_MDNIE_HW" --delete
 
         APPLY_PATCH "system" "system/framework/framework.jar" \
-            "$SRC_DIR/unica/patches/product_feature/mdnie/hw/framework.jar/0001-Disable-HW-mDNIe.patch"
+            "$MODPATH/mdnie/hw/framework.jar/0001-Disable-HW-mDNIe.patch"
         if [[ "$TARGET_LCD_CONFIG_COLOR_WEAKNESS_SOLUTION" == "0" ]]; then
             APPLY_PATCH "system" "system/framework/framework.jar" \
-                "$SRC_DIR/unica/patches/product_feature/mdnie/hw/framework.jar/0002-Disable-A11Y_COLOR_BOOL_SUPPORT_DMC_COLORWEAKNESS.patch"
+                "$MODPATH/mdnie/hw/framework.jar/0002-Disable-A11Y_COLOR_BOOL_SUPPORT_DMC_COLORWEAKNESS.patch"
         fi
         APPLY_PATCH "system" "system/framework/services.jar" \
-            "$SRC_DIR/unica/patches/product_feature/mdnie/hw/services.jar/0001-Disable-HW-mDNIe.patch"
+            "$MODPATH/mdnie/hw/services.jar/0001-Disable-HW-mDNIe.patch"
     fi
 elif $SOURCE_LCD_SUPPORT_MDNIE_HW && [[ "$SOURCE_LCD_CONFIG_COLOR_WEAKNESS_SOLUTION" == "0" ]]; then
     # TODO handle these conditions
@@ -596,7 +596,7 @@ if [[ "$SOURCE_WLAN_CONFIG_CPU_CSTATE_DISABLE_THRESHOLD" != "$TARGET_WLAN_CONFIG
             [[ "$SOURCE_WLAN_CONFIG_DATA_ACTIVITY_AFFINITY_BOOSTER_THRESHOLD" == "0" ]] && \
             [[ "$SOURCE_WLAN_CONFIG_L1SS_DISABLE_THRESHOLD" == "0" ]]; then
         APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
-            "$SRC_DIR/unica/patches/product_feature/wifi/thresholds/semwifi-service.jar/0001-Allow-custom-booster-thresholds-values.patch"
+            "$MODPATH/wifi/thresholds/semwifi-service.jar/0001-Allow-custom-booster-thresholds-values.patch"
         SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
             "smali/com/samsung/android/server/wifi/SemFrameworkFacade.smali" "replace" \
             "getBoosterThresholds()[I" \
@@ -632,7 +632,7 @@ if [[ "$SOURCE_WLAN_CONFIG_CUSTOM_BACKOFF" != "$TARGET_WLAN_CONFIG_CUSTOM_BACKOF
             "$TARGET_WLAN_CONFIG_CUSTOM_BACKOFF"
     elif [[ "$SOURCE_WLAN_CONFIG_CUSTOM_BACKOFF" == "none" ]] && [[ "$TARGET_WLAN_CONFIG_CUSTOM_BACKOFF" != "none" ]]; then
         APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
-            "$SRC_DIR/unica/patches/product_feature/wifi/custom_backoff/semwifi-service.jar/0001-Allow-custom-CUSTOM_BACKOFF-value.patch"
+            "$MODPATH/wifi/custom_backoff/semwifi-service.jar/0001-Allow-custom-CUSTOM_BACKOFF-value.patch"
         SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
             "smali/com/samsung/android/server/wifi/SemWifiCoexManager.smali" "replaceall" \
             "CONFIG_CUSTOM_BACKOFF" \
@@ -644,7 +644,7 @@ if [[ "$SOURCE_WLAN_CONFIG_CUSTOM_BACKOFF" != "$TARGET_WLAN_CONFIG_CUSTOM_BACKOF
             "$SOURCE_WLAN_CONFIG_CUSTOM_BACKOFF" \
             "CONFIG_CUSTOM_BACKOFF" > /dev/null
         APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
-            "$SRC_DIR/unica/patches/product_feature/wifi/custom_backoff/semwifi-service.jar/0001-Remove-CUSTOM_BACKOFF-value.patch"
+            "$MODPATH/wifi/custom_backoff/semwifi-service.jar/0001-Remove-CUSTOM_BACKOFF-value.patch"
     fi
 fi
 
@@ -654,11 +654,11 @@ if ! $SOURCE_WLAN_SUPPORT_80211AX_6GHZ; then
         ADD_TO_WORK_DIR "b0qxxx" "product" "overlay/SoftapOverlay6GHz/SoftapOverlay6GHz.apk" 0 0 644 "u:object_r:system_file:s0"
 
         APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
-            "$SRC_DIR/unica/patches/product_feature/wifi/80211ax_6ghz/semwifi-service.jar/0001-Enable-80211AX_6GHZ-support.patch"
+            "$MODPATH/wifi/80211ax_6ghz/semwifi-service.jar/0001-Enable-80211AX_6GHZ-support.patch"
         APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
-            "$SRC_DIR/unica/patches/product_feature/wifi/80211ax_6ghz/SecSettings.apk/0001-Enable-80211AX_6GHZ-support.patch"
+            "$MODPATH/wifi/80211ax_6ghz/SecSettings.apk/0001-Enable-80211AX_6GHZ-support.patch"
         APPLY_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
-            "$SRC_DIR/unica/patches/product_feature/wifi/80211ax_6ghz/SystemUI.apk/0001-Enable-80211AX_6GHZ-support.patch"
+            "$MODPATH/wifi/80211ax_6ghz/SystemUI.apk/0001-Enable-80211AX_6GHZ-support.patch"
     fi
 else
     if ! $TARGET_WLAN_SUPPORT_80211AX_6GHZ; then
@@ -703,7 +703,7 @@ if [[ "$SOURCE_WLAN_CONFIG_CONNECTION_PERSONALIZATION" != "$TARGET_WLAN_CONFIG_C
                 "0" > /dev/null
         fi
         APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
-            "$SRC_DIR/unica/patches/product_feature/wifi/connection_personalization/semwifi-service.jar/0001-Allow-custom-CONNECTION_PERSONALIZATION-value.patch"
+            "$MODPATH/wifi/connection_personalization/semwifi-service.jar/0001-Allow-custom-CONNECTION_PERSONALIZATION-value.patch"
         if [[ "$SOURCE_WLAN_CONFIG_DYNAMIC_SWITCH" != "0" ]]; then
             SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
                 "smali/com/samsung/android/server/wifi/SemWifiInjector.smali" "replace" \
@@ -718,7 +718,7 @@ if [[ "$SOURCE_WLAN_CONFIG_CONNECTION_PERSONALIZATION" != "$TARGET_WLAN_CONFIG_C
             "$TARGET_WLAN_CONFIG_CONNECTION_PERSONALIZATION" | \
             sed "s/CONFIG_CONNECTION_PERSONALIZATION/$SOURCE_WLAN_CONFIG_CONNECTION_PERSONALIZATION/g"
         APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
-            "$SRC_DIR/unica/patches/product_feature/wifi/connection_personalization/SecSettings.apk/0001-Allow-custom-CONNECTION_PERSONALIZATION-value.patch"
+            "$MODPATH/wifi/connection_personalization/SecSettings.apk/0001-Allow-custom-CONNECTION_PERSONALIZATION-value.patch"
         SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
             "smali_classes3/com/samsung/android/settings/wifi/develop/btm/BtmController.smali" "replace" \
             "getAvailabilityStatus()I" \
@@ -746,11 +746,11 @@ if [[ "$SOURCE_WLAN_CONFIG_CONNECTION_PERSONALIZATION" != "$TARGET_WLAN_CONFIG_C
 
         if ! $TARGET_WLAN_SUPPORT_APE_SERVICE; then
             APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
-                "$SRC_DIR/unica/patches/product_feature/wifi/ape_service/semwifi-service.jar/0001-Disable-APE_SERVICE-support.patch"
+                "$MODPATH/wifi/ape_service/semwifi-service.jar/0001-Disable-APE_SERVICE-support.patch"
             SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
                 "smali/com/samsung/android/server/wifi/SemQboxController\$1.smali" "remove"
             APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
-                "$SRC_DIR/unica/patches/product_feature/wifi/ape_service/SecSettings.apk/0001-Disable-APE_SERVICE-support.patch"
+                "$MODPATH/wifi/ape_service/SecSettings.apk/0001-Disable-APE_SERVICE-support.patch"
         fi
     else
         # TODO handle these conditions
@@ -763,7 +763,7 @@ fi
 if $SOURCE_WLAN_SUPPORT_MOBILEAP_POWER_SAVEMODE; then
     if ! $TARGET_WLAN_SUPPORT_MOBILEAP_POWER_SAVEMODE; then
         APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
-            "$SRC_DIR/unica/patches/product_feature/wifi/power_savemode/semwifi-service.jar/0001-Disable-MOBILEAP_POWER_SAVEMODE-support.patch"
+            "$MODPATH/wifi/power_savemode/semwifi-service.jar/0001-Disable-MOBILEAP_POWER_SAVEMODE-support.patch"
         SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
             "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replaceall" \
             "SPF_POWER_SAVEMODE=true" \
@@ -784,13 +784,13 @@ fi
 if $SOURCE_WLAN_SUPPORT_MOBILEAP_PRIORITIZE_TRAFFIC; then
     if ! $TARGET_WLAN_SUPPORT_MOBILEAP_PRIORITIZE_TRAFFIC; then
         APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
-            "$SRC_DIR/unica/patches/product_feature/wifi/prioritize_traffic/semwifi-service.jar/0001-Disable-MOBILEAP_PRIORITIZE_TRAFFIC-support.patch"
+            "$MODPATH/wifi/prioritize_traffic/semwifi-service.jar/0001-Disable-MOBILEAP_PRIORITIZE_TRAFFIC-support.patch"
         SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
             "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replaceall" \
             "SPF_Prio_Traffic=true" \
             "SPF_Prio_Traffic=false"
         APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
-            "$SRC_DIR/unica/patches/product_feature/wifi/prioritize_traffic/SecSettings.apk/0001-Disable-MOBILEAP_PRIORITIZE_TRAFFIC-support.patch"
+            "$MODPATH/wifi/prioritize_traffic/SecSettings.apk/0001-Disable-MOBILEAP_PRIORITIZE_TRAFFIC-support.patch"
     fi
 else
     if $TARGET_WLAN_SUPPORT_MOBILEAP_PRIORITIZE_TRAFFIC; then
@@ -805,10 +805,10 @@ if ! $SOURCE_WLAN_SUPPORT_MOBILEAP_WIFI_CONCURRENCY; then
         # Check for target flag instead as we've already took care of this SPF above
         if ! $TARGET_WLAN_SUPPORT_MOBILEAP_POWER_SAVEMODE; then
             APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
-                "$SRC_DIR/unica/patches/product_feature/wifi/power_savemode/semwifi-service.jar/0002-Enable-MOBILEAP_WIFI_CONCURRENCY-support.patch"
+                "$MODPATH/wifi/power_savemode/semwifi-service.jar/0002-Enable-MOBILEAP_WIFI_CONCURRENCY-support.patch"
         else
             APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
-                "$SRC_DIR/unica/patches/product_feature/wifi/wifisharing/semwifi-service.jar/0001-Enable-MOBILEAP_WIFI_CONCURRENCY-support.patch"
+                "$MODPATH/wifi/wifisharing/semwifi-service.jar/0001-Enable-MOBILEAP_WIFI_CONCURRENCY-support.patch"
         fi
         SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
             "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replaceall" \
@@ -832,10 +832,10 @@ if ! $SOURCE_WLAN_SUPPORT_MOBILEAP_WIFISHARING_LITE; then
         # Check for target flag instead as we've already took care of this SPF above
         if ! $TARGET_WLAN_SUPPORT_MOBILEAP_POWER_SAVEMODE; then
             APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
-                "$SRC_DIR/unica/patches/product_feature/wifi/power_savemode/semwifi-service.jar/0003-Enable-MOBILEAP_WIFISHARING_LITE-support.patch"
+                "$MODPATH/wifi/power_savemode/semwifi-service.jar/0003-Enable-MOBILEAP_WIFISHARING_LITE-support.patch"
         else
             APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
-                "$SRC_DIR/unica/patches/product_feature/wifi/wifisharing/semwifi-service.jar/0002-Enable-MOBILEAP_WIFISHARING_LITE-support.patch"
+                "$MODPATH/wifi/wifisharing/semwifi-service.jar/0002-Enable-MOBILEAP_WIFISHARING_LITE-support.patch"
         fi
         SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
             "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replaceall" \
@@ -854,15 +854,15 @@ fi
 if $SOURCE_WLAN_SUPPORT_TWT_CONTROL && $SOURCE_WLAN_SUPPORT_LOWLATENCY; then
     if ! $TARGET_WLAN_SUPPORT_TWT_CONTROL; then
         APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
-            "$SRC_DIR/unica/patches/product_feature/wifi/twt_control/semwifi-service.jar/0001-Disable-TWT_CONTROL-support.patch"
+            "$MODPATH/wifi/twt_control/semwifi-service.jar/0001-Disable-TWT_CONTROL-support.patch"
 
         if ! $TARGET_WLAN_SUPPORT_LOWLATENCY; then
             APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
-                "$SRC_DIR/unica/patches/product_feature/wifi/twt_control/semwifi-service.jar/0002-Disable-LOWLATENCY-support.patch"
+                "$MODPATH/wifi/twt_control/semwifi-service.jar/0002-Disable-LOWLATENCY-support.patch"
         fi
     elif ! $TARGET_WLAN_SUPPORT_LOWLATENCY; then
         APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
-            "$SRC_DIR/unica/patches/product_feature/wifi/lowlatency/semwifi-service.jar/0001-Disable-LOWLATENCY-support.patch"
+            "$MODPATH/wifi/lowlatency/semwifi-service.jar/0001-Disable-LOWLATENCY-support.patch"
     fi
 else
     if ! $SOURCE_WLAN_SUPPORT_TWT_CONTROL && $TARGET_WLAN_SUPPORT_TWT_CONTROL; then

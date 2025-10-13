@@ -79,7 +79,7 @@ BACKPORT_SF_PROPS
 if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "34" ]; then
     if [ ! -f "$WORK_DIR/vendor/bin/hw/vendor.samsung.hardware.biometrics.face@3.0-service" ]; then
         APPLY_PATCH "system" "system/framework/services.jar" \
-            "$SRC_DIR/unica/patches/legacy/face/services.jar/0001-Fallback-to-Face-HIDL-2.0.patch"
+            "$MODPATH/face/services.jar/0001-Fallback-to-Face-HIDL-2.0.patch"
     fi
 fi
 
@@ -89,7 +89,7 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ]; then
     if [ -f "$WORK_DIR/vendor/bin/hw/vendor.samsung.hardware.light-service" ] && \
             ! xxd -p -c 4 "$WORK_DIR/vendor/bin/hw/vendor.samsung.hardware.light-service" | grep -q "1853$"; then
         APPLY_PATCH "system" "system/framework/services.jar" \
-            "$SRC_DIR/unica/patches/legacy/lights/services.jar/0001-Backport-legacy-SehLights-HAL-code.patch"
+            "$MODPATH/lights/services.jar/0001-Backport-legacy-SehLights-HAL-code.patch"
     fi
 fi
 

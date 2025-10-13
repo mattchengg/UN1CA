@@ -6,7 +6,7 @@ SET_PROP "system" "ro.unica.codename" "$ROM_CODENAME"
 if $ROM_IS_OFFICIAL; then
     SET_PROP "system" "ro.unica.timestamp" "$ROM_BUILD_TIMESTAMP"
 
-    ADD_TO_WORK_DIR "$SRC_DIR/unica/mods/choidujour" "system" "." 0 0 755 "u:object_r:system_file:s0"
+    ADD_TO_WORK_DIR "$MODPATH" "system" "." 0 0 755 "u:object_r:system_file:s0"
 
     CERT_NAME="aosp_testkey"
     [ -f "$SRC_DIR/security/unica_ota.x509.pem" ] && CERT_NAME="unica_ota"

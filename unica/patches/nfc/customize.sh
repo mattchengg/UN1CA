@@ -96,8 +96,8 @@ if [[ "$SOURCE_SECURITY_CONFIG_ESE_CHIP_VENDOR" != "$TARGET_SECURITY_CONFIG_ESE_
         ADD_TO_WORK_DIR "a73xqxx" "system" "system/lib/libtlc_payment_spay.so" 0 0 644 "u:object_r:system_lib_file:s0"
         ADD_TO_WORK_DIR "a73xqxx" "system" "system/lib64/hidl_tlc_payment_comm_client.so" 0 0 644 "u:object_r:system_lib_file:s0"
         ADD_TO_WORK_DIR "a73xqxx" "system" "system/lib64/libtlc_payment_spay.so" 0 0 644 "u:object_r:system_lib_file:s0"
-        APPLY_PATCH "system" "system/framework/framework.jar" "$SRC_DIR/unica/patches/nfc/ese/framework.jar/0001-Disable-SemService.patch"
-        APPLY_PATCH "system" "system/framework/services.jar" "$SRC_DIR/unica/patches/nfc/ese/services.jar/0001-Disable-SemService.patch"
+        APPLY_PATCH "system" "system/framework/framework.jar" "$MODPATH/ese/framework.jar/0001-Disable-SemService.patch"
+        APPLY_PATCH "system" "system/framework/services.jar" "$MODPATH/ese/services.jar/0001-Disable-SemService.patch"
     else
         FTP="
         system/framework/framework.jar/smali_classes5/com/android/server/SemService.smali

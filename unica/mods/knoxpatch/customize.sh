@@ -7,7 +7,7 @@ DELETE_FROM_WORK_DIR "system" "system/lib64/vendor.samsung.hardware.security.wsm
 
 # Add KnoxPatchHooks
 APPLY_PATCH "system" "system/framework/framework.jar" \
-    "$SRC_DIR/unica/mods/knoxpatch/framework.jar/0001-Introduce-KnoxPatchHooks.patch"
+    "$MODPATH/framework.jar/0001-Introduce-KnoxPatchHooks.patch"
 SMALI_PATCH "system" "system/framework/framework.jar" \
     "smali/android/app/Instrumentation.smali" "replace" \
     'newApplication(Ljava/lang/Class;Landroid/content/Context;)Landroid/app/Application;' \
@@ -21,18 +21,18 @@ SMALI_PATCH "system" "system/framework/framework.jar" \
     '    invoke-static {p3}, Lio/mesalabs/unica/KnoxPatchHooks;->init(Landroid/content/Context;)V\n\n    return-object p0' \
     > /dev/null
 APPLY_PATCH "system" "system/framework/knoxsdk.jar" \
-    "$SRC_DIR/unica/mods/knoxpatch/knoxsdk.jar/0001-Introduce-KnoxPatchHooks.patch"
+    "$MODPATH/knoxsdk.jar/0001-Introduce-KnoxPatchHooks.patch"
 
 # Bypass ICD verification
 SMALI_PATCH "system" "system/framework/samsungkeystoreutils.jar" \
     "smali/com/samsung/android/security/keystore/AttestParameterSpec.smali" "return" \
     'isVerifiableIntegrity()Z' 'false'
 APPLY_PATCH "system" "system/framework/services.jar" \
-    "$SRC_DIR/unica/mods/knoxpatch/services.jar/0001-Bypass-ICD-verification.patch"
+    "$MODPATH/services.jar/0001-Bypass-ICD-verification.patch"
 
 # Disable SAK in DarManagerService
 APPLY_PATCH "system" "system/framework/services.jar" \
-    "$SRC_DIR/unica/mods/knoxpatch/services.jar/0002-Disable-SAK-in-DarManagerService.patch"
+    "$MODPATH/services.jar/0002-Disable-SAK-in-DarManagerService.patch"
 SMALI_PATCH "system" "system/framework/services.jar" \
     "smali/com/android/server/knox/dar/AttestedCertParser.smali" 'remove'
 SMALI_PATCH "system" "system/framework/services.jar" \
