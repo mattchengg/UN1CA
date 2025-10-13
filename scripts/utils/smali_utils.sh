@@ -399,7 +399,7 @@ SMALI_PATCH()
     elif [[ "$OPERATION" == "replaceall" ]]; then
         LOG "- Replacing all occurrences of \"$VALUE\" with \"$REPLACEMENT\" in /$PARTITION/$FILE/$SMALI"
 
-        EVAL "sed -i \"s|$VALUE|$REPLACEMENT|g\" \"$FILE_PATH/$SMALI\"" || return 1
+        EVAL "sed -i \"s|$VALUE|$REPLACEMENT|g\" \"$FILE_PATH/${SMALI//$/\\$}\"" || return 1
 
         AFTER="$(sha1sum "$FILE_PATH/$SMALI")"
         if [[ "$BEFORE" == "$AFTER" ]]; then
