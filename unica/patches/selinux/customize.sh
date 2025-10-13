@@ -11,6 +11,10 @@ heatmap_default
 heatmap_default_exec
 "
 
+DUPLICATES+="
+init.svc.vendor.wvkprov_server_hal
+"
+
 # One UI 7.0 additions
 ENTRIES+="
 attiqi_app
@@ -78,5 +82,16 @@ for e in $ENTRIES; do
     fi
 done
 
-unset ENTRIES CIL_NAME VENDOR_API_LIST
+for e in $DUPLICATES; do
+    if grep -q "^$e.*" "$WORK_DIR/$(GET_SYSTEM_EXT)/etc/selinux/system_ext_property_contexts"; then
+        # the problematic entry is currently present in system_ext, check if we need to remove it
+        if grep -q "^$e.*" "$WORK_DIR/vendor/etc/selinux/vendor_property_contexts"; then
+            # the problematic entry is found in target vendor
+            LOG "- \"$e\" SELinux duplicate entry found. Removing"
+            sed -i "s/^$e/#SEC_DUPLICATE: $e/g" "$WORK_DIR/vendor/etc/selinux/vendor_property_contexts"
+        fi
+    fi
+done
+
+unset ENTRIES DUPLICATES CIL_NAME VENDOR_API_LIST
 unset -f GET_SYSTEM_EXT
