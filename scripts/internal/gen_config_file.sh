@@ -287,6 +287,12 @@ fi
 #     It can be checked in the following ways:
 #       - "SEC_FLOATING_FEATURE_LCD_CONFIG_HFR_SUPPORTED_REFRESH_RATE" value in floating_feature.xml
 #
+#   [SOURCE/TARGET]_LCD_CONFIG_HFR_SUPPORTED_REFRESH_RATE_NS
+#     String containing the device refresh rate normal speed.
+#     Defaults to "none".
+#     It can be checked in the following ways:
+#       - "SEC_FLOATING_FEATURE_LCD_CONFIG_HFR_SUPPORTED_REFRESH_RATE_NS" value in floating_feature.xml
+#
 #   [SOURCE/TARGET]_LCD_CONFIG_SEAMLESS_BRT
 #     String containing the device low/high brightness thresholds for VRR.
 #     Defaults to "none" for devices without VRR.
@@ -452,6 +458,8 @@ fi
     GET_BUILD_VAR "TARGET_LCD_CONFIG_HFR_MODE"
     GET_BUILD_VAR "SOURCE_LCD_CONFIG_HFR_SUPPORTED_REFRESH_RATE" "$(test "$SOURCE_LCD_CONFIG_HFR_MODE" -gt "0" && echo "" || echo "none")"
     GET_BUILD_VAR "TARGET_LCD_CONFIG_HFR_SUPPORTED_REFRESH_RATE" "$(test "$TARGET_LCD_CONFIG_HFR_MODE" -gt "0" && echo "" || echo "none")"
+    GET_BUILD_VAR "SOURCE_LCD_CONFIG_HFR_SUPPORTED_REFRESH_RATE_NS" "none"
+    GET_BUILD_VAR "TARGET_LCD_CONFIG_HFR_SUPPORTED_REFRESH_RATE_NS" "none"
     GET_BUILD_VAR "SOURCE_LCD_CONFIG_SEAMLESS_BRT" "$(test "$SOURCE_LCD_CONFIG_HFR_MODE" -gt "1" && echo "" || echo "none")"
     GET_BUILD_VAR "TARGET_LCD_CONFIG_SEAMLESS_BRT" "$(test "$TARGET_LCD_CONFIG_HFR_MODE" -gt "1" && echo "" || echo "none")"
     GET_BUILD_VAR "SOURCE_LCD_CONFIG_SEAMLESS_LUX" "$(test "$SOURCE_LCD_CONFIG_HFR_MODE" -gt "1" && echo "" || echo "none")"
