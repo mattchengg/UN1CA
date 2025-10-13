@@ -704,8 +704,7 @@ fi
 # SEC_PRODUCT_FEATURE_WLAN_SUPPORT_MOBILEAP_6G
 if ! $SOURCE_WLAN_SUPPORT_MOBILEAP_6G && $TARGET_WLAN_SUPPORT_MOBILEAP_6G; then
     SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
-        "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replace" \
-        "showSecProductFeature()Ljava/lang/String;" \
+        "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replaceall" \
         "SPF_6G=false" \
         "SPF_6G=true"
     SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
@@ -714,8 +713,7 @@ if ! $SOURCE_WLAN_SUPPORT_MOBILEAP_6G && $TARGET_WLAN_SUPPORT_MOBILEAP_6G; then
         "true"
 elif $SOURCE_WLAN_SUPPORT_MOBILEAP_6G && ! $TARGET_WLAN_SUPPORT_MOBILEAP_6G; then
     SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
-        "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replace" \
-        "showSecProductFeature()Ljava/lang/String;" \
+        "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replaceall" \
         "SPF_6G=true" \
         "SPF_6G=false"
     SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
@@ -767,8 +765,7 @@ if $SOURCE_WLAN_SUPPORT_MOBILEAP_POWER_SAVEMODE; then
         APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
             "$SRC_DIR/unica/patches/product_feature/wifi/power_savemode/semwifi-service.jar/0001-Disable-MOBILEAP_POWER_SAVEMODE-support.patch"
         SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
-            "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replace" \
-            "showSecProductFeature()Ljava/lang/String;" \
+            "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replaceall" \
             "SPF_POWER_SAVEMODE=true" \
             "SPF_POWER_SAVEMODE=false"
         SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
@@ -789,8 +786,7 @@ if $SOURCE_WLAN_SUPPORT_MOBILEAP_PRIORITIZE_TRAFFIC; then
         APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
             "$SRC_DIR/unica/patches/product_feature/wifi/prioritize_traffic/semwifi-service.jar/0001-Disable-MOBILEAP_PRIORITIZE_TRAFFIC-support.patch"
         SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
-            "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replace" \
-            "showSecProductFeature()Ljava/lang/String;" \
+            "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replaceall" \
             "SPF_Prio_Traffic=true" \
             "SPF_Prio_Traffic=false"
         APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
@@ -815,8 +811,7 @@ if ! $SOURCE_WLAN_SUPPORT_MOBILEAP_WIFI_CONCURRENCY; then
                 "$SRC_DIR/unica/patches/product_feature/wifi/wifisharing/semwifi-service.jar/0001-Enable-MOBILEAP_WIFI_CONCURRENCY-support.patch"
         fi
         SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
-            "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replace" \
-            "showSecProductFeature()Ljava/lang/String;" \
+            "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replaceall" \
             "SPF_Concurrency=false" \
             "SPF_Concurrency=true"
     fi
@@ -843,8 +838,7 @@ if ! $SOURCE_WLAN_SUPPORT_MOBILEAP_WIFISHARING_LITE; then
                 "$SRC_DIR/unica/patches/product_feature/wifi/wifisharing/semwifi-service.jar/0002-Enable-MOBILEAP_WIFISHARING_LITE-support.patch"
         fi
         SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
-            "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replace" \
-            "showSecProductFeature()Ljava/lang/String;" \
+            "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replaceall" \
             "SPF_WS_Lite=false" \
             "SPF_WS_Lite=true"
     fi
