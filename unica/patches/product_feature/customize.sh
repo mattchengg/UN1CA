@@ -677,8 +677,12 @@ if [[ "$SOURCE_WLAN_CONFIG_CUSTOM_BACKOFF" != "$TARGET_WLAN_CONFIG_CUSTOM_BACKOF
             "$TARGET_WLAN_CONFIG_CUSTOM_BACKOFF" | \
             sed "s/CONFIG_CUSTOM_BACKOFF/$SOURCE_WLAN_CONFIG_CUSTOM_BACKOFF/g"
     elif [[ "$SOURCE_WLAN_CONFIG_CUSTOM_BACKOFF" != "none" ]] && [[ "$TARGET_WLAN_CONFIG_CUSTOM_BACKOFF" == "none" ]]; then
-        # TODO handle this condition
-        LOG_MISSING_PATCHES "SOURCE_WLAN_CONFIG_CUSTOM_BACKOFF" "TARGET_WLAN_CONFIG_CUSTOM_BACKOFF"
+        SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+            "smali/com/samsung/android/server/wifi/SemWifiCoexManager.smali" "replaceall" \
+            "$SOURCE_WLAN_CONFIG_CUSTOM_BACKOFF" \
+            "CONFIG_CUSTOM_BACKOFF" > /dev/null
+        APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
+            "$SRC_DIR/unica/patches/product_feature/wifi/custom_backoff/semwifi-service.jar/0001-Remove-CUSTOM_BACKOFF-value.patch"
     fi
 fi
 
