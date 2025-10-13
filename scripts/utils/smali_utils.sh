@@ -62,7 +62,6 @@ SMALI_PATCH()
     if [[ "$OPERATION" == "replaceall" ]]; then
         _CHECK_NON_EMPTY_PARAM "VALUE" "$5" || return 1
         local VALUE="$5"
-        _CHECK_NON_EMPTY_PARAM "REPLACEMENT" "$6" || return 1
         local REPLACEMENT="$6"
     elif [[ "$OPERATION" != "remove" ]]; then
         _CHECK_NON_EMPTY_PARAM "METHOD" "$5" || return 1
@@ -82,7 +81,6 @@ SMALI_PATCH()
     if [[ "$OPERATION" == "replace" ]]; then
         _CHECK_NON_EMPTY_PARAM "VALUE" "$6" || return 1
         local VALUE="$6"
-        _CHECK_NON_EMPTY_PARAM "REPLACEMENT" "$7" || return 1
         local REPLACEMENT="$7"
     fi
 
