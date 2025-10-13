@@ -371,12 +371,16 @@ SMALI_PATCH()
                         print REP
                         next
                     }
+                } else if ($0 ~ /^[[:space:]]*const-string(\/jumbo)?/) {
+                    sub("\"" STR "\"", "\"" REP "\"")
                 } else {
-                    if (/^[[:space:]]*const-string/ && index($0, "\"" STR "\"")) {
-                        sub("\"" STR "\"", "\"" REP "\"")
-                    }
-                    else if (index($0, STR)) {
-                        gsub(STR, REP)
+                    line = $0
+                    gsub(/^[ \t]+|[ \t]+$/, "", line)
+
+                    if (line == STR) {
+                        match($0, /^[ \t]+/)
+                        indent = substr($0, RSTART, RLENGTH)
+                        $0 = indent REP
                     }
                 }
             }
