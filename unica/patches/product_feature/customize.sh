@@ -724,11 +724,27 @@ fi
 
 # SEC_PRODUCT_FEATURE_WLAN_SUPPORT_APE_SERVICE
 # SEC_PRODUCT_FEATURE_WLAN_CONFIG_CONNECTION_PERSONALIZATION
+# SEC_PRODUCT_FEATURE_WLAN_CONFIG_DYNAMIC_SWITCH
 if [[ "$SOURCE_WLAN_CONFIG_CONNECTION_PERSONALIZATION" != "$TARGET_WLAN_CONFIG_CONNECTION_PERSONALIZATION" ]] || \
+        [[ "$SOURCE_WLAN_CONFIG_DYNAMIC_SWITCH" != "$TARGET_WLAN_CONFIG_DYNAMIC_SWITCH" ]] || \
         [[ "$SOURCE_WLAN_SUPPORT_APE_SERVICE" != "$TARGET_WLAN_SUPPORT_APE_SERVICE" ]]; then
     if [[ "$SOURCE_WLAN_CONFIG_CONNECTION_PERSONALIZATION" == "1" ]] && $SOURCE_WLAN_SUPPORT_APE_SERVICE; then
+        if [[ "$SOURCE_WLAN_CONFIG_DYNAMIC_SWITCH" != "0" ]]; then
+            SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+                "smali/com/samsung/android/server/wifi/SemWifiInjector.smali" "replace" \
+                "<init>(Landroid/content/Context;)V" \
+                "$SOURCE_WLAN_CONFIG_DYNAMIC_SWITCH" \
+                "0" > /dev/null
+        fi
         APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
             "$SRC_DIR/unica/patches/product_feature/wifi/connection_personalization/semwifi-service.jar/0001-Allow-custom-CONNECTION_PERSONALIZATION-value.patch"
+        if [[ "$SOURCE_WLAN_CONFIG_DYNAMIC_SWITCH" != "0" ]]; then
+            SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+                "smali/com/samsung/android/server/wifi/SemWifiInjector.smali" "replace" \
+                "<init>(Landroid/content/Context;)V" \
+                "0" \
+                "$SOURCE_WLAN_CONFIG_DYNAMIC_SWITCH" > /dev/null
+        fi
         SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
             "smali/com/samsung/android/server/wifi/SemWifiInjector.smali" "replace" \
             "<init>(Landroid/content/Context;)V" \
@@ -743,6 +759,24 @@ if [[ "$SOURCE_WLAN_CONFIG_CONNECTION_PERSONALIZATION" != "$TARGET_WLAN_CONFIG_C
             "CONFIG_CONNECTION_PERSONALIZATION" \
             "$TARGET_WLAN_CONFIG_CONNECTION_PERSONALIZATION" | \
             sed "s/CONFIG_CONNECTION_PERSONALIZATION/$SOURCE_WLAN_CONFIG_CONNECTION_PERSONALIZATION/g"
+
+        if [[ "$SOURCE_WLAN_CONFIG_DYNAMIC_SWITCH" != "$TARGET_WLAN_CONFIG_DYNAMIC_SWITCH" ]]; then
+            SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+                "smali/com/samsung/android/server/wifi/SemWifiInjector.smali" "replace" \
+                "<init>(Landroid/content/Context;)V" \
+                "$SOURCE_WLAN_CONFIG_DYNAMIC_SWITCH" \
+                "$TARGET_WLAN_CONFIG_DYNAMIC_SWITCH"
+            SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+                "smali/com/samsung/android/server/wifi/SemWifiResourceManager.smali" "replace" \
+                "<init>(Landroid/content/Context;Lcom/samsung/android/server/wifi/halclient/SemWifiNative;Lcom/samsung/android/server/wifi/SemWifiInjector;)V" \
+                "$SOURCE_WLAN_CONFIG_DYNAMIC_SWITCH" \
+                "$TARGET_WLAN_CONFIG_DYNAMIC_SWITCH"
+            SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+                "smali_classes2/com/android/settings/development/WifiSafePreferenceController.smali" "replace" \
+                "<init>(Landroid/content/Context;)V" \
+                "$SOURCE_WLAN_CONFIG_DYNAMIC_SWITCH" \
+                "$TARGET_WLAN_CONFIG_DYNAMIC_SWITCH"
+        fi
 
         if ! $TARGET_WLAN_SUPPORT_APE_SERVICE; then
             APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
