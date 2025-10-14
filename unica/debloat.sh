@@ -29,9 +29,7 @@ etc/dpolicy
 "
 
 # Samsung GameDriver
-EVAL "rm -r \"$WORK_DIR/system/system/priv-app/GameDriver-\"*"
-EVAL "sed -i \"/GameDriver/d\" \"$WORK_DIR/configs/file_context-system\""
-EVAL "sed -i \"/GameDriver/d\" \"$WORK_DIR/configs/fs_config-system\""
+SYSTEM_DEBLOAT+="$(find "$WORK_DIR/system" -type d -name "*Driver-*" | sed "s|$WORK_DIR/system/||g")"
 
 # Samsung PROCA certificate DB
 SYSTEM_DEBLOAT+="
@@ -133,11 +131,7 @@ system/app/PlayAutoInstallConfig
 "
 
 # Language packs
-SYSTEM_DEBLOAT+="
-system/app/SamsungTTSVoice_en_US_f00
-system/app/SamsungTTSVoice_es_MX_f00
-system/app/SamsungTTSVoice_pt_BR_f00
-"
+SYSTEM_DEBLOAT+="$(find "$WORK_DIR/system" -type d -name "*TTSVoice*" | sed "s|$WORK_DIR/system/||g")"
 
 # Live Transcribe
 SYSTEM_DEBLOAT+="
