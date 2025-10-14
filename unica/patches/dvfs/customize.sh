@@ -1,5 +1,4 @@
-alias _LOG=ABORT
-$DEBUG && alias _LOG=LOGW
+_LOG() { if $DEBUG; then LOGW "$1"; else ABORT "$1"; fi }
 
 # SEC_PRODUCT_FEATURE_DVFSAPP_CONFIG_DVFS_POLICY_FILENAME
 if [[ "$SOURCE_DVFSAPP_CONFIG_DVFS_POLICY_FILENAME" != "$TARGET_DVFSAPP_CONFIG_DVFS_POLICY_FILENAME" ]]; then
@@ -89,4 +88,4 @@ else
     fi
 fi
 
-unalias _LOG
+unset -f _LOG

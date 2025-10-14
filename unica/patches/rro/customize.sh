@@ -12,8 +12,7 @@ if [ ! -d "$SRC_DIR/target/$TARGET_CODENAME/overlay" ]; then
     fi
 fi
 
-alias _LOG=ABORT
-$DEBUG && alias _LOG=LOGW
+_LOG() { if $DEBUG; then LOGW "$1"; else ABORT "$1"; fi }
 
 DECODE_APK "product" "overlay/framework-res__${SOURCE_PRODUCT_NAME}__auto_generated_rro_product.apk"
 
@@ -41,5 +40,5 @@ LOG_STEP_OUT
 
 SET_METADATA "product" "overlay/framework-res__${TARGET_PRODUCT_NAME}__auto_generated_rro_product.apk" 0 0 644 "u:object_r:system_file:s0"
 
-unalias _LOG
 unset SOURCE_PRODUCT_NAME TARGET_PRODUCT_NAME
+unset -f _LOG
