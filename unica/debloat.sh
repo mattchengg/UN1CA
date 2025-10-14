@@ -110,6 +110,11 @@ PRODUCT_DEBLOAT+="
 app/Gmail2
 "
 
+# Google Assistant shortcut
+PRODUCT_DEBLOAT+="
+app/AssistantShell
+"
+
 # Google Chrome
 PRODUCT_DEBLOAT+="
 app/Chrome
