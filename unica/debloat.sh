@@ -138,6 +138,12 @@ system/app/PlayAutoInstallConfig
 # Language packs
 SYSTEM_DEBLOAT+="$(find "$WORK_DIR/system" -type d -name "*TTSVoice*" | sed "s|$WORK_DIR/system/||g")"
 
+# LED Cover Service
+SYSTEM_DEBLOAT+="
+system/etc/permissions/privapp-permissions-com.sec.android.cover.ledcover.xml
+system/priv-app/LedCoverService
+"
+
 # Live Transcribe
 SYSTEM_DEBLOAT+="
 system/app/LiveTranscribe
