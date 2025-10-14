@@ -26,18 +26,18 @@ VENDOR_DEBLOAT="$(sed "/^$/d" <<< "$VENDOR_DEBLOAT" | sort)"
 
 [ "$ODM_DEBLOAT" ] && xargs -I "{}" -P "$(nproc)" \
     bash -c 'source "$SRC_DIR/scripts/utils/module_utils.sh"; DELETE_FROM_WORK_DIR "odm" "$1"' "bash" "{}" \
-    <<< "$ODM_DEBLOAT"
+    <<< "$ODM_DEBLOAT" 2>&1 | sed "/File not found/d"
 [ "$PRODUCT_DEBLOAT" ] && xargs -I "{}" -P "$(nproc)" \
     bash -c 'source "$SRC_DIR/scripts/utils/module_utils.sh"; DELETE_FROM_WORK_DIR "product" "$1"' "bash" "{}" \
-    <<< "$PRODUCT_DEBLOAT"
+    <<< "$PRODUCT_DEBLOAT" 2>&1 | sed "/File not found/d"
 [ "$SYSTEM_DEBLOAT" ] && xargs -I "{}" -P "$(nproc)" \
     bash -c 'source "$SRC_DIR/scripts/utils/module_utils.sh"; DELETE_FROM_WORK_DIR "system" "$1"' "bash" "{}" \
-    <<< "$SYSTEM_DEBLOAT"
+    <<< "$SYSTEM_DEBLOAT" 2>&1 | sed "/File not found/d"
 [ "$SYSTEM_EXT_DEBLOAT" ] && xargs -I "{}" -P "$(nproc)" \
     bash -c 'source "$SRC_DIR/scripts/utils/module_utils.sh"; DELETE_FROM_WORK_DIR "system_ext" "$1"' "bash" "{}" \
-    <<< "$SYSTEM_EXT_DEBLOAT"
+    <<< "$SYSTEM_EXT_DEBLOAT" 2>&1 | sed "/File not found/d"
 [ "$VENDOR_DEBLOAT" ] && xargs -I "{}" -P "$(nproc)" \
     bash -c 'source "$SRC_DIR/scripts/utils/module_utils.sh"; DELETE_FROM_WORK_DIR "vendor" "$1"' "bash" "{}" \
-    <<< "$VENDOR_DEBLOAT"
+    <<< "$VENDOR_DEBLOAT" 2>&1 | sed "/File not found/d"
 
 unset ODM_DEBLOAT PRODUCT_DEBLOAT SYSTEM_DEBLOAT SYSTEM_EXT_DEBLOAT VENDOR_DEBLOAT
