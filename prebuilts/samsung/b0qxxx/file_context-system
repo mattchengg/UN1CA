@@ -76,3 +76,9 @@
 /system/priv-app/AirReadingGlass/AirReadingGlass\.apk u:object_r:system_file:s0
 /system/priv-app/SmartEye u:object_r:system_file:s0
 /system/priv-app/SmartEye/SmartEye\.apk u:object_r:system_file:s0
+/system/system_ext u:object_r:system_file:s0
+/system/system_ext/framework u:object_r:system_file:s0
+/system/system_ext/framework/org\.carconnectivity\.android\.digitalkey\.timesync\.jar u:object_r:system_file:s0
+/system/system_ext/priv-app u:object_r:system_file:s0
+/system/system_ext/priv-app/DckTimeSyncService u:object_r:system_file:s0
+/system/system_ext/priv-app/DckTimeSyncService/DckTimeSyncService\.apk u:object_r:system_file:s0
