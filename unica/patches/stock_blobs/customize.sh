@@ -1,7 +1,33 @@
+# [
+MATCH_TARGET_FEATURES()
+{
+    local SOURCE_FEATURES
+    local TARGET_FEATURES
+
+    SOURCE_FEATURES="$(find "$WORK_DIR/system/system/etc/permissions" -name "com.sec.feature*" -printf "%f\n")"
+    SOURCE_FEATURES="$(sort <<< "$SOURCE_FEATURES")"
+    TARGET_FEATURES="$(find "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/etc/permissions" -name "com.sec.feature*" -printf "%f\n")"
+    TARGET_FEATURES="$(sort <<< "$TARGET_FEATURES")"
+
+    for f in $SOURCE_FEATURES; do
+        if ! grep -q "$f" <<< "$TARGET_FEATURES"; then
+            DELETE_FROM_WORK_DIR "system" "system/etc/permissions/$f"
+        fi
+    done
+    for f in $TARGET_FEATURES; do
+        if ! grep -q "$f" <<< "$SOURCE_FEATURES"; then
+            ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/etc/permissions/$f" 0 0 644 "u:object_r:system_file:s0"
+        fi
+    done
+}
+# ]
+
 TARGET_FIRMWARE_PATH="$(cut -d "/" -f 1 -s <<< "$TARGET_FIRMWARE")_$(cut -d "/" -f 2 -s <<< "$TARGET_FIRMWARE")"
 
 DELETE_FROM_WORK_DIR "system" "system/cameradata"
 ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/cameradata" 0 0 755 "u:object_r:system_file:s0"
+
+MATCH_TARGET_FEATURES
 
 if [ -d "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/etc/saiv" ]; then
     ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" \
@@ -44,3 +70,4 @@ else
 fi
 
 unset TARGET_FIRMWARE_PATH
+unset -f MATCH_TARGET_FEATURES
