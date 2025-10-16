@@ -1,35 +1,34 @@
-SOURCE_FIRMWARE_PATH="$FW_DIR/$(echo -n "$SOURCE_FIRMWARE" | sed 's./._.g' | rev | cut -d "_" -f2- | rev)"
-TARGET_FIRMWARE_PATH="$FW_DIR/$(echo -n "$TARGET_FIRMWARE" | sed 's./._.g' | rev | cut -d "_" -f2- | rev)"
+TARGET_FIRMWARE_PATH="$(cut -d "/" -f 1 -s <<< "$TARGET_FIRMWARE")_$(cut -d "/" -f 2 -s <<< "$TARGET_FIRMWARE")"
+
+DELETE_FROM_WORK_DIR "system" "system/cameradata"
+ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/cameradata" 0 0 755 "u:object_r:system_file:s0"
+
+if [ -d "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/etc/saiv" ]; then
+    ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" \
+        "system/etc/saiv/image_understanding/db/aic_classifier/aic_classifier_cnn.info" 0 0 644 "u:object_r:system_file:s0"
+    ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" \
+        "system/etc/saiv/image_understanding/db/aic_detector/aic_detector_cnn.info" 0 0 644 "u:object_r:system_file:s0"
+else
+    if [ -d "$WORK_DIR/system/system/etc/saiv" ]; then
+        DELETE_FROM_WORK_DIR "system" "system/etc/saiv"
+    fi
+fi
 
 ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/media/bootsamsung.qmg" 0 0 644 "u:object_r:system_file:s0"
 ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/media/bootsamsungloop.qmg" 0 0 644 "u:object_r:system_file:s0"
 ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/media/shutdown.qmg" 0 0 644 "u:object_r:system_file:s0"
 
-echo "Replacing saiv blobs with stock"
-if [ -d "$TARGET_FIRMWARE_PATH/system/system/etc/saiv" ]; then
-    BLOBS_LIST="
-    system/etc/saiv/image_understanding/db/aic_classifier/aic_classifier_cnn.info
-    system/etc/saiv/image_understanding/db/aic_detector/aic_detector_cnn.info
-    "
-    for blob in $BLOBS_LIST
-    do
-        ADD_TO_WORK_DIR "$TARGET_FIRMWARE_PATH" "system" "$blob" 0 0 644 "u:object_r:system_file:s0"
-    done
-else
-    DELETE_FROM_WORK_DIR "system" "system/etc/saiv"
-fi
 DELETE_FROM_WORK_DIR "system" "system/saiv"
-ADD_TO_WORK_DIR "$TARGET_FIRMWARE_PATH" "system" "system/saiv" 0 0 755 "u:object_r:system_file:s0"
+ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/saiv" 0 0 755 "u:object_r:system_file:s0"
 DELETE_FROM_WORK_DIR "system" "system/saiv/textrecognition"
-ADD_TO_WORK_DIR "$SOURCE_FIRMWARE_PATH" "system" "system/saiv/textrecognition" 0 0 755 "u:object_r:system_file:s0"
+ADD_TO_WORK_DIR "$SOURCE_FIRMWARE" "system" "system/saiv/textrecognition" 0 0 755 "u:object_r:system_file:s0"
 
-echo "Replacing cameradata blobs with stock"
-DELETE_FROM_WORK_DIR "system" "system/cameradata"
-ADD_TO_WORK_DIR "$TARGET_FIRMWARE_PATH" "system" "system/cameradata" 0 0 755 "u:object_r:system_file:s0"
-
-if [ -f "$TARGET_FIRMWARE_PATH/system/system/usr/share/alsa/alsa.conf" ]; then
-    echo "Add stock alsa.conf"
-    ADD_TO_WORK_DIR "$TARGET_FIRMWARE_PATH" "system" "system/usr/share/alsa/alsa.conf" 0 0 644 "u:object_r:system_file:s0"
+if [ -f "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/usr/share/alsa/alsa.conf" ]; then
+    ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/usr/share/alsa/alsa.conf" 0 0 644 "u:object_r:system_file:s0"
 else
-    DELETE_FROM_WORK_DIR "system" "system/usr/share/alsa"
+    if [ -d "$WORK_DIR/system/system/usr/share/alsa" ]; then
+        DELETE_FROM_WORK_DIR "system" "system/usr/share/alsa"
+    fi
 fi
+
+unset TARGET_FIRMWARE_PATH
