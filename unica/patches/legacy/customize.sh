@@ -80,6 +80,18 @@ if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "34" ]; then
     if [ ! -f "$WORK_DIR/vendor/bin/hw/vendor.samsung.hardware.biometrics.face@3.0-service" ]; then
         APPLY_PATCH "system" "system/framework/services.jar" \
             "$MODPATH/face/services.jar/0001-Fallback-to-Face-HIDL-2.0.patch"
+        SMALI_PATCH "system" "system/framework/services.jar" \
+            "smali/com/android/server/biometrics/sensors/face/aidl/SemFaceServiceExImpl\$\$ExternalSyntheticLambda6.smali" "remove"
+        SMALI_PATCH "system" "system/framework/services.jar" \
+            "smali_classes2/vendor/samsung/hardware/biometrics/face/V3_0/ISehBiometricsFace.smali" "remove"
+        SMALI_PATCH "system" "system/framework/services.jar" \
+            "smali_classes2/vendor/samsung/hardware/biometrics/face/V3_0/ISehBiometricsFace\$Proxy.smali" "remove"
+        SMALI_PATCH "system" "system/framework/services.jar" \
+            "smali_classes2/vendor/samsung/hardware/biometrics/face/V3_0/ISehBiometricsFace\$Stub\$1.smali" "remove"
+        SMALI_PATCH "system" "system/framework/services.jar" \
+            "smali_classes2/vendor/samsung/hardware/biometrics/face/V3_0/ISehBiometricsFaceClientCallback\$Proxy.smali" "remove"
+        SMALI_PATCH "system" "system/framework/services.jar" \
+            "smali_classes2/vendor/samsung/hardware/biometrics/face/V3_0/ISehBiometricsFaceClientCallback.smali" "remove"
     fi
 fi
 
