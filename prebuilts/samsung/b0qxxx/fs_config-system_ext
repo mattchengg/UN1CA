@@ -1,4 +1,6 @@
  0 0 755 capabilities=0x0
+system_ext/apex 0 0 755 capabilities=0x0
+system_ext/apex/com.android.vndk.v31.apex 0 0 644 capabilities=0x0
 system_ext/framework 0 0 755 capabilities=0x0
 system_ext/framework/org.carconnectivity.android.digitalkey.timesync.jar 0 0 644 capabilities=0x0
 system_ext/priv-app 0 0 755 capabilities=0x0
