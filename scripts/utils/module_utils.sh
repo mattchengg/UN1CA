@@ -124,10 +124,10 @@ GET_GALAXY_STORE_DOWNLOAD_URL()
     local OS
     local OUT
 
-    # Galaxy S23 Ultra EUR_OPENX, EUX CSC
-    DEVICES+=("deviceId=SM-S918B&mcc=262&mnc=01&csc=EUX")
-    # Galaxy S23 Ultra CHN_OPENX, CHC CSC
-    DEVICES+=("deviceId=SM-S9180&mcc=460&mnc=00&csc=CHC")
+    # Galaxy S22 Ultra EUR_OPENX, EUX CSC
+    DEVICES+=("deviceId=SM-S908B&mcc=262&mnc=01&csc=EUX")
+    # Galaxy S22 Ultra CHN_OPENX, CHC CSC
+    DEVICES+=("deviceId=SM-S9080&mcc=460&mnc=00&csc=CHC")
 
     OS="sdkVer="
     OS+="$(GET_PROP "system" "ro.build.version.sdk")"
@@ -135,7 +135,7 @@ GET_GALAXY_STORE_DOWNLOAD_URL()
     OS+="$(GET_PROP "system" "ro.build.version.oneui")"
 
     for i in "${DEVICES[@]}"; do
-        OUT="$(curl -L -s "https://vas.samsungapps.com/stub/stubDownload.as?appId=$PACKAGE&$i&$OS&extuk=0191d6627f38685f&pd=0")"
+        OUT="$(curl -L -s "https://vas.samsungapps.com/stub/stubDownload.as?appId=$PACKAGE&$i&$OS&extuk=0000000000000000&pd=0")"
         if grep -q "Download URI Available" <<< "$OUT"; then
             grep "downloadURI" <<< "$OUT" | cut -d ">" -f 2 | sed -e 's/<!\[CDATA\[//g; s/\]\]//g'
             return $?
