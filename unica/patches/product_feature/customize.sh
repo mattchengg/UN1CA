@@ -597,6 +597,10 @@ if [[ "$SOURCE_RIL_FEATURES" != "$TARGET_RIL_FEATURES" ]]; then
             "smali/com/samsung/telephony/model/feature/tag/SamsungProductFeatureTag.smali" "replaceall" \
             "$SOURCE_RIL_FEATURES" \
             "${TARGET_RIL_FEATURES//none/}"
+        SMALI_PATCH "system" "system/priv-app/TeleService/TeleService.apk" \
+            "smali/com/samsung/telephony/model/feature/SamsungFeatureSatellite.smali" "replaceall" \
+            "$SOURCE_RIL_FEATURES" \
+            "${TARGET_RIL_FEATURES//none/}"
     else
         # TODO handle this condition
         LOG_MISSING_PATCHES "SOURCE_RIL_FEATURES" "TARGET_RIL_FEATURES"
