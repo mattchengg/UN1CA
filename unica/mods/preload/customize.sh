@@ -1,9 +1,7 @@
 # Samsung Internet Browser
 # https://play.google.com/store/apps/details?id=com.sec.android.app.sbrowser
-if [[ "$TARGET_CODENAME" != "a71" ]]; then
-    DOWNLOAD_FILE "$(GET_GALAXY_STORE_DOWNLOAD_URL "com.sec.android.app.sbrowser")" \
-        "$WORK_DIR/system/system/preload/SBrowser/SBrowser.apk"
-fi
+DOWNLOAD_FILE "$(GET_GALAXY_STORE_DOWNLOAD_URL "com.sec.android.app.sbrowser")" \
+    "$WORK_DIR/system/system/preload/SBrowser/SBrowser.apk"
 
 sed -i "/system\/preload/d" "$WORK_DIR/configs/fs_config-system" \
     && sed -i "/system\/preload/d" "$WORK_DIR/configs/file_context-system"
