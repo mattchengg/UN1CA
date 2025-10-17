@@ -166,16 +166,16 @@ fi
 #     Integer containing the size in bytes of the target device super group size, which can be checked using the lpdump tool.
 #     Notice this must be smaller than TARGET_SUPER_PARTITION_SIZE.
 #
+#   TARGET_OS_SINGLE_SYSTEM_IMAGE
+#     String containing the target device SSI, it must match the `ro.build.product` prop.
+#     Currently, only "qssi" is supported.
+#
 #   TARGET_OS_FILE_SYSTEM_TYPE
 #     String containing the target device firmware file system.
 #     Using a different value than stock will require patching the device fstab file in vendor and kernel ramdisk.
 #
 #   TARGET_OS_BUILD_SYSTEM_EXT_PARTITION
 #     If set to true, system_ext partition will be built.
-#
-#   TARGET_OS_SINGLE_SYSTEM_IMAGE
-#     String containing the target device SSI, it must match the `ro.build.product` prop.
-#     Currently, only "qssi" is supported.
 #
 #   TARGET_OS_BOOT_DEVICE_PATH
 #     String containing the path to the target device block devices.
@@ -217,22 +217,6 @@ fi
 #     It can be checked in the following ways:
 #       - `AndroidManifest.xml` of `SamsungCamera.apk` has `hal3_mass-phone-release` value
 #
-#   [SOURCE/TARGET]_DVFSAPP_CONFIG_DVFS_POLICY_FILENAME
-#     String containing the DVFS policy file name used by SDHMS.
-#     It can be checked in the following ways:
-#       - `DVFS_FILENAME` value in the `com.android.server.ssrm.Feature` class inside `ssrm.jar`
-#
-#   [SOURCE/TARGET]_DVFSAPP_CONFIG_SSRM_POLICY_FILENAME
-#     String containing the SSRM policy file name used by SDHMS.
-#     It can be checked in the following ways:
-#       - `SSRM_FILENAME` value in the `com.android.server.ssrm.Feature` class inside `ssrm.jar`
-#       - "SEC_FLOATING_FEATURE_SYSTEM_CONFIG_SIOP_POLICY_FILENAME" value in floating_feature.xml
-#
-#   [SOURCE/TARGET]_FINGERPRINT_CONFIG_SENSOR
-#     String containing the fingerprint sensor feature string.
-#     It can be checked in the following ways:
-#       - `mConfig` value in the `com.samsung.android.bio.fingerprint.SemFingerprintManager$Characteristic` class inside `framework.jar`
-#
 #   [SOURCE/TARGET]_COMMON_CONFIG_MDNIE_MODE
 #     Integer containing the device mDNIe feature bit flag.
 #     It can be checked in the following ways:
@@ -257,6 +241,22 @@ fi
 #       - `com.samsung.android.settings.usefulfeature.videoenhancer.VideoEnhancerPreferenceController.getAvailabilityStatus()`
 #         method inside `SecSettings.apk` is not UNSUPPORTED_ON_DEVICE (3)
 #       - "SEC_FLOATING_FEATURE_COMMON_SUPPORT_HDR_EFFECT" in floating_feature.xml is set to "TRUE"
+#
+#   [SOURCE/TARGET]_DVFSAPP_CONFIG_DVFS_POLICY_FILENAME
+#     String containing the DVFS policy file name used by SDHMS.
+#     It can be checked in the following ways:
+#       - `DVFS_FILENAME` value in the `com.android.server.ssrm.Feature` class inside `ssrm.jar`
+#
+#   [SOURCE/TARGET]_DVFSAPP_CONFIG_SSRM_POLICY_FILENAME
+#     String containing the SSRM policy file name used by SDHMS.
+#     It can be checked in the following ways:
+#       - `SSRM_FILENAME` value in the `com.android.server.ssrm.Feature` class inside `ssrm.jar`
+#       - "SEC_FLOATING_FEATURE_SYSTEM_CONFIG_SIOP_POLICY_FILENAME" value in floating_feature.xml
+#
+#   [SOURCE/TARGET]_FINGERPRINT_CONFIG_SENSOR
+#     String containing the fingerprint sensor feature string.
+#     It can be checked in the following ways:
+#       - `mConfig` value in the `com.samsung.android.bio.fingerprint.SemFingerprintManager$Characteristic` class inside `framework.jar`
 #
 #   [SOURCE/TARGET]_LCD_CONFIG_COLOR_WEAKNESS_SOLUTION
 #     Integer containing the device mDNIe color blindness feature flag.
@@ -315,6 +315,9 @@ fi
 #     Defaults to "none".
 #     It can be checked in the following ways:
 #     - `RIL_FEATURES` value in the `com.android.internal.telephony.TelephonyFeatures` class inside `framework.jar`
+#
+#   [SOURCE/TARGET]_RIL_SIM_CONFIG_MULTISIM_TRAYCOUNT
+#     Integer containing the device multi SIM tray count.
 #
 #   [SOURCE/TARGET]_SECURITY_CONFIG_ESE_CHIP_VENDOR
 #     String containing the device eSE chip vendor.
@@ -471,6 +474,8 @@ fi
     GET_BUILD_VAR "TARGET_LCD_SUPPORT_MDNIE_HW"
     GET_BUILD_VAR "SOURCE_RIL_FEATURES" "none"
     GET_BUILD_VAR "TARGET_RIL_FEATURES" "none"
+    GET_BUILD_VAR "SOURCE_RIL_SIM_CONFIG_MULTISIM_TRAYCOUNT"
+    GET_BUILD_VAR "TARGET_RIL_SIM_CONFIG_MULTISIM_TRAYCOUNT"
     GET_BUILD_VAR "SOURCE_SECURITY_CONFIG_ESE_CHIP_VENDOR" "none"
     GET_BUILD_VAR "TARGET_SECURITY_CONFIG_ESE_CHIP_VENDOR" "none"
     GET_BUILD_VAR "SOURCE_SECURITY_CONFIG_ESE_COS_NAME" "none"
