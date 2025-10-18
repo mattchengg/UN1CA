@@ -62,7 +62,10 @@ else
     source "$SRC_DIR/target/$1/config.sh" || exit 1
 fi
 
-if [ ! -f "$SRC_DIR/unica/configs/$TARGET_OS_SINGLE_SYSTEM_IMAGE.sh" ]; then
+if [ ! "$TARGET_OS_SINGLE_SYSTEM_IMAGE" ]; then
+    LOGE "TARGET_OS_SINGLE_SYSTEM_IMAGE is not set!"
+    exit 1
+elif [ ! -f "$SRC_DIR/unica/configs/$TARGET_OS_SINGLE_SYSTEM_IMAGE.sh" ]; then
     LOGE "\"$TARGET_OS_SINGLE_SYSTEM_IMAGE\" is not a valid system image"
     exit 1
 else
