@@ -1,4 +1,4 @@
-From e47b89344fb20dc8824f1e03130cf5ddf33040ca Mon Sep 17 00:00:00 2001
+From 0036cdcf77a5c5a48318d814bcf07e3a9ee0b4b7 Mon Sep 17 00:00:00 2001
 From: Salvo Giangreco <giangrecosalvo9@gmail.com>
 Date: Mon, 6 Oct 2025 15:12:32 +0200
 Subject: [PATCH] Introduce KeyboxImitationHooks
@@ -3423,7 +3423,7 @@ index 00000000..58521d17
 +.end method
 diff --git a/smali_classes6/io/mesalabs/unica/KeyboxImitationHooks.smali b/smali_classes6/io/mesalabs/unica/KeyboxImitationHooks.smali
 new file mode 100644
-index 00000000..0a2b7ea1
+index 00000000..6cf8db2a
 --- /dev/null
 +++ b/smali_classes6/io/mesalabs/unica/KeyboxImitationHooks.smali
 @@ -0,0 +1,1035 @@
@@ -4260,7 +4260,7 @@ index 00000000..0a2b7ea1
 +
 +    move-result-object p0
 +
-+    invoke-static {p0}, Lio/mesalabs/unica/KeyboxUtils;->fetchPrivateKey(Ljava/lang/Long;)Ljava/security/KeyPair;
++    invoke-static {p0}, Lio/mesalabs/unica/KeyboxUtils;->deletePrivateKey(Ljava/lang/Long;)Ljava/security/KeyPair;
 +
 +    return v2
 +
@@ -4464,7 +4464,7 @@ index 00000000..0a2b7ea1
 +.end method
 diff --git a/smali_classes6/io/mesalabs/unica/KeyboxUtils.smali b/smali_classes6/io/mesalabs/unica/KeyboxUtils.smali
 new file mode 100644
-index 00000000..254a651a
+index 00000000..28e07058
 --- /dev/null
 +++ b/smali_classes6/io/mesalabs/unica/KeyboxUtils.smali
 @@ -0,0 +1,1159 @@
@@ -5209,7 +5209,7 @@ index 00000000..254a651a
 +
 +    const-string v0, "key-"
 +
-+    const-string v1, "sys.unica.vbmeta.key"
++    const-string v1, "ro.boot.vbmeta.public_key_digest"
 +
 +    const-string v2, ""
 +
