@@ -17,12 +17,6 @@ SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
     'ro.product.model' \
     'ro.boot.em.model'
 
-# Enable Outdoor mode support
-SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
-    "smali_classes4/com/samsung/android/settings/display/controller/SecOutDoorModePreferenceController.smali" "return" \
-    'isAvailable()Z' \
-    'true'
-
 LOG_STEP_IN "- Adding UN1CA Settings"
 
 # Dynamically patch SecSettings
