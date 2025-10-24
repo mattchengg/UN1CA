@@ -3,6 +3,54 @@ SET_PROP "system" "ro.unica.codename" "$ROM_CODENAME"
 
 DECODE_APK "system" "system/priv-app/SecSettings/SecSettings.apk"
 
+# Always show One UI minor version
+SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+    "smali_classes4/com/samsung/android/settings/deviceinfo/softwareinfo/OneUIVersionPreferenceController.smali" "replace" \
+    'isDeviceWithMicroVersion()Z' \
+    'move-result p0' \
+    'const/4 p0, 0x1'
+
+# Show real device model number
+SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+    "smali_classes4/com/samsung/android/settings/deviceinfo/aboutphone/ModelNameGetter.smali" "replace" \
+    'getModelName()Ljava/lang/String;' \
+    'ro.product.model' \
+    'ro.boot.em.model'
+
+# Enable Outdoor mode support
+SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+    "smali_classes4/com/samsung/android/settings/display/controller/SecOutDoorModePreferenceController.smali" "return" \
+    'isAvailable()Z' \
+    'true'
+
+# Set auto confirm PIN min digits to 4
+SMALI_PATCH "system" "system/framework/services.jar" \
+    "smali/com/android/server/locksettings/LockSettingsService.smali" "replace" \
+    'refreshStoredPinLength(I)Z' \
+    'const/4 v0, 0x6' \
+    'const/4 v0, 0x4'
+SMALI_PATCH "system" "system/framework/services.jar" \
+    "smali/com/android/server/locksettings/SyntheticPasswordManager.smali" "replace" \
+    'createLskfBasedProtector(Landroid/service/gatekeeper/IGateKeeperService;Lcom/android/internal/widget/LockscreenCredential;JLcom/android/internal/widget/LockscreenCredential;Lcom/android/server/locksettings/SyntheticPasswordManager$SyntheticPassword;I)J' \
+    'const/4 v12, 0x6' \
+    'const/4 v12, 0x4'
+SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+    "smali/com/android/settings/password/ChooseLockPassword\$ChooseLockPasswordFragment.smali" "replace" \
+    'handleNext$2()V' \
+    'const/4 v4, 0x6' \
+    'const/4 v4, 0x4'
+SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+    "smali/com/android/settings/password/ChooseLockPassword\$ChooseLockPasswordFragment.smali" "replace" \
+    'setAutoPinConfirmOption(IZ)V' \
+    'const/4 p2, 0x6' \
+    'const/4 p2, 0x4'
+
+# Allow custom Monotype fonts
+SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+    "smali_classes4/com/samsung/android/settings/display/SecDisplayUtils.smali" "return" \
+    'isInvalidFont(Landroid/content/Context;Ljava/lang/String;)Z' \
+    'false'
+
 LOG_STEP_IN "- Adding UN1CA Settings"
 
 # Dynamically patch SecSettings
@@ -33,6 +81,7 @@ while IFS= read -r f; do
 done < <(find "$MODPATH/SecSettings.apk" -type f)
 
 # Mark UN1CA Settings fragments as "valid"
+LOG "- Patching \"smali_classes2/com/android/settings/core/gateway/SettingsGateway.smali\" in /system/system/priv-app/SecSettings.apk"
 SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
     "smali_classes2/com/android/settings/core/gateway/SettingsGateway.smali" "replace" \
     '<clinit>()V' \
@@ -45,6 +94,7 @@ SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
     'filled-new-array/range {v1 .. v160}, [Ljava/lang/String;' \
     '    const-string v161, "io.mesalabs.unica.settings.spoof.SpoofSettingsFragment"\n\n    filled-new-array/range {v1 .. v161}, [Ljava/lang/String;' \
     > /dev/null
+LOG "- Patching \"smali_classes2/com/android/settings/SettingsActivity.smali\" in /system/system/priv-app/SecSettings.apk"
 SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
     "smali_classes2/com/android/settings/SettingsActivity.smali" "replace" \
     'isValidFragment(Ljava/lang/String;)Z' \
@@ -53,6 +103,7 @@ SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
     > /dev/null
 
 # Add UN1CA Settings SearchIndexDataProvider(s)
+LOG "- Patching \"smali/com/android/settingslib/search/SearchIndexableResourcesBase.smali\" in /system/system/priv-app/SecSettings.apk"
 SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
     "smali/com/android/settingslib/search/SearchIndexableResourcesBase.smali" "replace" \
     '<init>()V' \
@@ -113,6 +164,8 @@ SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
     'return-void' \
     '    invoke-virtual {p0, v0}, Lcom/android/settingslib/search/SearchIndexableResourcesBase;->addIndex(Lcom/android/settingslib/search/SearchIndexableData;)V\n\n    return-void' \
     > /dev/null
+DECODE_APK "system" "system/priv-app/SecSettingsIntelligence/SecSettingsIntelligence.apk"
+LOG "- Patching \"smali_classes2/com/samsung/android/settings/intelligence/search/categorizing/TopLevelKeysCollector.smali\" in /system/system/priv-app/SecSettingsIntelligence/SecSettingsIntelligence.apk"
 SMALI_PATCH "system" "system/priv-app/SecSettingsIntelligence/SecSettingsIntelligence.apk" \
     "smali_classes2/com/samsung/android/settings/intelligence/search/categorizing/TopLevelKeysCollector.smali" "replace" \
     '<init>(Landroid/content/Context;)V' \
