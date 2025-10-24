@@ -1,6 +1,10 @@
-.class public Lio/mesalabs/unica/settings/spoof/GamesPropsPreferenceController;
+.class public Lio/mesalabs/unica/settings/ui/LiveBlurPreferenceController;
 .super Lcom/android/settings/core/TogglePreferenceController;
-.source "GamesPropsPreferenceController.java"
+.source "LiveBlurPreferenceController.java"
+
+
+# instance fields
+.field public mRebootDialog:Landroidx/appcompat/app/AlertDialog;
 
 
 # direct methods
@@ -15,20 +19,35 @@
 
 # virtual methods
 .method public getAvailabilityStatus()I
-    .locals 0
+    .locals 1
 
     :try_start_0
-    const-string p0, "io.mesalabs.unica.GamesPropsUtils"
+    const-string p0, "io.mesalabs.unica.FloatingFeatureHooks"
 
     invoke-static {p0}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
     :try_end_0
     .catch Ljava/lang/ClassNotFoundException; {:try_start_0 .. :try_end_0} :catch_0
+
+    const-string p0, "ro.board.platform"
+
+    invoke-static {p0}, Landroid/os/SemSystemProperties;->get(Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object p0
+
+    const-string v0, "mt"
+
+    invoke-virtual {p0, v0}, Ljava/lang/String;->startsWith(Ljava/lang/String;)Z
+
+    move-result p0
+
+    if-nez p0, :cond_0
 
     const/4 p0, 0x0
 
     return p0
 
     :catch_0
+    :cond_0
     const/4 p0, 0x3
 
     return p0
@@ -107,7 +126,7 @@
 .method public isChecked()Z
     .locals 1
 
-    const-string p0, "persist.sys.unica.gamehooks"
+    const-string p0, "persist.sys.unica.nativeblur"
 
     const/4 v0, 0x1
 
@@ -147,15 +166,32 @@
 .end method
 
 .method public setChecked(Z)Z
-    .locals 0
+    .locals 1
 
-    const-string p0, "persist.sys.unica.gamehooks"
+    const-string v0, "persist.sys.unica.nativeblur"
 
     invoke-static {p1}, Ljava/lang/Boolean;->toString(Z)Ljava/lang/String;
 
     move-result-object p1
 
-    invoke-static {p0, p1}, Landroid/os/SemSystemProperties;->set(Ljava/lang/String;Ljava/lang/String;)V
+    invoke-static {v0, p1}, Landroid/os/SemSystemProperties;->set(Ljava/lang/String;Ljava/lang/String;)V
+
+    iget-object p1, p0, Lio/mesalabs/unica/settings/ui/LiveBlurPreferenceController;->mRebootDialog:Landroidx/appcompat/app/AlertDialog;
+
+    if-nez p1, :cond_0
+
+    iget-object p1, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
+
+    invoke-static {p1}, Lio/mesalabs/unica/utils/Utils;->createRebootDialog(Landroid/content/Context;)Landroidx/appcompat/app/AlertDialog;
+
+    move-result-object p1
+
+    iput-object p1, p0, Lio/mesalabs/unica/settings/ui/LiveBlurPreferenceController;->mRebootDialog:Landroidx/appcompat/app/AlertDialog;
+
+    :cond_0
+    iget-object p0, p0, Lio/mesalabs/unica/settings/ui/LiveBlurPreferenceController;->mRebootDialog:Landroidx/appcompat/app/AlertDialog;
+
+    invoke-virtual {p0}, Landroid/app/Dialog;->show()V
 
     const/4 p0, 0x1
 

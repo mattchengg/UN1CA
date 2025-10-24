@@ -3,6 +3,10 @@
     <string name="keywords_unica_settings">UN1CA Settings</string>
     <string name="menu_key_unica_top_settings">top_level_unica</string>
     <string name="unica_device_name_title">Device name</string>
+    <string name="unica_dialog_reboot_msg">To apply the changes, a restart is required.</string>
+    <string name="unica_dialog_reboot_negative">Not now</string>
+    <string name="unica_dialog_reboot_positive">Restart</string>
+    <string name="unica_dialog_reboot_title">Restart required</string>
     <string name="unica_extra_settings_title">Extra settings</string>
     <string name="unica_games_spoof_title">Unlock higher FPS in games</string>
     <string name="unica_hma_title">Hide installed apps</string>
@@ -21,11 +25,14 @@
     <string name="unica_keybox_toast_loaded">Keybox file loaded.</string>
     <string name="unica_keybox_toast_not_gak">Keybox is not signed by Google.</string>
     <string name="unica_keybox_toast_not_valid">Keybox file not valid.</string>
+    <string name="unica_launcher_anim_type_title">Launcher animation type</string>
+    <string name="unica_max_refresh_rate_title">Force peak refresh rate</string>
     <string name="unica_menu_item_reboot_download_title">Reboot to Download</string>
     <string name="unica_menu_item_reboot_fastboot_title">Reboot to Fastboot</string>
     <string name="unica_menu_item_reboot_recovery_title">Reboot to Recovery</string>
     <string name="unica_menu_item_reboot_title">Reboot</string>
     <string name="unica_menu_reboot_title">Reboot options</string>
+    <string name="unica_native_blur_title">Enable live blur effect</string>
     <string name="unica_pif_attest_key_title">Block DroidGuard key attestation</string>
     <string name="unica_pif_custom_title">Import custom PIF props from file</string>
     <string name="unica_pif_summary">Spoof your device to pass Google Play attestation.</string>
@@ -40,5 +47,6 @@
     <string name="unica_rom_version_title">ROM version</string>
     <string name="unica_settings_title">UN1CA Settings</string>
     <string name="unica_spoof_settings_title">Spoof settings</string>
+    <string name="unica_ui_settings_title">UI settings</string>
     <string name="unica_updates_title">UN1CA Updates</string>
 </resources>

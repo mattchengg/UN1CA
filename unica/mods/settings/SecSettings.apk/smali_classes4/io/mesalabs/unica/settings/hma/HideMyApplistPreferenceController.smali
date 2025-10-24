@@ -48,12 +48,12 @@
 
     const/4 p0, 0x0
 
-    return v0
+    return p0
 
     :catch_0
     const/4 p0, 0x3
 
-    return v0
+    return p0
 .end method
 
 .method public bridge synthetic getBackgroundWorkerClass()Ljava/lang/Class;
