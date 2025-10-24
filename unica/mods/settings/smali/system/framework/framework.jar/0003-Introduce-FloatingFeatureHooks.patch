@@ -1,12 +1,12 @@
-From 1b61591032677011c34a5843dba1f54ad3b935aa Mon Sep 17 00:00:00 2001
+From fd6f7363516acc194993192e33a415e47ec85205 Mon Sep 17 00:00:00 2001
 From: Salvo Giangreco <giangrecosalvo9@gmail.com>
 Date: Fri, 24 Oct 2025 13:32:43 +0200
 Subject: [PATCH] Introduce FloatingFeatureHooks
 
 ---
  .../android/feature/SemFloatingFeature.smali  |  70 +++-
- .../mesalabs/unica/FloatingFeatureHooks.smali | 300 ++++++++++++++++++
- 2 files changed, 360 insertions(+), 10 deletions(-)
+ .../mesalabs/unica/FloatingFeatureHooks.smali | 306 ++++++++++++++++++
+ 2 files changed, 366 insertions(+), 10 deletions(-)
  create mode 100644 smali_classes6/io/mesalabs/unica/FloatingFeatureHooks.smali
 
 diff --git a/smali_classes6/com/samsung/android/feature/SemFloatingFeature.smali b/smali_classes6/com/samsung/android/feature/SemFloatingFeature.smali
@@ -166,10 +166,10 @@ index ef456f39..37c79e55 100644
  .end method
 diff --git a/smali_classes6/io/mesalabs/unica/FloatingFeatureHooks.smali b/smali_classes6/io/mesalabs/unica/FloatingFeatureHooks.smali
 new file mode 100644
-index 00000000..aa67121d
+index 00000000..1905b954
 --- /dev/null
 +++ b/smali_classes6/io/mesalabs/unica/FloatingFeatureHooks.smali
-@@ -0,0 +1,300 @@
+@@ -0,0 +1,306 @@
 +.class public final Lio/mesalabs/unica/FloatingFeatureHooks;
 +.super Ljava/lang/Object;
 +.source "FloatingFeatureHooks.java"
@@ -213,7 +213,7 @@ index 00000000..aa67121d
 +
 +# direct methods
 +.method static constructor blacklist <clinit>()V
-+    .locals 5
++    .locals 4
 +
 +    new-instance v0, Ljava/util/HashMap;
 +
@@ -239,11 +239,11 @@ index 00000000..aa67121d
 +
 +    move-result v2
 +
-+    const/4 v3, 0x1
-+
 +    if-nez v2, :cond_0
 +
 +    const-string v2, "persist.sys.unica.nativeblur"
++
++    const/4 v3, 0x1
 +
 +    invoke-static {v2, v3}, Landroid/os/SemSystemProperties;->getBoolean(Ljava/lang/String;Z)Z
 +
@@ -251,57 +251,19 @@ index 00000000..aa67121d
 +
 +    if-eqz v2, :cond_0
 +
-+    move v2, v3
-+
 +    goto :goto_0
 +
 +    :cond_0
-+    const/4 v2, 0x0
++    const/4 v3, 0x0
 +
 +    :goto_0
-+    invoke-static {v2}, Ljava/lang/Boolean;->valueOf(Z)Ljava/lang/Boolean;
++    invoke-static {v3}, Ljava/lang/Boolean;->valueOf(Z)Ljava/lang/Boolean;
 +
 +    move-result-object v2
 +
-+    const-string v4, "SEC_FLOATING_FEATURE_GRAPHICS_SUPPORT_3D_SURFACE_TRANSITION_FLAG"
++    const-string v3, "SEC_FLOATING_FEATURE_GRAPHICS_SUPPORT_3D_SURFACE_TRANSITION_FLAG"
 +
-+    invoke-virtual {v0, v4, v2}, Ljava/util/HashMap;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-+
-+    const-string v0, "persist.sys.unica.launcher_anim_type"
-+
-+    invoke-static {v0, v3}, Landroid/os/SemSystemProperties;->getInt(Ljava/lang/String;I)I
-+
-+    move-result v0
-+
-+    if-eqz v0, :cond_3
-+
-+    if-eq v0, v3, :cond_2
-+
-+    const/4 v2, 0x2
-+
-+    if-eq v0, v2, :cond_1
-+
-+    const-string v0, "LowestEnd"
-+
-+    goto :goto_1
-+
-+    :cond_1
-+    const-string v0, "LowEnd"
-+
-+    goto :goto_1
-+
-+    :cond_2
-+    const-string v0, "Mass"
-+
-+    goto :goto_1
-+
-+    :cond_3
-+    const-string v0, "HighEnd"
-+
-+    :goto_1
-+    const-string v2, "SEC_FLOATING_FEATURE_LAUNCHER_CONFIG_ANIMATION_TYPE"
-+
-+    invoke-virtual {v1, v2, v0}, Ljava/util/HashMap;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
++    invoke-virtual {v0, v3, v2}, Ljava/util/HashMap;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 +
 +    const-string v0, "ro.boot.em.model"
 +
@@ -317,7 +279,7 @@ index 00000000..aa67121d
 +
 +    move-result v0
 +
-+    if-eqz v0, :cond_4
++    if-eqz v0, :cond_1
 +
 +    const-string v0, "SEC_FLOATING_FEATURE_SETTINGS_CONFIG_BRAND_NAME"
 +
@@ -331,7 +293,7 @@ index 00000000..aa67121d
 +
 +    invoke-virtual {v1, v0, v2}, Ljava/util/HashMap;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 +
-+    :cond_4
++    :cond_1
 +    return-void
 +.end method
 +
@@ -430,10 +392,54 @@ index 00000000..aa67121d
 +    goto :goto_0
 +
 +    :cond_0
++    const-string v0, "SEC_FLOATING_FEATURE_LAUNCHER_CONFIG_ANIMATION_TYPE"
++
++    invoke-virtual {p0, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v0
++
++    if-eqz v0, :cond_4
++
++    const-string v0, "persist.sys.unica.launcher_anim_type"
++
++    const/4 v1, 0x1
++
++    invoke-static {v0, v1}, Landroid/os/SemSystemProperties;->getInt(Ljava/lang/String;I)I
++
++    move-result v0
++
++    if-eqz v0, :cond_3
++
++    if-eq v0, v1, :cond_2
++
++    const/4 v1, 0x2
++
++    if-eq v0, v1, :cond_1
++
++    const-string v0, "LowestEnd"
++
++    goto :goto_0
++
++    :cond_1
++    const-string v0, "LowEnd"
++
++    goto :goto_0
++
++    :cond_2
++    const-string v0, "Mass"
++
++    goto :goto_0
++
++    :cond_3
++    const-string v0, "HighEnd"
++
++    goto :goto_0
++
++    :cond_4
 +    const/4 v0, 0x0
 +
 +    :goto_0
-+    if-eqz v0, :cond_1
++    if-eqz v0, :cond_5
 +
 +    new-instance v1, Ljava/lang/StringBuilder;
 +
@@ -467,7 +473,7 @@ index 00000000..aa67121d
 +
 +    invoke-static {p0}, Lio/mesalabs/unica/FloatingFeatureHooks;->dlog(Ljava/lang/String;)V
 +
-+    :cond_1
++    :cond_5
 +    return-object v0
 +.end method
 -- 
