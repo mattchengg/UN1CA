@@ -71,7 +71,13 @@ SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
     "smali_classes2/com/android/settings/core/gateway/SettingsGateway.smali" "replace" \
     '<clinit>()V' \
     'filled-new-array/range {v1 .. v160}, [Ljava/lang/String;' \
-    '    const-string v161, "io.mesalabs.unica.settings.spoof.SpoofSettingsFragment"\n\n    filled-new-array/range {v1 .. v161}, [Ljava/lang/String;' \
+    '    const-string v161, "io.mesalabs.unica.settings.hma.HideMyApplistFragment"\n\n    filled-new-array/range {v1 .. v161}, [Ljava/lang/String;' \
+    > /dev/null
+SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+    "smali_classes2/com/android/settings/core/gateway/SettingsGateway.smali" "replace" \
+    '<clinit>()V' \
+    'filled-new-array/range {v1 .. v161}, [Ljava/lang/String;' \
+    '    const-string v162, "io.mesalabs.unica.settings.spoof.SpoofSettingsFragment"\n\n    filled-new-array/range {v1 .. v162}, [Ljava/lang/String;' \
     > /dev/null
 LOG "- Patching \"smali_classes2/com/android/settings/SettingsActivity.smali\" in /system/system/priv-app/SecSettings.apk"
 SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \

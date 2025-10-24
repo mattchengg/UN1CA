@@ -92,16 +92,10 @@
     return-object p0
 .end method
 
-.method public getSliceHighlightMenuRes()I
-    .locals 1
+.method public bridge synthetic getSliceHighlightMenuRes()I
+    .locals 0
 
-    const-string p0, "string"
-
-    const-string v0, "menu_key_unica_spoof_settings"
-
-    invoke-static {p0, v0}, Lio/mesalabs/unica/utils/Utils;->getResourceId(Ljava/lang/String;Ljava/lang/String;)I
-
-    move-result p0
+    const/4 p0, 0x0
 
     return p0
 .end method
