@@ -1,0 +1,4 @@
+id=vintf
+name=Target VINTF compatibility
+author=salvogiangri
+description=Replace generic source vintf manifests with target ones
