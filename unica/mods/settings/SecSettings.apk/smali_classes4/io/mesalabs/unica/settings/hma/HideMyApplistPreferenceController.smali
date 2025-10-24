@@ -137,124 +137,137 @@
 
     if-ne v0, v2, :cond_5
 
-    iget-object v0, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
+    new-instance v0, Ljava/util/ArrayList;
 
-    invoke-static {v0}, Lio/mesalabs/unica/HideAppListUtils;->getApps(Landroid/content/Context;)Ljava/util/Set;
+    invoke-direct {v0}, Ljava/util/ArrayList;-><init>()V
 
-    move-result-object v0
+    iget-object v3, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
 
-    invoke-interface {v0}, Ljava/util/Set;->isEmpty()Z
+    invoke-virtual {v3}, Landroid/content/Context;->getPackageManager()Landroid/content/pm/PackageManager;
 
-    move-result v2
+    move-result-object v3
 
-    if-nez v2, :cond_4
+    iget-object v4, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
 
-    invoke-interface {v0}, Ljava/util/Set;->size()I
+    invoke-static {v4}, Lio/mesalabs/unica/HideAppListUtils;->getApps(Landroid/content/Context;)Ljava/util/Set;
 
-    move-result v2
+    move-result-object v4
 
-    const/4 v3, 0x2
+    invoke-interface {v4}, Ljava/util/Set;->iterator()Ljava/util/Iterator;
 
-    if-le v2, v3, :cond_0
-
-    goto :goto_2
-
-    :cond_0
-    iget-object v2, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
-
-    invoke-virtual {v2}, Landroid/content/Context;->getPackageManager()Landroid/content/pm/PackageManager;
-
-    move-result-object v2
-
-    invoke-interface {v0}, Ljava/util/Set;->iterator()Ljava/util/Iterator;
-
-    move-result-object v0
-
-    const/4 v3, 0x0
+    move-result-object v4
 
     :catch_0
-    :cond_1
+    :cond_0
     :goto_0
-    invoke-interface {v0}, Ljava/util/Iterator;->hasNext()Z
-
-    move-result v4
-
-    if-eqz v4, :cond_3
-
-    invoke-interface {v0}, Ljava/util/Iterator;->next()Ljava/lang/Object;
-
-    move-result-object v4
-
-    check-cast v4, Ljava/lang/String;
-
-    const/high16 v5, 0x400000
-
-    :try_start_0
-    invoke-virtual {v2, v4, v5}, Landroid/content/pm/PackageManager;->getPackageInfo(Ljava/lang/String;I)Landroid/content/pm/PackageInfo;
-
-    move-result-object v4
-
-    iget-object v4, v4, Landroid/content/pm/PackageInfo;->applicationInfo:Landroid/content/pm/ApplicationInfo;
-
-    if-eqz v4, :cond_1
-
-    invoke-static {v3}, Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z
+    invoke-interface {v4}, Ljava/util/Iterator;->hasNext()Z
 
     move-result v5
 
-    if-nez v5, :cond_2
+    if-eqz v5, :cond_1
 
-    iget-object v5, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
+    invoke-interface {v4}, Ljava/util/Iterator;->next()Ljava/lang/Object;
 
-    const-string v6, "camera_flash_notification_2_apps"
+    move-result-object v5
 
-    invoke-static {v1, v6}, Lio/mesalabs/unica/utils/Utils;->getResourceId(Ljava/lang/String;Ljava/lang/String;)I
+    check-cast v5, Ljava/lang/String;
 
-    move-result v6
+    const/high16 v6, 0x400000
 
-    invoke-virtual {v4, v2}, Landroid/content/pm/ApplicationInfo;->loadLabel(Landroid/content/pm/PackageManager;)Ljava/lang/CharSequence;
+    :try_start_0
+    invoke-virtual {v3, v5, v6}, Landroid/content/pm/PackageManager;->getPackageInfo(Ljava/lang/String;I)Landroid/content/pm/PackageInfo;
 
-    move-result-object v4
+    move-result-object v5
 
-    invoke-virtual {v4}, Ljava/lang/Object;->toString()Ljava/lang/String;
+    iget-object v6, v5, Landroid/content/pm/PackageInfo;->applicationInfo:Landroid/content/pm/ApplicationInfo;
 
-    move-result-object v4
+    if-eqz v6, :cond_0
 
-    filled-new-array {v3, v4}, [Ljava/lang/Object;
+    iget-object v5, v5, Landroid/content/pm/PackageInfo;->applicationInfo:Landroid/content/pm/ApplicationInfo;
 
-    move-result-object v4
+    invoke-virtual {v5, v3}, Landroid/content/pm/ApplicationInfo;->loadLabel(Landroid/content/pm/PackageManager;)Ljava/lang/CharSequence;
 
-    invoke-virtual {v5, v6, v4}, Landroid/content/Context;->getString(I[Ljava/lang/Object;)Ljava/lang/String;
+    move-result-object v5
 
-    move-result-object v3
+    invoke-virtual {v5}, Ljava/lang/Object;->toString()Ljava/lang/String;
 
-    goto :goto_1
+    move-result-object v5
 
-    :cond_2
-    invoke-virtual {v4, v2}, Landroid/content/pm/ApplicationInfo;->loadLabel(Landroid/content/pm/PackageManager;)Ljava/lang/CharSequence;
-
-    move-result-object v4
-
-    invoke-virtual {v4}, Ljava/lang/Object;->toString()Ljava/lang/String;
-
-    move-result-object v3
+    invoke-interface {v0, v5}, Ljava/util/List;->add(Ljava/lang/Object;)Z
     :try_end_0
     .catch Landroid/content/pm/PackageManager$NameNotFoundException; {:try_start_0 .. :try_end_0} :catch_0
 
     goto :goto_0
 
+    :cond_1
+    invoke-interface {v0}, Ljava/util/List;->isEmpty()Z
+
+    move-result v3
+
+    if-nez v3, :cond_4
+
+    invoke-interface {v0}, Ljava/util/List;->size()I
+
+    move-result v3
+
+    const/4 v4, 0x2
+
+    if-le v3, v4, :cond_2
+
+    goto :goto_1
+
+    :cond_2
+    invoke-interface {v0}, Ljava/util/List;->size()I
+
+    move-result v3
+
+    if-ne v3, v4, :cond_3
+
+    new-instance v3, Lio/mesalabs/unica/settings/hma/HideMyApplistPreferenceController$$ExternalSyntheticLambda0;
+
+    invoke-direct {v3}, Lio/mesalabs/unica/settings/hma/HideMyApplistPreferenceController$$ExternalSyntheticLambda0;-><init>()V
+
+    invoke-interface {v0, v3}, Ljava/util/List;->sort(Ljava/util/Comparator;)V
+
+    iget-object p0, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
+
+    const-string v3, "camera_flash_notification_2_apps"
+
+    invoke-static {v1, v3}, Lio/mesalabs/unica/utils/Utils;->getResourceId(Ljava/lang/String;Ljava/lang/String;)I
+
+    move-result v1
+
+    const/4 v3, 0x0
+
+    invoke-interface {v0, v3}, Ljava/util/List;->get(I)Ljava/lang/Object;
+
+    move-result-object v3
+
+    invoke-interface {v0, v2}, Ljava/util/List;->get(I)Ljava/lang/Object;
+
+    move-result-object v0
+
+    filled-new-array {v3, v0}, [Ljava/lang/Object;
+
+    move-result-object v0
+
+    invoke-virtual {p0, v1, v0}, Landroid/content/Context;->getString(I[Ljava/lang/Object;)Ljava/lang/String;
+
+    move-result-object p0
+
+    return-object p0
+
     :cond_3
-    :goto_1
-    invoke-static {v3}, Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z
+    invoke-interface {v0}, Ljava/util/List;->getFirst()Ljava/lang/Object;
 
-    move-result v0
+    move-result-object p0
 
-    if-nez v0, :cond_5
+    check-cast p0, Ljava/lang/CharSequence;
 
-    return-object v3
+    return-object p0
 
     :cond_4
-    :goto_2
+    :goto_1
     iget-object p0, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
 
     invoke-virtual {p0}, Landroid/content/Context;->getResources()Landroid/content/res/Resources;
@@ -269,11 +282,11 @@
 
     move-result v1
 
-    invoke-interface {v0}, Ljava/util/Set;->size()I
+    invoke-interface {v0}, Ljava/util/List;->size()I
 
     move-result v2
 
-    invoke-interface {v0}, Ljava/util/Set;->size()I
+    invoke-interface {v0}, Ljava/util/List;->size()I
 
     move-result v0
 
