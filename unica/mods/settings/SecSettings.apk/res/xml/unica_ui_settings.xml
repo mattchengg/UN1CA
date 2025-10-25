@@ -5,4 +5,6 @@
     <SecDropDownPreference android:title="@string/unica_launcher_anim_type_title" android:key="unica_launcher_anim_type" android:summary="%s" settings:controller="io.mesalabs.unica.settings.ui.LauncherAnimationTypePreferenceController" />
     <com.samsung.android.settings.widget.SecInsetCategoryPreference />
     <SecSwitchPreference android:title="@string/unica_max_refresh_rate_title" android:key="unica_max_refresh_rate" settings:controller="io.mesalabs.unica.settings.ui.ForceMaxRefreshRatePreferenceController" />
+    <com.samsung.android.settings.widget.SecInsetCategoryPreference />
+    <SecSwitchPreference android:title="@string/unica_boot_sound_title" android:key="unica_boot_sound" settings:controller="io.mesalabs.unica.settings.ui.BootSoundPreferenceController" />
 </PreferenceScreen>
