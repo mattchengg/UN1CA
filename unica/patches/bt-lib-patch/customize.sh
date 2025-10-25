@@ -25,6 +25,8 @@ if [ ! -f "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" ]; then
     LOG_STEP_OUT
 fi
 
-# https://github.com/3arthur6/BluetoothLibraryPatcher/blob/64a360eb5780b6fc716b5c62d499a8861834486f/hexpatch.sh#L12
+# Disable VaultKeeper support
+# Before: [tbnz w8, #0, #0xbd260]
+# After: [b #0xbd260]
 HEX_PATCH "$WORK_DIR/system/system/lib64/libbluetooth_jni.so" \
-    "00122a0140395f01086b00020054" "00122a0140395f01086bde030014"
+    "2897773948050037" "289777392a000014"
