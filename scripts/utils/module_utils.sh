@@ -17,28 +17,6 @@
 
 # [
 source "$SRC_DIR/scripts/utils/smali_utils.sh"
-
-_GET_PROP_LOCATION()
-{
-    local FILES
-    FILES="$(_GET_PROP_FILES_PATH "$1")"
-
-    if IS_VALID_PARTITION_NAME "$1"; then
-        shift
-    fi
-
-    _CHECK_NON_EMPTY_PARAM "PROP" "$1" || return 1
-
-    local PROP="$1"
-    local MATCHES=()
-    while IFS= read -r f; do
-        if grep -q "^$PROP=" "$f" 2> /dev/null; then
-            MATCHES+=("$f")
-        fi
-    done <<< "$FILES"
-
-    printf '%s\n' "${MATCHES[@]}"
-}
 # ]
 
 # ABORT <message>
@@ -235,90 +213,6 @@ SET_FLOATING_FEATURE_CONFIG()
         fi
         echo "    <${CONFIG}>${VALUE}</${CONFIG}>" >> "$FILE"
         echo "</SecFloatingFeatureSet>" >> "$FILE"
-    fi
-
-    return 0
-}
-
-# SET_PROP "<partition>" "<prop>" "<value>"
-# Sets the supplied prop to the desidered value, partition name CANNOT be omitted.
-# "-d" or "--delete" can be passed as value to delete the prop.
-SET_PROP()
-{
-    _CHECK_NON_EMPTY_PARAM "PARTITION" "$1" || return 1
-    _CHECK_NON_EMPTY_PARAM "PROP" "$2" || return 1
-
-    local PARTITION="$1"
-    local PROP="$2"
-    local VALUE="$3"
-
-    if ! IS_VALID_PARTITION_NAME "$PARTITION"; then
-        LOGE "\"$PARTITION\" is not a valid partition name"
-        return 1
-    fi
-
-    if [ "$(GET_PROP "$PARTITION" "$PROP")" ]; then
-        local FILES
-        FILES="$(_GET_PROP_LOCATION "$PARTITION" "$PROP")"
-
-        while IFS= read -r f; do
-            if [[ "$VALUE" == "-d" ]] || [[ "$VALUE" == "--delete" ]]; then
-                LOG "- Deleting \"$PROP\" prop in ${f//$WORK_DIR/}"
-                sed -i "/^$PROP/d" "$f"
-            else
-                LOG "- Replacing \"$PROP\" prop with \"$VALUE\" in ${f//$WORK_DIR/}"
-
-                local LINES
-                LINES="$(sed -n "/^${PROP}\b/=" "$f")"
-                for l in $LINES; do
-                    sed -i "$l c${PROP}=${VALUE}" "$f"
-                done
-            fi
-        done <<< "$FILES"
-    elif [[ "$VALUE" != "-d" ]] && [[ "$VALUE" != "--delete" ]]; then
-        local FILE
-
-        case "$PARTITION" in
-            "system")
-                FILE="$WORK_DIR/system/system/build.prop"
-                ;;
-            "system_ext")
-                if $TARGET_OS_BUILD_SYSTEM_EXT_PARTITION; then
-                    FILE="$WORK_DIR/system_ext/etc/build.prop"
-                else
-                    FILE="$WORK_DIR/system/system/system_ext/etc/build.prop"
-                fi
-                ;;
-            "system_dlkm")
-                FILE="$WORK_DIR/system_dlkm/etc/build.prop"
-                ;;
-            "vendor")
-                FILE="$WORK_DIR/vendor/build.prop"
-                ;;
-            "vendor_dlkm")
-                FILE="$WORK_DIR/vendor_dlkm/etc/build.prop"
-                ;;
-            "odm_dlkm")
-                FILE="$WORK_DIR/vendor/odm_dlkm/etc/build.prop"
-                ;;
-            "odm")
-                FILE="$WORK_DIR/odm/etc/build.prop"
-                ;;
-            "product")
-                FILE="$WORK_DIR/product/etc/build.prop"
-                ;;
-        esac
-
-        if [ ! -f "$FILE" ]; then
-            LOGW "File not found: ${FILE//$WORK_DIR/}"
-            return 0
-        fi
-
-        LOG "- Adding \"$PROP\" prop with \"$VALUE\" in ${FILE//$WORK_DIR/}"
-        if ! grep -q "Added by scripts" "$FILE"; then
-            echo "# Added by scripts/utils/module_utils.sh" >> "$FILE"
-        fi
-        echo "$PROP=$VALUE" >> "$FILE"
     fi
 
     return 0
