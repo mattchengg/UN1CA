@@ -1,4 +1,4 @@
-From 8ab9b53b4f0bdb8a42602276e5fe034a3aa11ad8 Mon Sep 17 00:00:00 2001
+From 61b7ed8a9a3727248c1fa9b1d86ff4bcc4ee638e Mon Sep 17 00:00:00 2001
 From: Salvo Giangreco <giangrecosalvo9@gmail.com>
 Date: Mon, 6 Oct 2025 15:12:32 +0200
 Subject: [PATCH] Introduce KeyboxImitationHooks
@@ -206,7 +206,7 @@ index 3f9a0c3e..7f15f8a7 100644
      new-instance p0, Landroid/os/RemoteException;
  
 diff --git a/smali_classes3/android/system/keystore2/IKeystoreService$Stub$Proxy.smali b/smali_classes3/android/system/keystore2/IKeystoreService$Stub$Proxy.smali
-index 2bf02c02..27ceb85a 100644
+index 2bf02c02..96c60ba0 100644
 --- a/smali_classes3/android/system/keystore2/IKeystoreService$Stub$Proxy.smali
 +++ b/smali_classes3/android/system/keystore2/IKeystoreService$Stub$Proxy.smali
 @@ -62,6 +62,15 @@
@@ -353,7 +353,7 @@ index 2bf02c02..27ceb85a 100644
          }
      .end annotation
  
-+    invoke-static {p1, p3}, Lio/mesalabs/unica/KeyboxImitationHooks;->onListEntriesBatched(ILjava/lang/String;)[Landroid/system/keystore2/KeyDescriptor;
++    invoke-static {p1, p4}, Lio/mesalabs/unica/KeyboxImitationHooks;->onListEntriesBatched(ILjava/lang/String;)[Landroid/system/keystore2/KeyDescriptor;
 +
 +    move-result-object v0
 +
@@ -9051,5 +9051,5 @@ index 00000000..4124c7f9
 +    return-void
 +.end method
 -- 
-2.51.0
+2.51.1
 
