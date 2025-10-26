@@ -1,13 +1,13 @@
-From dd2859caa0cf61f9e6cb68f7102025cb17af54df Mon Sep 17 00:00:00 2001
+From de234dce2ba5d6341bffd8c18c347e5f68881d05 Mon Sep 17 00:00:00 2001
 From: Salvo Giangreco <giangrecosalvo9@gmail.com>
 Date: Sun, 26 Oct 2025 15:31:23 +0100
 Subject: [PATCH] Introduce HideDeveloperStatusUtils
 
 ---
  .../android/provider/Settings$Global.smali    |  15 +
- .../HideDeveloperStatusUtils$Action.smali     | 152 ++++++++
- .../unica/HideDeveloperStatusUtils.smali      | 364 ++++++++++++++++++
- 3 files changed, 531 insertions(+)
+ .../HideDeveloperStatusUtils$Action.smali     | 152 +++++++
+ .../unica/HideDeveloperStatusUtils.smali      | 371 ++++++++++++++++++
+ 3 files changed, 538 insertions(+)
  create mode 100644 smali_classes6/io/mesalabs/unica/HideDeveloperStatusUtils$Action.smali
  create mode 100644 smali_classes6/io/mesalabs/unica/HideDeveloperStatusUtils.smali
 
@@ -197,11 +197,11 @@ index 00000000..71db276a
 +.end method
 diff --git a/smali_classes6/io/mesalabs/unica/HideDeveloperStatusUtils.smali b/smali_classes6/io/mesalabs/unica/HideDeveloperStatusUtils.smali
 new file mode 100644
-index 00000000..2e64894d
+index 00000000..7126a143
 --- /dev/null
 +++ b/smali_classes6/io/mesalabs/unica/HideDeveloperStatusUtils.smali
-@@ -0,0 +1,364 @@
-+.class public Lio/mesalabs/unica/HideDeveloperStatusUtils;
+@@ -0,0 +1,371 @@
++.class public final Lio/mesalabs/unica/HideDeveloperStatusUtils;
 +.super Ljava/lang/Object;
 +.source "HideDeveloperStatusUtils.java"
 +
@@ -232,15 +232,27 @@ index 00000000..2e64894d
 +
 +    new-instance v0, Ljava/util/HashSet;
 +
-+    const-string v1, "adb_wifi_enabled"
++    const/4 v1, 0x3
 +
-+    const-string v2, "development_settings_enabled"
++    new-array v1, v1, [Ljava/lang/String;
++
++    const/4 v2, 0x0
 +
 +    const-string v3, "adb_enabled"
 +
-+    filled-new-array {v3, v1, v2}, [Ljava/lang/String;
++    aput-object v3, v1, v2
 +
-+    move-result-object v1
++    const/4 v2, 0x1
++
++    const-string v3, "adb_wifi_enabled"
++
++    aput-object v3, v1, v2
++
++    const/4 v2, 0x2
++
++    const-string v3, "development_settings_enabled"
++
++    aput-object v3, v1, v2
 +
 +    invoke-static {v1}, Ljava/util/Arrays;->asList([Ljava/lang/Object;)Ljava/util/List;
 +
@@ -261,7 +273,7 @@ index 00000000..2e64894d
 +    return-void
 +.end method
 +
-+.method private static blacklist getApps(Landroid/content/ContentResolver;)Ljava/util/Set;
++.method public static blacklist getApps(Landroid/content/ContentResolver;)Ljava/util/Set;
 +    .locals 2
 +    .annotation system Ldalvik/annotation/Signature;
 +        value = {
@@ -283,7 +295,7 @@ index 00000000..2e64894d
 +    return-object p0
 +
 +    :cond_0
-+    const-string v0, "hide_developer_status"
++    const-string v0, "unica_hide_dev_list"
 +
 +    invoke-static {p0, v0}, Landroid/provider/Settings$Secure;->getString(Landroid/content/ContentResolver;Ljava/lang/String;)Ljava/lang/String;
 +
@@ -299,7 +311,7 @@ index 00000000..2e64894d
 +
 +    const-string v0, ","
 +
-+    invoke-virtual {p0, v0}, Ljava/lang/Object;->equals(Ljava/lang/Object;)Z
++    invoke-virtual {p0, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
 +
 +    move-result v1
 +
@@ -327,7 +339,7 @@ index 00000000..2e64894d
 +    return-object p0
 +.end method
 +
-+.method private static blacklist getApps(Landroid/content/Context;)Ljava/util/Set;
++.method public static blacklist getApps(Landroid/content/Context;)Ljava/util/Set;
 +    .locals 0
 +    .annotation system Ldalvik/annotation/Signature;
 +        value = {
@@ -363,11 +375,11 @@ index 00000000..2e64894d
 +.method private static blacklist isBootCompleted()Z
 +    .locals 2
 +
-+    const-string/jumbo v0, "sys.boot_completed"
++    const-string v0, "sys.boot_completed"
 +
 +    const/4 v1, 0x0
 +
-+    invoke-static {v0, v1}, Landroid/os/SystemProperties;->getBoolean(Ljava/lang/String;Z)Z
++    invoke-static {v0, v1}, Landroid/os/SemSystemProperties;->getBoolean(Ljava/lang/String;Z)Z
 +
 +    move-result v0
 +
@@ -375,9 +387,9 @@ index 00000000..2e64894d
 +.end method
 +
 +.method private static blacklist putAppsForUser(Landroid/content/Context;Ljava/lang/String;ILio/mesalabs/unica/HideDeveloperStatusUtils$Action;)V
-+    .locals 1
++    .locals 2
 +
-+    if-eqz p0, :cond_1
++    if-eqz p0, :cond_3
 +
 +    if-gez p2, :cond_0
 +
@@ -392,23 +404,23 @@ index 00000000..2e64894d
 +
 +    move-result p3
 +
-+    packed-switch p3, :pswitch_data_0
++    if-eqz p3, :cond_2
++
++    const/4 v1, 0x1
++
++    if-eq p3, v1, :cond_1
 +
 +    goto :goto_0
 +
-+    :pswitch_0
++    :cond_1
 +    invoke-interface {v0, p1}, Ljava/util/Set;->remove(Ljava/lang/Object;)Z
 +
 +    goto :goto_0
 +
-+    :pswitch_1
++    :cond_2
 +    invoke-interface {v0, p1}, Ljava/util/Set;->add(Ljava/lang/Object;)Z
 +
-+    nop
-+
 +    :goto_0
-+    nop
-+
 +    invoke-virtual {p0}, Landroid/content/Context;->getContentResolver()Landroid/content/ContentResolver;
 +
 +    move-result-object p0
@@ -419,35 +431,25 @@ index 00000000..2e64894d
 +
 +    move-result-object p1
 +
-+    const-string p3, "hide_developer_status"
++    const-string p3, "unica_hide_dev_list"
 +
 +    invoke-static {p0, p3, p1, p2}, Landroid/provider/Settings$Secure;->putStringForUser(Landroid/content/ContentResolver;Ljava/lang/String;Ljava/lang/String;I)Z
 +
-+    return-void
-+
-+    :cond_1
++    :cond_3
 +    :goto_1
 +    return-void
-+
-+    nop
-+
-+    :pswitch_data_0
-+    .packed-switch 0x0
-+        :pswitch_1
-+        :pswitch_0
-+    .end packed-switch
 +.end method
 +
 +.method public static blacklist shouldHideDevStatus(Landroid/content/ContentResolver;Ljava/lang/String;Ljava/lang/String;)Z
-+    .locals 2
++    .locals 3
 +
 +    const/4 v0, 0x0
 +
-+    if-eqz p0, :cond_3
++    if-eqz p0, :cond_4
 +
-+    if-eqz p1, :cond_3
++    if-eqz p1, :cond_4
 +
-+    if-eqz p2, :cond_3
++    if-eqz p2, :cond_4
 +
 +    invoke-static {}, Lio/mesalabs/unica/HideDeveloperStatusUtils;->isBootCompleted()Z
 +
@@ -458,39 +460,50 @@ index 00000000..2e64894d
 +    goto :goto_0
 +
 +    :cond_0
++    const-string v1, "unica_hide_dev"
++
++    const/4 v2, 0x1
++
++    invoke-static {p0, v1, v2}, Landroid/provider/Settings$System;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
++
++    move-result v1
++
++    if-eq v1, v2, :cond_1
++
++    return v0
++
++    :cond_1
++    sget-object v1, Lio/mesalabs/unica/HideDeveloperStatusUtils;->settingsToHide:Ljava/util/Set;
++
++    invoke-interface {v1, p2}, Ljava/util/Set;->contains(Ljava/lang/Object;)Z
++
++    move-result p2
++
++    if-nez p2, :cond_2
++
++    return v0
++
++    :cond_2
 +    invoke-static {p0}, Lio/mesalabs/unica/HideDeveloperStatusUtils;->getApps(Landroid/content/ContentResolver;)Ljava/util/Set;
 +
 +    move-result-object p0
 +
 +    invoke-interface {p0}, Ljava/util/Set;->isEmpty()Z
 +
-+    move-result v1
++    move-result p2
 +
-+    if-eqz v1, :cond_1
++    if-eqz p2, :cond_3
 +
 +    return v0
 +
-+    :cond_1
++    :cond_3
 +    invoke-interface {p0, p1}, Ljava/util/Set;->contains(Ljava/lang/Object;)Z
 +
 +    move-result p0
 +
-+    if-eqz p0, :cond_2
++    return p0
 +
-+    sget-object p0, Lio/mesalabs/unica/HideDeveloperStatusUtils;->settingsToHide:Ljava/util/Set;
-+
-+    invoke-interface {p0, p2}, Ljava/util/Set;->contains(Ljava/lang/Object;)Z
-+
-+    move-result p0
-+
-+    if-eqz p0, :cond_2
-+
-+    const/4 v0, 0x1
-+
-+    :cond_2
-+    return v0
-+
-+    :cond_3
++    :cond_4
 +    :goto_0
 +    return v0
 +.end method
@@ -498,7 +511,7 @@ index 00000000..2e64894d
 +
 +# virtual methods
 +.method public blacklist addApp(Landroid/content/Context;Ljava/lang/String;I)V
-+    .locals 1
++    .locals 0
 +
 +    if-eqz p1, :cond_1
 +
@@ -509,11 +522,9 @@ index 00000000..2e64894d
 +    goto :goto_0
 +
 +    :cond_0
-+    sget-object v0, Lio/mesalabs/unica/HideDeveloperStatusUtils$Action;->ADD:Lio/mesalabs/unica/HideDeveloperStatusUtils$Action;
++    sget-object p0, Lio/mesalabs/unica/HideDeveloperStatusUtils$Action;->ADD:Lio/mesalabs/unica/HideDeveloperStatusUtils$Action;
 +
-+    invoke-static {p1, p2, p3, v0}, Lio/mesalabs/unica/HideDeveloperStatusUtils;->putAppsForUser(Landroid/content/Context;Ljava/lang/String;ILio/mesalabs/unica/HideDeveloperStatusUtils$Action;)V
-+
-+    return-void
++    invoke-static {p1, p2, p3, p0}, Lio/mesalabs/unica/HideDeveloperStatusUtils;->putAppsForUser(Landroid/content/Context;Ljava/lang/String;ILio/mesalabs/unica/HideDeveloperStatusUtils$Action;)V
 +
 +    :cond_1
 +    :goto_0
@@ -521,7 +532,7 @@ index 00000000..2e64894d
 +.end method
 +
 +.method public blacklist removeApp(Landroid/content/Context;Ljava/lang/String;I)V
-+    .locals 1
++    .locals 0
 +
 +    if-eqz p1, :cond_1
 +
@@ -532,11 +543,9 @@ index 00000000..2e64894d
 +    goto :goto_0
 +
 +    :cond_0
-+    sget-object v0, Lio/mesalabs/unica/HideDeveloperStatusUtils$Action;->REMOVE:Lio/mesalabs/unica/HideDeveloperStatusUtils$Action;
++    sget-object p0, Lio/mesalabs/unica/HideDeveloperStatusUtils$Action;->REMOVE:Lio/mesalabs/unica/HideDeveloperStatusUtils$Action;
 +
-+    invoke-static {p1, p2, p3, v0}, Lio/mesalabs/unica/HideDeveloperStatusUtils;->putAppsForUser(Landroid/content/Context;Ljava/lang/String;ILio/mesalabs/unica/HideDeveloperStatusUtils$Action;)V
-+
-+    return-void
++    invoke-static {p1, p2, p3, p0}, Lio/mesalabs/unica/HideDeveloperStatusUtils;->putAppsForUser(Landroid/content/Context;Ljava/lang/String;ILio/mesalabs/unica/HideDeveloperStatusUtils$Action;)V
 +
 +    :cond_1
 +    :goto_0
@@ -544,7 +553,7 @@ index 00000000..2e64894d
 +.end method
 +
 +.method public blacklist setApps(Landroid/content/Context;I)V
-+    .locals 2
++    .locals 1
 +
 +    if-eqz p1, :cond_1
 +
@@ -553,13 +562,11 @@ index 00000000..2e64894d
 +    goto :goto_0
 +
 +    :cond_0
-+    const/4 v0, 0x0
++    const/4 p0, 0x0
 +
-+    sget-object v1, Lio/mesalabs/unica/HideDeveloperStatusUtils$Action;->SET:Lio/mesalabs/unica/HideDeveloperStatusUtils$Action;
++    sget-object v0, Lio/mesalabs/unica/HideDeveloperStatusUtils$Action;->SET:Lio/mesalabs/unica/HideDeveloperStatusUtils$Action;
 +
-+    invoke-static {p1, v0, p2, v1}, Lio/mesalabs/unica/HideDeveloperStatusUtils;->putAppsForUser(Landroid/content/Context;Ljava/lang/String;ILio/mesalabs/unica/HideDeveloperStatusUtils$Action;)V
-+
-+    return-void
++    invoke-static {p1, p0, p2, v0}, Lio/mesalabs/unica/HideDeveloperStatusUtils;->putAppsForUser(Landroid/content/Context;Ljava/lang/String;ILio/mesalabs/unica/HideDeveloperStatusUtils$Action;)V
 +
 +    :cond_1
 +    :goto_0
