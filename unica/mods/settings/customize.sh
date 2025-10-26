@@ -83,20 +83,26 @@ SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
     "smali_classes2/com/android/settings/core/gateway/SettingsGateway.smali" "replace" \
     '<clinit>()V' \
     'filled-new-array/range {v1 .. v162}, [Ljava/lang/String;' \
-    '    const-string v163, "io.mesalabs.unica.settings.spoof.SpoofSettingsFragment"\n\n    filled-new-array/range {v1 .. v163}, [Ljava/lang/String;' \
+    '    const-string v163, "io.mesalabs.unica.settings.spoof.HideDeveloperStatusFragment"\n\n    filled-new-array/range {v1 .. v163}, [Ljava/lang/String;' \
     > /dev/null
 SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
     "smali_classes2/com/android/settings/core/gateway/SettingsGateway.smali" "replace" \
     '<clinit>()V' \
     'filled-new-array/range {v1 .. v163}, [Ljava/lang/String;' \
-    '    const-string v164, "io.mesalabs.unica.settings.ui.UISettingsFragment"\n\n    filled-new-array/range {v1 .. v164}, [Ljava/lang/String;' \
+    '    const-string v164, "io.mesalabs.unica.settings.spoof.SpoofSettingsFragment"\n\n    filled-new-array/range {v1 .. v164}, [Ljava/lang/String;' \
+    > /dev/null
+SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+    "smali_classes2/com/android/settings/core/gateway/SettingsGateway.smali" "replace" \
+    '<clinit>()V' \
+    'filled-new-array/range {v1 .. v164}, [Ljava/lang/String;' \
+    '    const-string v165, "io.mesalabs.unica.settings.ui.UISettingsFragment"\n\n    filled-new-array/range {v1 .. v165}, [Ljava/lang/String;' \
     > /dev/null
 LOG "- Patching \"smali_classes2/com/android/settings/SettingsActivity.smali\" in /system/system/priv-app/SecSettings.apk"
 SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
     "smali_classes2/com/android/settings/SettingsActivity.smali" "replace" \
     'isValidFragment(Ljava/lang/String;)Z' \
     'const/16 v2, 0x9f' \
-    'const/16 v2, 0xa4' \
+    'const/16 v2, 0xa5' \
     > /dev/null
 
 # Add UN1CA Settings SearchIndexDataProvider(s)

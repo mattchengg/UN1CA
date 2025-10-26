@@ -1,6 +1,6 @@
-.class public Lio/mesalabs/unica/settings/hma/HideMyApplistPreferenceController;
+.class public Lio/mesalabs/unica/settings/spoof/HideDeveloperStatusPreferenceController;
 .super Lcom/android/settings/core/TogglePreferenceController;
-.source "HideMyApplistPreferenceController.java"
+.source "HideDeveloperStatusPreferenceController.java"
 
 
 # instance fields
@@ -23,7 +23,7 @@
 
     invoke-super {p0, p1}, Lcom/android/settings/core/TogglePreferenceController;->displayPreference(Landroidx/preference/PreferenceScreen;)V
 
-    const-string v0, "unica_hma"
+    const-string v0, "unica_hide_dev"
 
     invoke-virtual {p1, v0}, Landroidx/preference/PreferenceGroup;->findPreference(Ljava/lang/CharSequence;)Landroidx/preference/Preference;
 
@@ -31,7 +31,7 @@
 
     check-cast p1, Landroidx/preference/SecSwitchPreferenceScreen;
 
-    iput-object p1, p0, Lio/mesalabs/unica/settings/hma/HideMyApplistPreferenceController;->mPreference:Landroidx/preference/SecSwitchPreferenceScreen;
+    iput-object p1, p0, Lio/mesalabs/unica/settings/spoof/HideDeveloperStatusPreferenceController;->mPreference:Landroidx/preference/SecSwitchPreferenceScreen;
 
     return-void
 .end method
@@ -40,7 +40,7 @@
     .locals 0
 
     :try_start_0
-    const-string p0, "io.mesalabs.unica.HideAppListUtils"
+    const-string p0, "io.mesalabs.unica.HideDeveloperStatusUtils"
 
     invoke-static {p0}, Ljava/lang/Class;->forName(Ljava/lang/String;)Ljava/lang/Class;
     :try_end_0
@@ -119,17 +119,17 @@
 
     move-result-object v0
 
-    const-string v1, "unica_hma"
+    const-string v1, "unica_hide_dev"
 
-    const/4 v2, 0x1
+    const/4 v2, 0x0
 
     invoke-static {v0, v1, v2}, Landroid/provider/Settings$System;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
 
     move-result v0
 
-    const-string v1, "string"
+    const/4 v1, 0x1
 
-    if-ne v0, v2, :cond_5
+    if-ne v0, v1, :cond_5
 
     new-instance v0, Ljava/util/ArrayList;
 
@@ -143,7 +143,7 @@
 
     iget-object v4, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
 
-    invoke-static {v4}, Lio/mesalabs/unica/HideAppListUtils;->getApps(Landroid/content/Context;)Ljava/util/Set;
+    invoke-static {v4}, Lio/mesalabs/unica/HideDeveloperStatusUtils;->getApps(Landroid/content/Context;)Ljava/util/Set;
 
     move-result-object v4
 
@@ -215,48 +215,48 @@
 
     move-result v3
 
-    if-ne v3, v4, :cond_3
+    if-eq v3, v4, :cond_3
 
-    new-instance v3, Lio/mesalabs/unica/settings/hma/HideMyApplistPreferenceController$$ExternalSyntheticLambda0;
-
-    invoke-direct {v3}, Lio/mesalabs/unica/settings/hma/HideMyApplistPreferenceController$$ExternalSyntheticLambda0;-><init>()V
-
-    invoke-interface {v0, v3}, Ljava/util/List;->sort(Ljava/util/Comparator;)V
-
-    iget-object p0, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
-
-    const-string v3, "camera_flash_notification_2_apps"
-
-    invoke-static {v1, v3}, Lio/mesalabs/unica/utils/Utils;->getResourceId(Ljava/lang/String;Ljava/lang/String;)I
-
-    move-result v1
-
-    const/4 v3, 0x0
-
-    invoke-interface {v0, v3}, Ljava/util/List;->get(I)Ljava/lang/Object;
-
-    move-result-object v3
-
-    invoke-interface {v0, v2}, Ljava/util/List;->get(I)Ljava/lang/Object;
-
-    move-result-object v0
-
-    filled-new-array {v3, v0}, [Ljava/lang/Object;
-
-    move-result-object v0
-
-    invoke-virtual {p0, v1, v0}, Landroid/content/Context;->getString(I[Ljava/lang/Object;)Ljava/lang/String;
-
-    move-result-object p0
-
-    return-object p0
-
-    :cond_3
     invoke-interface {v0}, Ljava/util/List;->getFirst()Ljava/lang/Object;
 
     move-result-object p0
 
     check-cast p0, Ljava/lang/CharSequence;
+
+    return-object p0
+
+    :cond_3
+    new-instance v3, Lio/mesalabs/unica/settings/spoof/HideDeveloperStatusPreferenceController$$ExternalSyntheticLambda0;
+
+    invoke-direct {v3}, Lio/mesalabs/unica/settings/spoof/HideDeveloperStatusPreferenceController$$ExternalSyntheticLambda0;-><init>()V
+
+    invoke-interface {v0, v3}, Ljava/util/List;->sort(Ljava/util/Comparator;)V
+
+    iget-object p0, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
+
+    const-string v3, "string"
+
+    const-string v4, "camera_flash_notification_2_apps"
+
+    invoke-static {v3, v4}, Lio/mesalabs/unica/utils/Utils;->getResourceId(Ljava/lang/String;Ljava/lang/String;)I
+
+    move-result v3
+
+    invoke-interface {v0, v2}, Ljava/util/List;->get(I)Ljava/lang/Object;
+
+    move-result-object v2
+
+    invoke-interface {v0, v1}, Ljava/util/List;->get(I)Ljava/lang/Object;
+
+    move-result-object v0
+
+    filled-new-array {v2, v0}, [Ljava/lang/Object;
+
+    move-result-object v0
+
+    invoke-virtual {p0, v3, v0}, Landroid/content/Context;->getString(I[Ljava/lang/Object;)Ljava/lang/String;
+
+    move-result-object p0
 
     return-object p0
 
@@ -299,17 +299,7 @@
     return-object p0
 
     :cond_5
-    iget-object p0, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
-
-    const-string v0, "unica_hma_summary"
-
-    invoke-static {v1, v0}, Lio/mesalabs/unica/utils/Utils;->getResourceId(Ljava/lang/String;Ljava/lang/String;)I
-
-    move-result v0
-
-    invoke-virtual {p0, v0}, Landroid/content/Context;->getText(I)Ljava/lang/CharSequence;
-
-    move-result-object p0
+    const-string p0, ""
 
     return-object p0
 .end method
@@ -339,9 +329,9 @@
 
     move-result-object p0
 
-    const-string v0, "unica_hma"
+    const-string v0, "unica_hide_dev"
 
-    const/4 v1, 0x1
+    const/4 v1, 0x0
 
     invoke-static {p0, v0, v1}, Landroid/provider/Settings$System;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
 
@@ -352,7 +342,7 @@
     goto :goto_0
 
     :cond_0
-    const/4 v1, 0x0
+    const/4 v1, 0x1
 
     :goto_0
     return v1
@@ -387,17 +377,17 @@
 
     move-result-object p0
 
-    const-string v0, "unica_hma"
+    const-string v0, "unica_hide_dev"
 
-    const/4 v1, 0x1
+    const/4 v1, 0x0
 
     invoke-static {p0, v0, v1}, Landroid/provider/Settings$System;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
 
     move-result p0
 
-    if-nez p0, :cond_0
+    if-eqz p0, :cond_0
 
-    const/4 v1, 0x0
+    const/4 v1, 0x1
 
     :cond_0
     invoke-static {p1, v1}, Landroidx/preference/SecPreferenceUtils;->applySummaryColor(Landroidx/preference/Preference;Z)V
@@ -424,17 +414,17 @@
 
     move-result-object v0
 
-    const-string v1, "unica_hma"
+    const-string v1, "unica_hide_dev"
 
     invoke-static {v0, v1, p1}, Landroid/provider/Settings$System;->putInt(Landroid/content/ContentResolver;Ljava/lang/String;I)Z
 
     move-result v0
 
-    iget-object v1, p0, Lio/mesalabs/unica/settings/hma/HideMyApplistPreferenceController;->mPreference:Landroidx/preference/SecSwitchPreferenceScreen;
+    iget-object v1, p0, Lio/mesalabs/unica/settings/spoof/HideDeveloperStatusPreferenceController;->mPreference:Landroidx/preference/SecSwitchPreferenceScreen;
 
     if-eqz v1, :cond_0
 
-    invoke-virtual {p0, v1}, Lio/mesalabs/unica/settings/hma/HideMyApplistPreferenceController;->refreshSummary(Landroidx/preference/Preference;)V
+    invoke-virtual {p0, v1}, Lio/mesalabs/unica/settings/spoof/HideDeveloperStatusPreferenceController;->refreshSummary(Landroidx/preference/Preference;)V
 
     :cond_0
     return v0

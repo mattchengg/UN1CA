@@ -16,6 +16,7 @@
     <string name="unica_gphotos_title">Unlimited storage on Google Photos</string>
     <string name="unica_hma_summary">Prevent apps from detecting other installed apps.</string>
     <string name="unica_hma_title">Hide installed apps</string>
+    <string name="unica_hide_dev_title">Hide developer status</string>
     <string name="unica_keybox_clear_title">Delete keybox data</string>
     <string name="unica_keybox_load_title">Import keybox XML file</string>
     <string name="unica_keybox_status_checking">Checking validity…</string>
