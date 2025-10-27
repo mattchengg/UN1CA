@@ -196,33 +196,60 @@
 .end method
 
 .method public setChecked(Z)Z
-    .locals 1
+    .locals 3
 
     const-string v0, "persist.sys.unica.vulkan"
 
     invoke-static {p1}, Ljava/lang/Boolean;->toString(Z)Ljava/lang/String;
 
-    move-result-object p1
+    move-result-object v1
 
-    invoke-static {v0, p1}, Landroid/os/SemSystemProperties;->set(Ljava/lang/String;Ljava/lang/String;)V
+    invoke-static {v0, v1}, Landroid/os/SemSystemProperties;->set(Ljava/lang/String;Ljava/lang/String;)V
 
-    iget-object p1, p0, Lio/mesalabs/unica/settings/ui/VulkanPreferenceController;->mRebootDialog:Landroidx/appcompat/app/AlertDialog;
+    iget-object v0, p0, Lio/mesalabs/unica/settings/ui/VulkanPreferenceController;->mRebootDialog:Landroidx/appcompat/app/AlertDialog;
 
-    if-nez p1, :cond_0
+    if-nez v0, :cond_0
 
-    iget-object p1, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
+    iget-object v0, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
 
-    invoke-static {p1}, Lio/mesalabs/unica/utils/Utils;->createRebootDialog(Landroid/content/Context;)Landroidx/appcompat/app/AlertDialog;
+    invoke-static {v0}, Lio/mesalabs/unica/utils/Utils;->createRebootDialog(Landroid/content/Context;)Landroidx/appcompat/app/AlertDialog;
 
-    move-result-object p1
+    move-result-object v0
 
-    iput-object p1, p0, Lio/mesalabs/unica/settings/ui/VulkanPreferenceController;->mRebootDialog:Landroidx/appcompat/app/AlertDialog;
+    iput-object v0, p0, Lio/mesalabs/unica/settings/ui/VulkanPreferenceController;->mRebootDialog:Landroidx/appcompat/app/AlertDialog;
 
     :cond_0
+    const-string v0, "debug.hwui.renderer"
+
+    invoke-static {v0}, Landroid/os/SemSystemProperties;->get(Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v0
+
+    const-string v1, "skiavk"
+
+    if-eqz p1, :cond_1
+
+    invoke-virtual {v0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+
+    move-result v2
+
+    if-eqz v2, :cond_2
+
+    :cond_1
+    if-nez p1, :cond_3
+
+    invoke-virtual {v0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+
+    move-result p1
+
+    if-eqz p1, :cond_3
+
+    :cond_2
     iget-object p0, p0, Lio/mesalabs/unica/settings/ui/VulkanPreferenceController;->mRebootDialog:Landroidx/appcompat/app/AlertDialog;
 
     invoke-virtual {p0}, Landroid/app/Dialog;->show()V
 
+    :cond_3
     const/4 p0, 0x1
 
     return p0
