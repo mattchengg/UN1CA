@@ -121,6 +121,7 @@ if $SOURCE_AUDIO_SUPPORT_VIRTUAL_VIBRATION; then
             "$MODPATH/audio/virtual_vib/services.jar/0001-Disable-virtual-vibration-support.patch"
         SMALI_PATCH "system" "system/framework/services.jar" \
             "smali/com/android/server/audio/BtHelper\$\$ExternalSyntheticLambda0.smali" "remove"
+        EVAL "sed -i \"/.source/q\" \"$APKTOOL_DIR/system/framework/services.jar/smali_classes2/com/android/server/vibrator/VibratorManagerInternal.smali\""
         SMALI_PATCH "system" "system/framework/services.jar" \
             "smali_classes2/com/android/server/vibrator/VibratorManagerService\$SamsungBroadcastReceiver\$\$ExternalSyntheticLambda1.smali" "remove"
         SMALI_PATCH "system" "system/framework/services.jar" \

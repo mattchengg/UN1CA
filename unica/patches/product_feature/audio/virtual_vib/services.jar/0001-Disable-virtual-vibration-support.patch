@@ -1,6 +1,6 @@
-From 2860859effc43739831a2d89e5e3fcab95bd3485 Mon Sep 17 00:00:00 2001
+From ece814cded44c56bfb8d005376f8d999276bf022 Mon Sep 17 00:00:00 2001
 From: Salvo Giangreco <giangrecosalvo9@gmail.com>
-Date: Thu, 9 Oct 2025 23:48:35 +0200
+Date: Mon, 27 Oct 2025 10:31:28 +0100
 Subject: [PATCH] Disable virtual vibration support
 
 UN1CA: this patch is not complete! Please check unica/patches/product_feature/customize.sh for more info.
@@ -9,17 +9,16 @@ UN1CA: this patch is not complete! Please check unica/patches/product_feature/cu
  smali/com/android/server/audio/BtHelper.smali |   4 -
  .../vibrator/VibrationCustomSettings.smali    |   6 -
  .../server/vibrator/VibrationSettings.smali   |   4 +-
- .../vibrator/VibratorManagerInternal.smali    |  49 ---
  .../vibrator/VibratorManagerService$1.smali   | 251 ++++--------
  ...nagerService$ExternalVibratorService.smali | 374 ++++++++----------
  .../VibratorManagerService$Lifecycle.smali    |  12 +-
  ...stReceiver$$ExternalSyntheticLambda0.smali |  23 +-
  .../vibrator/VibratorManagerService.smali     | 111 +-----
  .../android/server/audio/utils/BtUtils.smali  |  68 ----
- 11 files changed, 339 insertions(+), 686 deletions(-)
+ 10 files changed, 339 insertions(+), 637 deletions(-)
 
 diff --git a/smali/com/android/server/audio/AudioDeviceBroker.smali b/smali/com/android/server/audio/AudioDeviceBroker.smali
-index 94243d8cb..8a2ab436a 100644
+index dafa61a6b..84de8193f 100644
 --- a/smali/com/android/server/audio/AudioDeviceBroker.smali
 +++ b/smali/com/android/server/audio/AudioDeviceBroker.smali
 @@ -621,12 +621,6 @@
@@ -277,7 +276,7 @@ index 94243d8cb..8a2ab436a 100644
      return-void
  .end method
 diff --git a/smali/com/android/server/audio/BtHelper.smali b/smali/com/android/server/audio/BtHelper.smali
-index 0c2afcfee..a3801dca8 100644
+index 5803f6ba9..096ddfa71 100644
 --- a/smali/com/android/server/audio/BtHelper.smali
 +++ b/smali/com/android/server/audio/BtHelper.smali
 @@ -42,8 +42,6 @@
@@ -299,7 +298,7 @@ index 0c2afcfee..a3801dca8 100644
      .catchall {:try_start_0 .. :try_end_0} :catchall_0
  
 diff --git a/smali_classes2/com/android/server/vibrator/VibrationCustomSettings.smali b/smali_classes2/com/android/server/vibrator/VibrationCustomSettings.smali
-index 94ed19055..588d02ecc 100644
+index 0448f9ab1..6123ed29a 100644
 --- a/smali_classes2/com/android/server/vibrator/VibrationCustomSettings.smali
 +++ b/smali_classes2/com/android/server/vibrator/VibrationCustomSettings.smali
 @@ -8,8 +8,6 @@
@@ -330,7 +329,7 @@ index 94ed19055..588d02ecc 100644
  
      iput v0, p0, Lcom/android/server/vibrator/VibrationCustomSettings;->mAudioMode:I
 diff --git a/smali_classes2/com/android/server/vibrator/VibrationSettings.smali b/smali_classes2/com/android/server/vibrator/VibrationSettings.smali
-index 49815294d..760ee1b74 100644
+index 5d79ffa41..cbb54641a 100644
 --- a/smali_classes2/com/android/server/vibrator/VibrationSettings.smali
 +++ b/smali_classes2/com/android/server/vibrator/VibrationSettings.smali
 @@ -1402,11 +1402,9 @@
@@ -346,65 +345,8 @@ index 49815294d..760ee1b74 100644
      iget-object v7, v1, Lcom/android/server/vibrator/VibrationCustomSettings;->mContext:Landroid/content/Context;
  
      invoke-virtual {v7}, Landroid/content/Context;->getMainExecutor()Ljava/util/concurrent/Executor;
-diff --git a/smali_classes2/com/android/server/vibrator/VibratorManagerInternal.smali b/smali_classes2/com/android/server/vibrator/VibratorManagerInternal.smali
-index b13056bdd..fc3eac20c 100644
---- a/smali_classes2/com/android/server/vibrator/VibratorManagerInternal.smali
-+++ b/smali_classes2/com/android/server/vibrator/VibratorManagerInternal.smali
-@@ -1,52 +1,3 @@
- .class public final Lcom/android/server/vibrator/VibratorManagerInternal;
- .super Ljava/lang/Object;
- .source "qb/101886872 4ec8f6d2813f753a220c00d05e2aa013ded863b1967e4bb65f3969ed08f5cc72"
--
--
--# instance fields
--.field public mServiceWeakReference:Ljava/lang/ref/WeakReference;
--
--
--# virtual methods
--.method public final updateWatchConnectionState(Z)V
--    .locals 2
--
--    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerInternal;->mServiceWeakReference:Ljava/lang/ref/WeakReference;
--
--    invoke-virtual {p0}, Ljava/lang/ref/WeakReference;->get()Ljava/lang/Object;
--
--    move-result-object p0
--
--    check-cast p0, Lcom/android/server/vibrator/VibratorManagerService;
--
--    if-nez p0, :cond_0
--
--    return-void
--
--    :cond_0
--    iget-object p0, p0, Lcom/android/server/vibrator/VibratorManagerService;->mVibrationSettings:Lcom/android/server/vibrator/VibrationSettings;
--
--    iget-object p0, p0, Lcom/android/server/vibrator/VibrationSettings;->mCustomSettings:Lcom/android/server/vibrator/VibrationCustomSettings;
--
--    invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
--
--    new-instance v0, Ljava/lang/StringBuilder;
--
--    const-string/jumbo v1, "Update only watch connected: "
--
--    invoke-direct {v0, v1}, Ljava/lang/StringBuilder;-><init>(Ljava/lang/String;)V
--
--    invoke-virtual {v0, p1}, Ljava/lang/StringBuilder;->append(Z)Ljava/lang/StringBuilder;
--
--    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
--
--    move-result-object v0
--
--    const-string/jumbo v1, "VibrationCustomSettings"
--
--    invoke-static {v1, v0}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
--
--    iput-boolean p1, p0, Lcom/android/server/vibrator/VibrationCustomSettings;->mOnlyWatchConnected:Z
--
--    return-void
--.end method
 diff --git a/smali_classes2/com/android/server/vibrator/VibratorManagerService$1.smali b/smali_classes2/com/android/server/vibrator/VibratorManagerService$1.smali
-index 5ece79fb1..bb01dd7c8 100644
+index c8d23247c..51914c754 100644
 --- a/smali_classes2/com/android/server/vibrator/VibratorManagerService$1.smali
 +++ b/smali_classes2/com/android/server/vibrator/VibratorManagerService$1.smali
 @@ -35,19 +35,19 @@
@@ -940,7 +882,7 @@ index 5ece79fb1..bb01dd7c8 100644
      return-void
  
 diff --git a/smali_classes2/com/android/server/vibrator/VibratorManagerService$ExternalVibratorService.smali b/smali_classes2/com/android/server/vibrator/VibratorManagerService$ExternalVibratorService.smali
-index 001989ce8..aca544c0a 100644
+index a1602e347..eb2029fab 100644
 --- a/smali_classes2/com/android/server/vibrator/VibratorManagerService$ExternalVibratorService.smali
 +++ b/smali_classes2/com/android/server/vibrator/VibratorManagerService$ExternalVibratorService.smali
 @@ -21,7 +21,7 @@
@@ -1634,7 +1576,7 @@ index 001989ce8..aca544c0a 100644
  
      :catchall_0
 diff --git a/smali_classes2/com/android/server/vibrator/VibratorManagerService$Lifecycle.smali b/smali_classes2/com/android/server/vibrator/VibratorManagerService$Lifecycle.smali
-index 63ad9a6cd..3f96e4da7 100644
+index d20562da0..c5e89927f 100644
 --- a/smali_classes2/com/android/server/vibrator/VibratorManagerService$Lifecycle.smali
 +++ b/smali_classes2/com/android/server/vibrator/VibratorManagerService$Lifecycle.smali
 @@ -19,7 +19,7 @@
@@ -1664,7 +1606,7 @@ index 63ad9a6cd..3f96e4da7 100644
  
      move-result-object p1
 diff --git a/smali_classes2/com/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda0.smali b/smali_classes2/com/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda0.smali
-index f8dc4432f..039eda008 100644
+index 2c7c2eaac..b893ed82b 100644
 --- a/smali_classes2/com/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda0.smali
 +++ b/smali_classes2/com/android/server/vibrator/VibratorManagerService$SamsungBroadcastReceiver$$ExternalSyntheticLambda0.smali
 @@ -24,7 +24,7 @@
@@ -1718,7 +1660,7 @@ index f8dc4432f..039eda008 100644
  
      return-void
 diff --git a/smali_classes2/com/android/server/vibrator/VibratorManagerService.smali b/smali_classes2/com/android/server/vibrator/VibratorManagerService.smali
-index bef2413e4..02672804c 100644
+index a6e515736..88f031e71 100644
 --- a/smali_classes2/com/android/server/vibrator/VibratorManagerService.smali
 +++ b/smali_classes2/com/android/server/vibrator/VibratorManagerService.smali
 @@ -82,8 +82,6 @@
@@ -1950,7 +1892,7 @@ index bef2413e4..02672804c 100644
  
      iget-object v0, v0, Lcom/android/server/vibrator/VibratorManagerService;->mHqmLoggingData:Lcom/samsung/android/server/vibrator/VibratorHqmData;
 diff --git a/smali_classes2/com/samsung/android/server/audio/utils/BtUtils.smali b/smali_classes2/com/samsung/android/server/audio/utils/BtUtils.smali
-index 5c8a336f4..2a4514dda 100644
+index ea1204dd1..781c64385 100644
 --- a/smali_classes2/com/samsung/android/server/audio/utils/BtUtils.smali
 +++ b/smali_classes2/com/samsung/android/server/audio/utils/BtUtils.smali
 @@ -247,74 +247,6 @@
@@ -2029,5 +1971,5 @@ index 5c8a336f4..2a4514dda 100644
      .locals 2
  
 -- 
-2.51.0
+2.51.1
 
