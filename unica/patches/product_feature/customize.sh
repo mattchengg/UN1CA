@@ -70,16 +70,21 @@ fi
 
 # SEC_PRODUCT_FEATURE_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION
 if [[ "$SOURCE_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION" != "$TARGET_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION" ]]; then
-    SMALI_PATCH "system" "system/framework/framework.jar" \
-        "smali_classes6/com/samsung/android/camera/mic/SemMultiMicManager.smali" "replace" \
-        "isSupported()Z" \
-        "$SOURCE_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION" \
-        "$TARGET_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION"
-    SMALI_PATCH "system" "system/framework/framework.jar" \
-        "smali_classes6/com/samsung/android/camera/mic/SemMultiMicManager.smali" "replace" \
-        "isSupported(I)Z" \
-        "$SOURCE_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION" \
-        "$TARGET_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION"
+    if [[ "$SOURCE_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION" != "none" ]]; then
+        SMALI_PATCH "system" "system/framework/framework.jar" \
+            "smali_classes6/com/samsung/android/camera/mic/SemMultiMicManager.smali" "replace" \
+            "isSupported()Z" \
+            "$SOURCE_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION" \
+            "${TARGET_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION//none/}"
+        SMALI_PATCH "system" "system/framework/framework.jar" \
+            "smali_classes6/com/samsung/android/camera/mic/SemMultiMicManager.smali" "replace" \
+            "isSupported(I)Z" \
+            "$SOURCE_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION" \
+            "${TARGET_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION//none/}"
+    else
+        # TODO handle this condition
+        LOG_MISSING_PATCHES "SOURCE_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION" "TARGET_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION"
+    fi
 fi
 
 # SEC_PRODUCT_FEATURE_AUDIO_CONFIG_HAPTIC
