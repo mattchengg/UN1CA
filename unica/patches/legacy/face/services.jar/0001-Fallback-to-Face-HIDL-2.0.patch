@@ -1,4 +1,4 @@
-From 3ee4492d6f9639310f7f43c506bacf93ea3e1471 Mon Sep 17 00:00:00 2001
+From 40cf1c890834c75512962bc2e57c783cb62b92a7 Mon Sep 17 00:00:00 2001
 From: Salvo Giangreco <giangrecosalvo9@gmail.com>
 Date: Thu, 16 Oct 2025 23:01:37 +0200
 Subject: [PATCH] Fallback to Face HIDL 2.0
@@ -12,16 +12,16 @@ UN1CA: this patch is not complete! Please check unica/patches/legacy/customize.s
  ...viceExImpl$$ExternalSyntheticLambda5.smali | 135 +------
  .../face/aidl/SemFaceServiceExImpl.smali      |   2 +-
  .../face/aidl/SemFaceSessionCloseClient.smali |   2 +-
- .../hidl/HidlToAidlCallbackConverter.smali    | 191 ++--------
+ .../hidl/HidlToAidlCallbackConverter.smali    | 189 ++-------
  .../face/hidl/HidlToAidlSensorAdapter.smali   |  14 +-
  .../face/hidl/HidlToAidlSessionAdapter.smali  |  28 +-
- .../sensors/face/hidl/TestHal.smali           | 335 +++++-----------
+ .../sensors/face/hidl/TestHal.smali           | 333 +++++-----------
  .../face/V2_0/ISehBiometricsFace$Proxy.smali  | 360 ++++++++++++++++++
  ...ehBiometricsFaceClientCallback$Proxy.smali | 146 +++++++
- 13 files changed, 729 insertions(+), 691 deletions(-)
+ 13 files changed, 727 insertions(+), 689 deletions(-)
 
 diff --git a/smali/com/android/server/biometrics/sensors/face/FaceService$FaceServiceWrapper.smali b/smali/com/android/server/biometrics/sensors/face/FaceService$FaceServiceWrapper.smali
-index 42ee9a2b7..353ff729c 100644
+index 01e097222..455399486 100644
 --- a/smali/com/android/server/biometrics/sensors/face/FaceService$FaceServiceWrapper.smali
 +++ b/smali/com/android/server/biometrics/sensors/face/FaceService$FaceServiceWrapper.smali
 @@ -3204,7 +3204,7 @@
@@ -43,7 +43,7 @@ index 42ee9a2b7..353ff729c 100644
      invoke-interface {p0}, Lvendor/samsung/hardware/biometrics/face/V2_0/ISehBiometricsFace;->sehIsTaSessionClosed()Z
  
 diff --git a/smali/com/android/server/biometrics/sensors/face/aidl/AidlResponseHandler.smali b/smali/com/android/server/biometrics/sensors/face/aidl/AidlResponseHandler.smali
-index 6ac3c41f9..a1604a7ec 100644
+index 4abb3a731..20d897823 100644
 --- a/smali/com/android/server/biometrics/sensors/face/aidl/AidlResponseHandler.smali
 +++ b/smali/com/android/server/biometrics/sensors/face/aidl/AidlResponseHandler.smali
 @@ -499,9 +499,9 @@
@@ -59,7 +59,7 @@ index 6ac3c41f9..a1604a7ec 100644
      invoke-virtual {p0, p1}, Landroid/os/Handler;->post(Ljava/lang/Runnable;)Z
  
 diff --git a/smali/com/android/server/biometrics/sensors/face/aidl/FaceAuthenticationClient.smali b/smali/com/android/server/biometrics/sensors/face/aidl/FaceAuthenticationClient.smali
-index b9706f254..1d43e66ac 100644
+index c2c98fbe1..04c280c51 100644
 --- a/smali/com/android/server/biometrics/sensors/face/aidl/FaceAuthenticationClient.smali
 +++ b/smali/com/android/server/biometrics/sensors/face/aidl/FaceAuthenticationClient.smali
 @@ -800,7 +800,7 @@
@@ -551,7 +551,7 @@ index b9706f254..1d43e66ac 100644
  
      const-string/jumbo v5, "authenticate FINISH ("
 diff --git a/smali/com/android/server/biometrics/sensors/face/aidl/FaceProvider$$ExternalSyntheticLambda9.smali b/smali/com/android/server/biometrics/sensors/face/aidl/FaceProvider$$ExternalSyntheticLambda9.smali
-index cdb236bda..5715675d4 100644
+index 63362745c..574ff0dbe 100644
 --- a/smali/com/android/server/biometrics/sensors/face/aidl/FaceProvider$$ExternalSyntheticLambda9.smali
 +++ b/smali/com/android/server/biometrics/sensors/face/aidl/FaceProvider$$ExternalSyntheticLambda9.smali
 @@ -652,7 +652,7 @@
@@ -573,7 +573,7 @@ index cdb236bda..5715675d4 100644
      invoke-interface {p0}, Lvendor/samsung/hardware/biometrics/face/V2_0/ISehBiometricsFace;->sehPauseEnrollment()I
  
 diff --git a/smali/com/android/server/biometrics/sensors/face/aidl/SemFaceServiceExImpl$$ExternalSyntheticLambda5.smali b/smali/com/android/server/biometrics/sensors/face/aidl/SemFaceServiceExImpl$$ExternalSyntheticLambda5.smali
-index b221b70b2..301e61f20 100644
+index e80671ca8..3498d2242 100644
 --- a/smali/com/android/server/biometrics/sensors/face/aidl/SemFaceServiceExImpl$$ExternalSyntheticLambda5.smali
 +++ b/smali/com/android/server/biometrics/sensors/face/aidl/SemFaceServiceExImpl$$ExternalSyntheticLambda5.smali
 @@ -9,22 +9,18 @@
@@ -753,7 +753,7 @@ index b221b70b2..301e61f20 100644
      return-void
  .end method
 diff --git a/smali/com/android/server/biometrics/sensors/face/aidl/SemFaceServiceExImpl.smali b/smali/com/android/server/biometrics/sensors/face/aidl/SemFaceServiceExImpl.smali
-index bec095b8e..19a78c1da 100644
+index 55c554d81..0304b31c1 100644
 --- a/smali/com/android/server/biometrics/sensors/face/aidl/SemFaceServiceExImpl.smali
 +++ b/smali/com/android/server/biometrics/sensors/face/aidl/SemFaceServiceExImpl.smali
 @@ -1456,7 +1456,7 @@
@@ -766,7 +766,7 @@ index bec095b8e..19a78c1da 100644
      if-eq p1, v11, :cond_3
  
 diff --git a/smali/com/android/server/biometrics/sensors/face/aidl/SemFaceSessionCloseClient.smali b/smali/com/android/server/biometrics/sensors/face/aidl/SemFaceSessionCloseClient.smali
-index 93fe85202..5591e5282 100644
+index 33062e68b..bb93ed8a9 100644
 --- a/smali/com/android/server/biometrics/sensors/face/aidl/SemFaceSessionCloseClient.smali
 +++ b/smali/com/android/server/biometrics/sensors/face/aidl/SemFaceSessionCloseClient.smali
 @@ -71,7 +71,7 @@
@@ -779,18 +779,9 @@ index 93fe85202..5591e5282 100644
      invoke-interface {v0}, Lvendor/samsung/hardware/biometrics/face/V2_0/ISehBiometricsFace;->sehCloseTaSession()I
  
 diff --git a/smali/com/android/server/biometrics/sensors/face/hidl/HidlToAidlCallbackConverter.smali b/smali/com/android/server/biometrics/sensors/face/hidl/HidlToAidlCallbackConverter.smali
-index 922e16c82..13218084d 100644
+index 1fd0a06f2..8719ad7b9 100644
 --- a/smali/com/android/server/biometrics/sensors/face/hidl/HidlToAidlCallbackConverter.smali
 +++ b/smali/com/android/server/biometrics/sensors/face/hidl/HidlToAidlCallbackConverter.smali
-@@ -3,7 +3,7 @@
- .source "qb/101886872 4ec8f6d2813f753a220c00d05e2aa013ded863b1967e4bb65f3969ed08f5cc72"
- 
- # interfaces
--.implements Lvendor/samsung/hardware/biometrics/face/V3_0/ISehBiometricsFaceClientCallback;
-+.implements Lvendor/samsung/hardware/biometrics/face/V2_0/ISehBiometricsFaceClientCallback;
- 
- 
- # instance fields
 @@ -248,11 +248,9 @@
  
      const-string/jumbo v1, "android.hidl.base@1.0::IBase"
@@ -1229,7 +1220,7 @@ index 922e16c82..13218084d 100644
      return-object p0
  .end method
 diff --git a/smali/com/android/server/biometrics/sensors/face/hidl/HidlToAidlSensorAdapter.smali b/smali/com/android/server/biometrics/sensors/face/hidl/HidlToAidlSensorAdapter.smali
-index fb4a57c8d..c968972f4 100644
+index 34fa1f148..c101fb1b0 100644
 --- a/smali/com/android/server/biometrics/sensors/face/hidl/HidlToAidlSensorAdapter.smali
 +++ b/smali/com/android/server/biometrics/sensors/face/hidl/HidlToAidlSensorAdapter.smali
 @@ -209,10 +209,6 @@
@@ -1275,7 +1266,7 @@ index fb4a57c8d..c968972f4 100644
  
      move-result-object v0
 diff --git a/smali/com/android/server/biometrics/sensors/face/hidl/HidlToAidlSessionAdapter.smali b/smali/com/android/server/biometrics/sensors/face/hidl/HidlToAidlSessionAdapter.smali
-index 1602ab842..8aad1b990 100644
+index 832dfa417..5bbdeeb6f 100644
 --- a/smali/com/android/server/biometrics/sensors/face/hidl/HidlToAidlSessionAdapter.smali
 +++ b/smali/com/android/server/biometrics/sensors/face/hidl/HidlToAidlSessionAdapter.smali
 @@ -895,7 +895,7 @@
@@ -1335,15 +1326,10 @@ index 1602ab842..8aad1b990 100644
  
      const-string/jumbo v5, "SetCallback FINISH ("
 diff --git a/smali/com/android/server/biometrics/sensors/face/hidl/TestHal.smali b/smali/com/android/server/biometrics/sensors/face/hidl/TestHal.smali
-index 05f40bce1..bec1c0b36 100644
+index 4637b22d7..371b818d9 100644
 --- a/smali/com/android/server/biometrics/sensors/face/hidl/TestHal.smali
 +++ b/smali/com/android/server/biometrics/sensors/face/hidl/TestHal.smali
-@@ -3,11 +3,11 @@
- .source "qb/101886872 4ec8f6d2813f753a220c00d05e2aa013ded863b1967e4bb65f3969ed08f5cc72"
- 
- # interfaces
--.implements Lvendor/samsung/hardware/biometrics/face/V3_0/ISehBiometricsFace;
-+.implements Lvendor/samsung/hardware/biometrics/face/V2_0/ISehBiometricsFace;
+@@ -7,7 +7,7 @@
  
  
  # instance fields
@@ -2153,7 +2139,7 @@ index 05f40bce1..bec1c0b36 100644
      return-object p0
  .end method
 diff --git a/smali_classes2/vendor/samsung/hardware/biometrics/face/V2_0/ISehBiometricsFace$Proxy.smali b/smali_classes2/vendor/samsung/hardware/biometrics/face/V2_0/ISehBiometricsFace$Proxy.smali
-index 320ef0532..09a87b8d6 100644
+index ccff12ca4..18e03db90 100644
 --- a/smali_classes2/vendor/samsung/hardware/biometrics/face/V2_0/ISehBiometricsFace$Proxy.smali
 +++ b/smali_classes2/vendor/samsung/hardware/biometrics/face/V2_0/ISehBiometricsFace$Proxy.smali
 @@ -948,6 +948,50 @@
@@ -2538,7 +2524,7 @@ index 320ef0532..09a87b8d6 100644
      .locals 2
  
 diff --git a/smali_classes2/vendor/samsung/hardware/biometrics/face/V2_0/ISehBiometricsFaceClientCallback$Proxy.smali b/smali_classes2/vendor/samsung/hardware/biometrics/face/V2_0/ISehBiometricsFaceClientCallback$Proxy.smali
-index 985873878..0720122d2 100644
+index 9d0be693e..9c0f254ab 100644
 --- a/smali_classes2/vendor/samsung/hardware/biometrics/face/V2_0/ISehBiometricsFaceClientCallback$Proxy.smali
 +++ b/smali_classes2/vendor/samsung/hardware/biometrics/face/V2_0/ISehBiometricsFaceClientCallback$Proxy.smali
 @@ -364,6 +364,152 @@
@@ -2695,5 +2681,5 @@ index 985873878..0720122d2 100644
      .locals 4
  
 -- 
-2.51.0
+2.51.1
 
