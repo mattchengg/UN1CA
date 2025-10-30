@@ -35,23 +35,12 @@
 
     const-string v0, "persist.sys.pif.version"
 
-    const-string v1, ""
+    const-string v1, "20251027"
 
     invoke-static {v0, v1}, Landroid/os/SemSystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
     move-result-object v0
 
-    invoke-static {v0}, Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z
-
-    move-result v1
-
-    if-eqz v1, :cond_0
-
-    const-string v0, "Not installed"
-
-    return-object v0
-
-    :cond_0
     :try_start_0
     new-instance v1, Ljava/text/SimpleDateFormat;
 
