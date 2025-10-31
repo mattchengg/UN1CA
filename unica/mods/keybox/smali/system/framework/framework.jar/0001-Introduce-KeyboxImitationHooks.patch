@@ -1,4 +1,4 @@
-From 61b7ed8a9a3727248c1fa9b1d86ff4bcc4ee638e Mon Sep 17 00:00:00 2001
+From e2a61622607004f35b82a526b056059af2e29625 Mon Sep 17 00:00:00 2001
 From: Salvo Giangreco <giangrecosalvo9@gmail.com>
 Date: Mon, 6 Oct 2025 15:12:32 +0200
 Subject: [PATCH] Introduce KeyboxImitationHooks
@@ -15,14 +15,14 @@ Subject: [PATCH] Introduce KeyboxImitationHooks
  .../mesalabs/unica/KeyProviderManager.smali   |   91 +
  .../unica/KeyboxChainGenerator$Digest.smali   |  141 +
  ...eyboxChainGenerator$KeyGenParameters.smali |  590 ++++
- .../mesalabs/unica/KeyboxChainGenerator.smali | 1488 ++++++++++
+ .../mesalabs/unica/KeyboxChainGenerator.smali | 1484 ++++++++++
  .../mesalabs/unica/KeyboxImitationHooks.smali | 2384 +++++++++++++++++
  ...eyboxOperationUtils$DecryptOperation.smali |  268 ++
  ...OperationUtils$KeyAgreementOperation.smali |  194 ++
  .../KeyboxOperationUtils$SignOperation.smali  |  223 ++
  .../mesalabs/unica/KeyboxOperationUtils.smali |  127 +
- .../io/mesalabs/unica/KeyboxUtils.smali       | 2236 ++++++++++++++++
- 18 files changed, 8656 insertions(+), 24 deletions(-)
+ .../io/mesalabs/unica/KeyboxUtils.smali       | 2232 +++++++++++++++
+ 18 files changed, 8648 insertions(+), 24 deletions(-)
  create mode 100644 smali_classes6/io/mesalabs/unica/IKeyboxProvider.smali
  create mode 100644 smali_classes6/io/mesalabs/unica/KeyProviderManager$DefaultKeyboxProvider$$ExternalSyntheticLambda0.smali
  create mode 100644 smali_classes6/io/mesalabs/unica/KeyProviderManager$DefaultKeyboxProvider.smali
@@ -2090,10 +2090,10 @@ index 00000000..e66b8178
 +.end method
 diff --git a/smali_classes6/io/mesalabs/unica/KeyboxChainGenerator.smali b/smali_classes6/io/mesalabs/unica/KeyboxChainGenerator.smali
 new file mode 100644
-index 00000000..27d0861e
+index 00000000..4642a1f9
 --- /dev/null
 +++ b/smali_classes6/io/mesalabs/unica/KeyboxChainGenerator.smali
-@@ -0,0 +1,1488 @@
+@@ -0,0 +1,1484 @@
 +.class final Lio/mesalabs/unica/KeyboxChainGenerator;
 +.super Ljava/lang/Object;
 +.source "KeyboxChainGenerator.java"
@@ -3293,10 +3293,6 @@ index 00000000..27d0861e
 +    move-result-object v9
 +
 +    invoke-interface {v9}, Ljava/security/PublicKey;->getEncoded()[B
-+
-+    move-result-object v9
-+
-+    invoke-static {v9}, Lcom/android/internal/org/bouncycastle/asn1/ASN1Sequence;->getInstance(Ljava/lang/Object;)Lcom/android/internal/org/bouncycastle/asn1/ASN1Sequence;
 +
 +    move-result-object v9
 +
@@ -6810,10 +6806,10 @@ index 00000000..77d03993
 +.end method
 diff --git a/smali_classes6/io/mesalabs/unica/KeyboxUtils.smali b/smali_classes6/io/mesalabs/unica/KeyboxUtils.smali
 new file mode 100644
-index 00000000..4124c7f9
+index 00000000..3a1608ae
 --- /dev/null
 +++ b/smali_classes6/io/mesalabs/unica/KeyboxUtils.smali
-@@ -0,0 +1,2236 @@
+@@ -0,0 +1,2232 @@
 +.class final Lio/mesalabs/unica/KeyboxUtils;
 +.super Ljava/lang/Object;
 +.source "KeyboxUtils.java"
@@ -7074,15 +7070,11 @@ index 00000000..4124c7f9
 +    aget-object p0, p0, v1
 +
 +    :goto_0
-+    invoke-static {p0}, Lio/mesalabs/unica/KeyboxUtils;->parseCertificate(Ljava/lang/String;)Ljava/security/cert/X509Certificate;
++    invoke-static {p0}, Lio/mesalabs/unica/KeyboxUtils;->decodePemOrBase64(Ljava/lang/String;)[B
 +
 +    move-result-object p0
 +
 +    new-instance v0, Lcom/android/internal/org/bouncycastle/cert/X509CertificateHolder;
-+
-+    invoke-virtual {p0}, Ljava/security/cert/X509Certificate;->getEncoded()[B
-+
-+    move-result-object p0
 +
 +    invoke-direct {v0, p0}, Lcom/android/internal/org/bouncycastle/cert/X509CertificateHolder;-><init>([B)V
 +
