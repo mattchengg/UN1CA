@@ -11,6 +11,16 @@ fi
 ADD_TO_WORK_DIR "$DONOR" "system" "system/bin/installd" 0 2000 755 "u:object_r:installd_exec:s0"
 ADD_TO_WORK_DIR "$DONOR" "system" "system/bin/vdc" 0 2000 755 "u:object_r:vdc_exec:s0"
 ADD_TO_WORK_DIR "$DONOR" "system" "system/bin/vold" 0 2000 755 "u:object_r:vold_exec:s0"
+# Support legacy sdFAT kernel drivers (pre-API 35)
+# Check unica/patches/legacy/customize.sh for more info.
+if [ "$TARGET_PLATFORM_SDK_VERSION" -lt "35" ] && \
+        grep -q "SDFAT" "$WORK_DIR/kernel/boot.img" && \
+        ! grep -q "bogus directory:" "$WORK_DIR/kernel/boot.img"; then
+    LOG_STEP_IN
+    # ",time_offset=%d" -> "NUL"
+    HEX_PATCH "$WORK_DIR/system/system/bin/vold" "2c74696d655f6f66667365743d2564" "000000000000000000000000000000"
+    LOG_STEP_OUT
+fi
 DELETE_FROM_WORK_DIR "system" "system/bin/dualdard"
 DELETE_FROM_WORK_DIR "system" "system/bin/sdp_cryptod"
 DELETE_FROM_WORK_DIR "system" "system/etc/init/dualdard.rc"
