@@ -1,6 +1,6 @@
 DECODE_APK "system" "system/priv-app/SecSetupWizard_Global/SecSetupWizard_Global.apk"
 
-LOG "- Enable navigation bar type settings step"
+LOG "- Enabling navigation bar type settings step"
 SMALI_PATCH "system" "system/priv-app/SecSetupWizard_Global/SecSetupWizard_Global.apk" \
     "smali/S2/f.smali" "replace" \
     "d(Landroid/content/Context;Z)Ljava/util/ArrayList;" \
@@ -14,7 +14,7 @@ SMALI_PATCH "system" "system/priv-app/SecSetupWizard_Global/SecSetupWizard_Globa
     "this_string_does_not_exist" \
     > /dev/null
 
-LOG "- Disable Recommended apps step"
+LOG "- Disabling Recommended apps step"
 EVAL "sed -i \"/omcagent/d\" \"$APKTOOL_DIR/system/priv-app/SecSetupWizard_Global/SecSetupWizard_Global.apk/res/values/arrays.xml\""
 
 # Dynamically patch SecSetupWizard_Global
@@ -23,7 +23,7 @@ EVAL "sed -i \"/omcagent/d\" \"$APKTOOL_DIR/system/priv-app/SecSetupWizard_Globa
 #   - Use the first line of the file to tell sed how to apply the rest of the content
 #   - Exception made for files under *res/values* where the "resources" tag gets nuked
 while IFS= read -r f; do
-    f="${f/$SRC_DIR\/unica\/mods\/settings\/SecSetupWizard_Global.apk\//}"
+    f="${f//$MODPATH\/SecSetupWizard_Global.apk\//}"
 
     if [ ! -f "$APKTOOL_DIR/system/priv-app/SecSetupWizard_Global/SecSetupWizard_Global.apk/$f" ] || \
             [[ "$f" != *".xml" ]]; then
@@ -39,8 +39,10 @@ while IFS= read -r f; do
             PATCH_INST="$(head -n 1 "$MODPATH/SecSetupWizard_Global.apk/$f")"
             CONTENT="$(tail -n +2 "$MODPATH/SecSetupWizard_Global.apk/$f")"
         fi
-        CONTENT="$(sed -e "s/\"/\\\\\"/g" -e "s/\\$/\\\\$/g" -e "s/ /\\\ /g" <<< "$CONTENT")"
+        CONTENT="$(sed -e "s/\"/\\\\\"/g" -e "s/\\$/\\\\$/g" -e "s/ /\\\ /g" -e "s/\\\\n/\\\\\\\\\n/g" <<< "$CONTENT")"
         CONTENT="$(sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g' <<< "$CONTENT")"
         EVAL "sed -i \"$PATCH_INST $CONTENT\" \"$APKTOOL_DIR/system/priv-app/SecSetupWizard_Global/SecSetupWizard_Global.apk/$f\""
     fi
 done < <(find "$MODPATH/SecSetupWizard_Global.apk" -type f)
+
+unset PATCH_INST CONTENT
