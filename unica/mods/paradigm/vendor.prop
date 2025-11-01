@@ -1,0 +1,7 @@
+# Fix default media sounds
+ro.config.ringtone=ACH_Galaxy_Bells.ogg
+ro.config.notification_sound=ACH_Brightline.ogg
+ro.config.alarm_alert=ACH_Morning_Xylophone.ogg
+ro.config.media_sound=Media_preview_Over_the_horizon.ogg
+ro.config.ringtone_2=ACH_Atomic_Bell.ogg
+ro.config.notification_sound_2=ACH_Three_Star.ogg
