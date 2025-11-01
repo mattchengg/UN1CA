@@ -33,14 +33,15 @@ SMALI_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
 LOG_STEP_IN "- Adding UN1CA Settings"
 
 # Dynamically patch SecSettings
-# - Add missing files in place
+# - Add missing/non-xml files in place
 # - Patch existing files
 #   - Use the first line of the file to tell sed how to apply the rest of the content
 #   - Exception made for files under *res/values* where the "resources" tag gets nuked
 while IFS= read -r f; do
-    f="${f/$SRC_DIR\/unica\/mods\/settings\/SecSettings.apk\//}"
+    f="${f//$MODPATH\/SecSettings.apk\//}"
 
-    if [ ! -f "$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/$f" ]; then
+    if [ ! -f "$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/$f" ] || \
+            [[ "$f" != *".xml" ]]; then
         LOG "- Adding \"$f\" to /system/system/priv-app/SecSettings.apk"
         EVAL "mkdir -p \"$(dirname "$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/$f")\""
         EVAL "cp -a \"$MODPATH/SecSettings.apk/${f//\$/\\$}\" \"$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/${f//\$/\\$}\""
@@ -53,7 +54,7 @@ while IFS= read -r f; do
             PATCH_INST="$(head -n 1 "$MODPATH/SecSettings.apk/$f")"
             CONTENT="$(tail -n +2 "$MODPATH/SecSettings.apk/$f")"
         fi
-        CONTENT="$(sed -e "s/\"/\\\\\"/g" -e "s/\\$/\\\\$/g" -e "s/ /\\\ /g" <<< "$CONTENT")"
+        CONTENT="$(sed -e "s/\"/\\\\\"/g" -e "s/\\$/\\\\$/g" -e "s/ /\\\ /g" -e "s/\\\\n/\\\\\\\\\n/g" <<< "$CONTENT")"
         CONTENT="$(sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g' <<< "$CONTENT")"
         EVAL "sed -i \"$PATCH_INST $CONTENT\" \"$APKTOOL_DIR/system/priv-app/SecSettings/SecSettings.apk/$f\""
     fi
