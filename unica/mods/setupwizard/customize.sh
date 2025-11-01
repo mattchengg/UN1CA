@@ -13,3 +13,6 @@ SMALI_PATCH "system" "system/priv-app/SecSetupWizard_Global/SecSetupWizard_Globa
     "navigationbar_setting" \
     "this_string_does_not_exist" \
     > /dev/null
+
+LOG "- Disable Recommended apps step"
+EVAL "sed -i \"/omcagent/d\" \"$APKTOOL_DIR/system/priv-app/SecSetupWizard_Global/SecSetupWizard_Global.apk/res/values/arrays.xml\""
