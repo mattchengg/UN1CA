@@ -34,8 +34,13 @@ ADD_TO_WORK_DIR "pa1qxxx" "system" \
     "system/etc/permissions/privapp-permissions-com.samsung.android.sead.xml" 0 0 644 "u:object_r:system_file:s0"
 ADD_TO_WORK_DIR "pa1qxxx" "system" \
     "system/priv-app/EnvironmentAdaptiveDisplay/EnvironmentAdaptiveDisplay.apk" 0 0 644 "u:object_r:system_file:s0"
-APPLY_PATCH "system" "system/framework/services.jar" \
-    "$MODPATH/ead/services.jar/0001-Add-Adaptive-color-tone-feature.patch"
+if $TARGET_LCD_SUPPORT_MDNIE_HW; then
+    APPLY_PATCH "system" "system/framework/services.jar" \
+        "$MODPATH/ead/services.jar/0001-Add-Adaptive-color-tone-feature.patch"
+else
+    APPLY_PATCH "system" "system/framework/services.jar" \
+        "$MODPATH/ead_mdnie/services.jar/0001-Add-Adaptive-color-tone-feature.patch"
+fi
 APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
     "$MODPATH/ead/SecSettings.apk/0001-Add-Adaptive-color-tone-feature.patch"
 APPLY_PATCH "system" "system/priv-app/SettingsProvider/SettingsProvider.apk" \
