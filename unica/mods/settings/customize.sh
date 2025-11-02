@@ -243,6 +243,11 @@ SMALI_PATCH "system" "system/priv-app/SecSettingsIntelligence/SecSettingsIntelli
     '    const-string v36, "top_level_unica"\n\n    filled-new-array/range {v1 .. v36}, [Ljava/lang/String;' \
     > /dev/null
 
+# Show Vulkan renderer toggle if required
+if [[ "$(GET_PROP "ro.hwui.use_vulkan")" != "true" ]]; then
+    SET_PROP "system" "persist.sys.unica.vulkan" "false"
+fi
+
 unset PATCH_INST CONTENT
 
 LOG_STEP_OUT
