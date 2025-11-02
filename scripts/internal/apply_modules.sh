@@ -43,7 +43,7 @@ APPLY_MODULE()
         return 0
     else
         MODNAME="$(grep "^name" "$MODPATH/module.prop" | sed "s/name=//")"
-        MODAUTH="$(grep "^author" "$MODPATH/module.prop" | sed "s/author=//" | sed "s/, /, @/")"
+        MODAUTH="$(grep "^author" "$MODPATH/module.prop" | sed "s/author=//" | sed "s/, /, @/g")"
     fi
 
     LOG_STEP_IN "- Processing \"$MODNAME\" by @$MODAUTH"
