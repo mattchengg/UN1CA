@@ -100,6 +100,10 @@ system/etc/permissions/privapp-permissions-com.samsung.android.game.gamehome.xml
 system/priv-app/GameHome
 "
 
+ADD_TO_WORK_DIR "pa1qxxx" "system" \
+    "system/etc/permissions/signature-permissions-com.samsung.android.game.gamehome.xml" \
+    0 0 644 "u:object_r:system_file:s0"
+
 # Gemini shortcut
 PRODUCT_DEBLOAT+="
 app/BardShell
