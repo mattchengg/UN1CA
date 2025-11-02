@@ -912,10 +912,6 @@ fi
 # SEC_PRODUCT_FEATURE_WLAN_SUPPORT_MOBILEAP_WIFISHARING_LITE
 if ! $SOURCE_WLAN_SUPPORT_MOBILEAP_WIFISHARING_LITE; then
     if $TARGET_WLAN_SUPPORT_MOBILEAP_WIFISHARING_LITE; then
-        if ! $TARGET_WLAN_SUPPORT_MOBILEAP_WIFI_CONCURRENCY; then
-            ABORT "TARGET_WLAN_SUPPORT_MOBILEAP_WIFI_CONCURRENCY is required by TARGET_WLAN_SUPPORT_MOBILEAP_WIFISHARING_LITE"
-        fi
-
         # Check for target flag instead as we've already took care of this SPF above
         if ! $TARGET_WLAN_SUPPORT_MOBILEAP_POWER_SAVEMODE; then
             APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
