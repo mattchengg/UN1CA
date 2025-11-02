@@ -732,22 +732,54 @@ if [[ "$SOURCE_WLAN_CONFIG_CUSTOM_BACKOFF" != "$TARGET_WLAN_CONFIG_CUSTOM_BACKOF
     fi
 fi
 
+# SEC_PRODUCT_FEATURE_WLAN_SUPPORT_80211AX
 # SEC_PRODUCT_FEATURE_WLAN_SUPPORT_80211AX_6GHZ
-if ! $SOURCE_WLAN_SUPPORT_80211AX_6GHZ; then
-    if $TARGET_WLAN_SUPPORT_80211AX_6GHZ; then
-        ADD_TO_WORK_DIR "b0qxxx" "product" "overlay/SoftapOverlay6GHz/SoftapOverlay6GHz.apk" 0 0 644 "u:object_r:system_file:s0"
+if $SOURCE_WLAN_SUPPORT_80211AX; then
+    if $TARGET_WLAN_SUPPORT_80211AX; then
+        if ! $SOURCE_WLAN_SUPPORT_80211AX_6GHZ; then
+            if $TARGET_WLAN_SUPPORT_80211AX_6GHZ; then
+                ADD_TO_WORK_DIR "b0qxxx" "product" "overlay/SoftapOverlay6GHz/SoftapOverlay6GHz.apk" 0 0 644 "u:object_r:system_file:s0"
 
-        APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
-            "$MODPATH/wifi/80211ax_6ghz/semwifi-service.jar/0001-Enable-80211AX_6GHZ-support.patch"
-        APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
-            "$MODPATH/wifi/80211ax_6ghz/SecSettings.apk/0001-Enable-80211AX_6GHZ-support.patch"
-        APPLY_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
-            "$MODPATH/wifi/80211ax_6ghz/SystemUI.apk/0001-Enable-80211AX_6GHZ-support.patch"
+                APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
+                    "$MODPATH/wifi/80211ax_6ghz/semwifi-service.jar/0001-Enable-80211AX_6GHZ-support.patch"
+                APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+                    "$MODPATH/wifi/80211ax_6ghz/SecSettings.apk/0001-Enable-80211AX_6GHZ-support.patch"
+                APPLY_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
+                    "$MODPATH/wifi/80211ax_6ghz/SystemUI.apk/0001-Enable-80211AX_6GHZ-support.patch"
+            fi
+        else
+            if ! $TARGET_WLAN_SUPPORT_80211AX_6GHZ; then
+                # TODO handle this condition
+                LOG_MISSING_PATCHES "SOURCE_WLAN_SUPPORT_80211AX_6GHZ" "TARGET_WLAN_SUPPORT_80211AX_6GHZ"
+            fi
+        fi
+    else
+        if $TARGET_WLAN_SUPPORT_80211AX_6GHZ; then
+            ABORT "TARGET_WLAN_SUPPORT_80211AX is required by TARGET_WLAN_SUPPORT_80211AX_6GHZ"
+        fi
+        if ! $SOURCE_WLAN_SUPPORT_80211AX_6GHZ; then
+            APPLY_PATCH "system" "system/framework/semwifi-service.jar" \
+                "$MODPATH/wifi/80211ax/semwifi-service.jar/0001-Disable-80211AX-support.patch"
+            APPLY_PATCH "system" "system/priv-app/SecSettings/SecSettings.apk" \
+                "$MODPATH/wifi/80211ax/SecSettings.apk/0001-Disable-80211AX-support.patch"
+            APPLY_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
+                "$MODPATH/wifi/80211ax/SystemUI.apk/0001-Disable-80211AX-support.patch"
+        else
+            # TODO handle these conditions
+            LOG_MISSING_PATCHES "SOURCE_WLAN_SUPPORT_80211AX" "TARGET_WLAN_SUPPORT_80211AX" || true
+            LOG_MISSING_PATCHES "SOURCE_WLAN_SUPPORT_80211AX_6GHZ" "TARGET_WLAN_SUPPORT_80211AX_6GHZ"
+        fi
     fi
 else
-    if ! $TARGET_WLAN_SUPPORT_80211AX_6GHZ; then
+    if $SOURCE_WLAN_SUPPORT_80211AX_6GHZ; then
+        ABORT "SOURCE_WLAN_SUPPORT_80211AX is required by SOURCE_WLAN_SUPPORT_80211AX_6GHZ"
+    fi
+    if $TARGET_WLAN_SUPPORT_80211AX; then
         # TODO handle this condition
-        LOG_MISSING_PATCHES "SOURCE_WLAN_SUPPORT_80211AX_6GHZ" "TARGET_WLAN_SUPPORT_80211AX_6GHZ"
+        LOG_MISSING_PATCHES "SOURCE_WLAN_SUPPORT_80211AX" "TARGET_WLAN_SUPPORT_80211AX"
+    fi
+    if $TARGET_WLAN_SUPPORT_80211AX_6GHZ; then
+        ABORT "TARGET_WLAN_SUPPORT_80211AX is required by TARGET_WLAN_SUPPORT_80211AX_6GHZ"
     fi
 fi
 
