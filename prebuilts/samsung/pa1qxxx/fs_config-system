@@ -202,3 +202,5 @@ system/priv-app/Moments 0 0 755 capabilities=0x0
 system/priv-app/Moments/Moments.apk 0 0 644 capabilities=0x0
 system/priv-app/SemanticSearchCore 0 0 755 capabilities=0x0
 system/priv-app/SemanticSearchCore/SemanticSearchCore.apk 0 0 644 capabilities=0x0
+system/priv-app/wallpaper-res 0 0 755 capabilities=0x0
+system/priv-app/wallpaper-res/wallpaper-res.apk 0 0 644 capabilities=0x0
