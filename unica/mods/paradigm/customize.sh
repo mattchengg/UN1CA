@@ -32,6 +32,7 @@ APPLY_PATCH "system" "system/priv-app/SecSoundPicker/SecSoundPicker.apk" \
 LOG_STEP_OUT
 
 # Adaptive colour tone
+LOG_STEP_IN "- Adding Adaptive colour tone feature"
 ADD_TO_WORK_DIR "pa1qxxx" "system" \
     "system/etc/permissions/privapp-permissions-com.samsung.android.sead.xml" 0 0 644 "u:object_r:system_file:s0"
 ADD_TO_WORK_DIR "pa1qxxx" "system" \
@@ -49,3 +50,22 @@ APPLY_PATCH "system" "system/priv-app/SettingsProvider/SettingsProvider.apk" \
     "$MODPATH/ead/SettingsProvider.apk/0001-Add-Adaptive-color-tone-feature.patch"
 APPLY_PATCH "system_ext" "priv-app/SystemUI/SystemUI.apk" \
     "$MODPATH/ead/SystemUI.apk/0001-Add-Adaptive-color-tone-toggle.patch"
+LOG_STEP_OUT
+
+# Set AI Version to 20253 (latest)
+SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_COMMON_CONFIG_AI_VERSION" "20253"
+
+# Semantic search
+# Requires SEC_FLOATING_FEATURE_COMMON_CONFIG_AI_VERSION >= 20251
+LOG_STEP_IN "- Adding Semantic search feature"
+ADD_TO_WORK_DIR "pa1qxxx" "system" \
+    "system/priv-app/SemanticSearchCore/SemanticSearchCore.apk" 0 0 644 "u:object_r:system_file:s0"
+DECODE_APK "system" "system/priv-app/SecSettingsIntelligence/SecSettingsIntelligence.apk"
+LOG "- Enabling Semantic search feature in /system/system/priv-app/SecSettingsIntelligence/SecSettingsIntelligence.apk"
+EVAL "cp -a \"$MODPATH/semanticsearch/SecSettingsIntelligence.apk/res/raw/\"* \"$APKTOOL_DIR/system/priv-app/SecSettingsIntelligence/SecSettingsIntelligence.apk/res/raw\""
+SMALI_PATCH "system" "system/priv-app/SecSettingsIntelligence/SecSettingsIntelligence.apk" \
+    "smali_classes2/com/samsung/android/settings/intelligence/Rune.smali" "replaceall" \
+    "const-string v1, \\\"\\\"" \
+    "const-string v1, \\\"400\\\"" \
+    > /dev/null
+LOG_STEP_OUT

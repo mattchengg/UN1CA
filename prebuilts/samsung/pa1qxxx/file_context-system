@@ -189,3 +189,5 @@
 /system/priv-app u:object_r:system_file:s0
 /system/priv-app/EnvironmentAdaptiveDisplay u:object_r:system_file:s0
 /system/priv-app/EnvironmentAdaptiveDisplay/EnvironmentAdaptiveDisplay\.apk u:object_r:system_file:s0
+/system/priv-app/SemanticSearchCore u:object_r:system_file:s0
+/system/priv-app/SemanticSearchCore/SemanticSearchCore\.apk u:object_r:system_file:s0
