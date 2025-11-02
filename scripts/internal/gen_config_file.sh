@@ -368,6 +368,9 @@ fi
 #   [SOURCE/TARGET]_WLAN_SUPPORT_LOWLATENCY
 #     Boolean which describes whether the device supports low latency Wi-Fi.
 #
+#   [SOURCE/TARGET]_WLAN_SUPPORT_MBO
+#     Boolean which describes whether the device supports the Wi-Fi Agile Multiband standard.
+#
 #   [SOURCE/TARGET]_WLAN_SUPPORT_MOBILEAP_6G
 #     Boolean which describes whether the device supports Wi-Fi 6E Mobile Hotspot.
 #
@@ -506,6 +509,8 @@ fi
     GET_BUILD_VAR "TARGET_WLAN_SUPPORT_APE_SERVICE"
     GET_BUILD_VAR "SOURCE_WLAN_SUPPORT_LOWLATENCY"
     GET_BUILD_VAR "TARGET_WLAN_SUPPORT_LOWLATENCY"
+    GET_BUILD_VAR "SOURCE_WLAN_SUPPORT_MBO"
+    GET_BUILD_VAR "TARGET_WLAN_SUPPORT_MBO"
     GET_BUILD_VAR "SOURCE_WLAN_SUPPORT_MOBILEAP_6G"
     GET_BUILD_VAR "TARGET_WLAN_SUPPORT_MOBILEAP_6G"
     GET_BUILD_VAR "SOURCE_WLAN_SUPPORT_MOBILEAP_POWER_SAVEMODE"

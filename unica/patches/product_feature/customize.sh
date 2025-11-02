@@ -751,27 +751,6 @@ else
     fi
 fi
 
-# SEC_PRODUCT_FEATURE_WLAN_SUPPORT_MOBILEAP_6G
-if ! $SOURCE_WLAN_SUPPORT_MOBILEAP_6G && $TARGET_WLAN_SUPPORT_MOBILEAP_6G; then
-    SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
-        "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replaceall" \
-        "SPF_6G=false" \
-        "SPF_6G=true"
-    SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
-        "smali/com/samsung/android/server/wifi/SemFrameworkFacade.smali" "return" \
-        "isSupportMobileAp6G()Z" \
-        "true"
-elif $SOURCE_WLAN_SUPPORT_MOBILEAP_6G && ! $TARGET_WLAN_SUPPORT_MOBILEAP_6G; then
-    SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
-        "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replaceall" \
-        "SPF_6G=true" \
-        "SPF_6G=false"
-    SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
-        "smali/com/samsung/android/server/wifi/SemFrameworkFacade.smali" "return" \
-        "isSupportMobileAp6G()Z" \
-        "false"
-fi
-
 # SEC_PRODUCT_FEATURE_WLAN_SUPPORT_APE_SERVICE
 # SEC_PRODUCT_FEATURE_WLAN_CONFIG_CONNECTION_PERSONALIZATION
 # SEC_PRODUCT_FEATURE_WLAN_CONFIG_DYNAMIC_SWITCH
@@ -841,6 +820,40 @@ if [[ "$SOURCE_WLAN_CONFIG_CONNECTION_PERSONALIZATION" != "$TARGET_WLAN_CONFIG_C
         LOG_MISSING_PATCHES "SOURCE_WLAN_CONFIG_CONNECTION_PERSONALIZATION" "TARGET_WLAN_CONFIG_CONNECTION_PERSONALIZATION" || true
         LOG_MISSING_PATCHES "SOURCE_WLAN_SUPPORT_APE_SERVICE" "TARGET_WLAN_SUPPORT_APE_SERVICE"
     fi
+fi
+
+# SEC_PRODUCT_FEATURE_WLAN_SUPPORT_MBO
+if ! $SOURCE_WLAN_SUPPORT_MBO && $TARGET_WLAN_SUPPORT_MBO; then
+    SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+        "smali/com/samsung/android/server/wifi/SemFrameworkFacade.smali" "return" \
+        "isMBOSupported()Z" \
+        "true"
+elif $SOURCE_WLAN_SUPPORT_MBO && ! $TARGET_WLAN_SUPPORT_MBO; then
+    SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+        "smali/com/samsung/android/server/wifi/SemFrameworkFacade.smali" "return" \
+        "isMBOSupported()Z" \
+        "false"
+fi
+
+# SEC_PRODUCT_FEATURE_WLAN_SUPPORT_MOBILEAP_6G
+if ! $SOURCE_WLAN_SUPPORT_MOBILEAP_6G && $TARGET_WLAN_SUPPORT_MOBILEAP_6G; then
+    SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+        "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replaceall" \
+        "SPF_6G=false" \
+        "SPF_6G=true"
+    SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+        "smali/com/samsung/android/server/wifi/SemFrameworkFacade.smali" "return" \
+        "isSupportMobileAp6G()Z" \
+        "true"
+elif $SOURCE_WLAN_SUPPORT_MOBILEAP_6G && ! $TARGET_WLAN_SUPPORT_MOBILEAP_6G; then
+    SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+        "smali/com/samsung/android/server/wifi/ap/SemSoftApConfiguration.smali" "replaceall" \
+        "SPF_6G=true" \
+        "SPF_6G=false"
+    SMALI_PATCH "system" "system/framework/semwifi-service.jar" \
+        "smali/com/samsung/android/server/wifi/SemFrameworkFacade.smali" "return" \
+        "isSupportMobileAp6G()Z" \
+        "false"
 fi
 
 # SEC_PRODUCT_FEATURE_WLAN_SUPPORT_MOBILEAP_POWER_SAVEMODE
