@@ -1,4 +1,4 @@
-From 99fffc5f407afd6b74b224b6559168fc6501257b Mon Sep 17 00:00:00 2001
+From cbc7ea0402bb27dc3e7a8e89f2d915b0b2ec42e6 Mon Sep 17 00:00:00 2001
 From: Salvo Giangreco <giangrecosalvo9@gmail.com>
 Date: Sat, 30 Aug 2025 16:29:23 +0200
 Subject: [PATCH] Add side fingerprint sensor support
@@ -9,7 +9,7 @@ Subject: [PATCH] Add side fingerprint sensor support
  ...intService$$ExternalSyntheticLambda1.smali | 961 ++++++++++--------
  .../fingerprint/FingerprintService$1.smali    |  27 +-
  .../fingerprint/FingerprintService$2.smali    |   2 +-
- .../SemFingerprintServiceExtImpl.smali        |  34 +-
+ .../SemFingerprintServiceExtImpl.smali        |  33 +-
  ...eManager$1$$ExternalSyntheticLambda0.smali |  36 +
  ...eManager$1$$ExternalSyntheticLambda1.smali |  69 ++
  .../fingerprint/SemFpGestureManager$1.smali   |  53 +
@@ -26,7 +26,7 @@ Subject: [PATCH] Add side fingerprint sensor support
  ...nseHandler$$ExternalSyntheticLambda8.smali |  20 +-
  .../server/display/EarlyWakeUpManager.smali   |   4 -
  .../server/power/PowerManagerUtil.smali       |   4 -
- 22 files changed, 1803 insertions(+), 552 deletions(-)
+ 22 files changed, 1802 insertions(+), 552 deletions(-)
  create mode 100644 smali/com/android/server/biometrics/sensors/fingerprint/SemFpGestureManager$1$$ExternalSyntheticLambda0.smali
  create mode 100644 smali/com/android/server/biometrics/sensors/fingerprint/SemFpGestureManager$1$$ExternalSyntheticLambda1.smali
  create mode 100644 smali/com/android/server/biometrics/sensors/fingerprint/SemFpGestureManager$1.smali
@@ -2367,18 +2367,10 @@ index 97de3d150..c0604f02e 100644
      invoke-interface {v1, p0}, Lcom/android/server/biometrics/sensors/fingerprint/ServiceProvider;->semAddAuthenticationListener(Lcom/android/server/biometrics/sensors/fingerprint/SemFpAuthenticationListener;)V
  
 diff --git a/smali/com/android/server/biometrics/sensors/fingerprint/SemFingerprintServiceExtImpl.smali b/smali/com/android/server/biometrics/sensors/fingerprint/SemFingerprintServiceExtImpl.smali
-index ae9a48d90..371fd4b63 100644
+index ae9a48d90..37e8e32b1 100644
 --- a/smali/com/android/server/biometrics/sensors/fingerprint/SemFingerprintServiceExtImpl.smali
 +++ b/smali/com/android/server/biometrics/sensors/fingerprint/SemFingerprintServiceExtImpl.smali
-@@ -3,6 +3,7 @@
- .source "qb/102434624 4ec8f6d2813f753a220c00d05e2aa013ded863b1967e4bb65f3969ed08f5cc72"
- 
- # interfaces
-+.implements Lcom/android/server/biometrics/sensors/fingerprint/SemFpHalLifecycleListener;
- .implements Lcom/android/server/biometrics/sensors/fingerprint/SemFpAuthenticationListener;
- 
- 
-@@ -21,6 +22,8 @@
+@@ -21,6 +21,8 @@
  
  .field public mFpProtectiveFilmGuide:Lcom/android/server/biometrics/sensors/fingerprint/SemFpProtectiveFilmGuide;
  
@@ -2387,7 +2379,7 @@ index ae9a48d90..371fd4b63 100644
  .field public final mHandler:Landroid/os/Handler;
  
  .field public mHasOpticalUdfps:Z
-@@ -457,10 +460,31 @@
+@@ -457,10 +459,31 @@
      goto :goto_0
  
      :cond_0
@@ -2420,7 +2412,7 @@ index ae9a48d90..371fd4b63 100644
      iget-object p0, p0, Lcom/android/server/biometrics/sensors/fingerprint/SemFingerprintServiceExtImpl;->mInjector:Lcom/android/server/biometrics/sensors/fingerprint/SemFingerprintServiceExtImpl$Injector;
  
      invoke-virtual {p0}, Ljava/lang/Object;->getClass()Ljava/lang/Class;
-@@ -475,7 +499,7 @@
+@@ -475,7 +498,7 @@
  
      invoke-virtual {p0, p1, v0}, Lcom/android/server/biometrics/sensors/fingerprint/SemUdfpsHelper;->dump(Ljava/io/PrintWriter;Landroid/util/Pair;)V
  
@@ -2429,7 +2421,7 @@ index ae9a48d90..371fd4b63 100644
      invoke-static {}, Lcom/android/server/biometrics/SemBioLoggingManager;->get()Lcom/android/server/biometrics/SemBioLoggingManager;
  
      move-result-object p0
-@@ -867,12 +891,6 @@
+@@ -867,12 +890,6 @@
      return-void
  .end method
  

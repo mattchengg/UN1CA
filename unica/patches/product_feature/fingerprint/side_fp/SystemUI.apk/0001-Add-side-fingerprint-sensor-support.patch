@@ -1,4 +1,4 @@
-From 559fb98d4d7967275216fda5de719c70a45ef7c1 Mon Sep 17 00:00:00 2001
+From f26d40abbf935b2a81064dfff5f7a1263f9f6a41 Mon Sep 17 00:00:00 2001
 From: Salvo Giangreco <giangrecosalvo9@gmail.com>
 Date: Mon, 13 Oct 2025 14:44:50 +0200
 Subject: [PATCH] Add side fingerprint sensor support
@@ -21,7 +21,7 @@ UN1CA: this patch is not complete! Please check unica/patches/product_feature/cu
  ...nitorImpl$$ExternalSyntheticLambda14.smali |   13 +-
  ...nitorImpl$$ExternalSyntheticLambda23.smali |   92 +
  ...nitorImpl$$ExternalSyntheticLambda27.smali |   97 +
- ...nitorImpl$$ExternalSyntheticLambda28.smali |   58 +-
+ ...nitorImpl$$ExternalSyntheticLambda28.smali |   56 +-
  ...nitorImpl$$ExternalSyntheticLambda32.smali |  112 +
  ...nitorImpl$$ExternalSyntheticLambda39.smali |   86 +
  ...nitorImpl$$ExternalSyntheticLambda41.smali |   42 +
@@ -62,7 +62,7 @@ UN1CA: this patch is not complete! Please check unica/patches/product_feature/cu
  .../SecStatusBarKeyguardViewManager$3.smali   |   20 +-
  .../android/systemui/util/DeviceState.smali   |  152 +-
  .../android/systemui/util/DeviceType.smali    |   24 +-
- 57 files changed, 4725 insertions(+), 6432 deletions(-)
+ 57 files changed, 4724 insertions(+), 6431 deletions(-)
  create mode 100644 smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda23.smali
  create mode 100644 smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda27.smali
  create mode 100644 smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda32.smali
@@ -70,7 +70,7 @@ UN1CA: this patch is not complete! Please check unica/patches/product_feature/cu
  create mode 100644 smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda41.smali
 
 diff --git a/smali/com/android/keyguard/DualDarInnerLockScreenController.smali b/smali/com/android/keyguard/DualDarInnerLockScreenController.smali
-index a760e2128..b007b2a65 100644
+index 634b0cde6d..6e0c27333a 100644
 --- a/smali/com/android/keyguard/DualDarInnerLockScreenController.smali
 +++ b/smali/com/android/keyguard/DualDarInnerLockScreenController.smali
 @@ -257,11 +257,11 @@
@@ -316,7 +316,7 @@ index a760e2128..b007b2a65 100644
  .end method
  
 diff --git a/smali/com/android/keyguard/KeyguardArrowViewController.smali b/smali/com/android/keyguard/KeyguardArrowViewController.smali
-index 5809751b9..9177b3c1b 100644
+index 213a8fbbb2..74b1487895 100644
 --- a/smali/com/android/keyguard/KeyguardArrowViewController.smali
 +++ b/smali/com/android/keyguard/KeyguardArrowViewController.smali
 @@ -897,7 +897,7 @@
@@ -432,7 +432,7 @@ index 5809751b9..9177b3c1b 100644
      iput v4, v1, Landroid/widget/FrameLayout$LayoutParams;->leftMargin:I
  
 diff --git a/smali/com/android/keyguard/KeyguardPasswordViewController.smali b/smali/com/android/keyguard/KeyguardPasswordViewController.smali
-index 969c6c855..3d36b3ebf 100644
+index 3f01081a55..9026ffe398 100644
 --- a/smali/com/android/keyguard/KeyguardPasswordViewController.smali
 +++ b/smali/com/android/keyguard/KeyguardPasswordViewController.smali
 @@ -388,7 +388,7 @@
@@ -547,7 +547,7 @@ index 969c6c855..3d36b3ebf 100644
  
  .method public needsInput()Z
 diff --git a/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController$2.smali b/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController$2.smali
-index 35f20ed4d..86b165b0b 100644
+index 8e638922e2..4c36601b63 100644
 --- a/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController$2.smali
 +++ b/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController$2.smali
 @@ -257,11 +257,7 @@
@@ -564,7 +564,7 @@ index 35f20ed4d..86b165b0b 100644
      :cond_1
      return-void
 diff --git a/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController$OnApplyWindowInsetsListener.smali b/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController$OnApplyWindowInsetsListener.smali
-index ce013a893..d6b2e689f 100644
+index 96f654531c..cd0555fcd1 100644
 --- a/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController$OnApplyWindowInsetsListener.smali
 +++ b/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController$OnApplyWindowInsetsListener.smali
 @@ -56,24 +56,12 @@
@@ -595,7 +595,7 @@ index ce013a893..d6b2e689f 100644
      return-object p2
  .end method
 diff --git a/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController.smali b/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController.smali
-index 939b818e5..dbf959269 100644
+index b935ee4918..fec1b375aa 100644
 --- a/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController.smali
 +++ b/smali/com/android/keyguard/KeyguardSecAbsKeyInputViewController.smali
 @@ -46,8 +46,6 @@
@@ -1559,7 +1559,7 @@ index 939b818e5..dbf959269 100644
      return-void
  .end method
 diff --git a/smali/com/android/keyguard/KeyguardSecPatternViewController$3.smali b/smali/com/android/keyguard/KeyguardSecPatternViewController$3.smali
-index a1ec6d175..414539e0a 100644
+index a92a38357d..ac988272f3 100644
 --- a/smali/com/android/keyguard/KeyguardSecPatternViewController$3.smali
 +++ b/smali/com/android/keyguard/KeyguardSecPatternViewController$3.smali
 @@ -155,11 +155,7 @@
@@ -1576,7 +1576,7 @@ index a1ec6d175..414539e0a 100644
      :cond_1
      return-void
 diff --git a/smali/com/android/keyguard/KeyguardSecPatternViewController.smali b/smali/com/android/keyguard/KeyguardSecPatternViewController.smali
-index dffe6d5af..f89f24818 100644
+index 3d9cdd23aa..59aedafb43 100644
 --- a/smali/com/android/keyguard/KeyguardSecPatternViewController.smali
 +++ b/smali/com/android/keyguard/KeyguardSecPatternViewController.smali
 @@ -2299,7 +2299,7 @@
@@ -2031,7 +2031,7 @@ index dffe6d5af..f89f24818 100644
  
      return-void
 diff --git a/smali/com/android/keyguard/KeyguardSecSecurityContainer$ArrowViewMode.smali b/smali/com/android/keyguard/KeyguardSecSecurityContainer$ArrowViewMode.smali
-index ef38e1435..a8a8d921a 100644
+index a41c8d9554..fd5448fc15 100644
 --- a/smali/com/android/keyguard/KeyguardSecSecurityContainer$ArrowViewMode.smali
 +++ b/smali/com/android/keyguard/KeyguardSecSecurityContainer$ArrowViewMode.smali
 @@ -98,7 +98,7 @@
@@ -2338,7 +2338,7 @@ index ef38e1435..a8a8d921a 100644
      invoke-virtual/range {v1 .. v6}, Landroidx/constraintlayout/widget/ConstraintSet;->connect(IIIII)V
  
 diff --git a/smali/com/android/keyguard/KeyguardSecSecurityContainerController$OnApplyWindowInsetsListener.smali b/smali/com/android/keyguard/KeyguardSecSecurityContainerController$OnApplyWindowInsetsListener.smali
-index a7ea93964..3256bd99c 100644
+index 1a333b3d4e..bc8e0973e9 100644
 --- a/smali/com/android/keyguard/KeyguardSecSecurityContainerController$OnApplyWindowInsetsListener.smali
 +++ b/smali/com/android/keyguard/KeyguardSecSecurityContainerController$OnApplyWindowInsetsListener.smali
 @@ -42,17 +42,15 @@
@@ -2576,7 +2576,7 @@ index a7ea93964..3256bd99c 100644
      move-result-object p0
  
 diff --git a/smali/com/android/keyguard/KeyguardSecSecurityContainerController.smali b/smali/com/android/keyguard/KeyguardSecSecurityContainerController.smali
-index a505455c9..e136f545e 100644
+index 45290c3888..33abd4f0e8 100644
 --- a/smali/com/android/keyguard/KeyguardSecSecurityContainerController.smali
 +++ b/smali/com/android/keyguard/KeyguardSecSecurityContainerController.smali
 @@ -3063,97 +3063,66 @@
@@ -2866,7 +2866,7 @@ index a505455c9..e136f545e 100644
  
      return-void
 diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitor.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitor.smali
-index 2865f30d1..bdbd51335 100644
+index def1e8d63c..fd1ac66b61 100644
 --- a/smali/com/android/keyguard/KeyguardSecUpdateMonitor.smali
 +++ b/smali/com/android/keyguard/KeyguardSecUpdateMonitor.smali
 @@ -610,12 +610,10 @@
@@ -2911,7 +2911,7 @@ index 2865f30d1..bdbd51335 100644
      .locals 0
  
 diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda11.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda11.smali
-index 00eb80338..8c1002fe5 100644
+index 84d5d1b92e..47fff02098 100644
 --- a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda11.smali
 +++ b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda11.smali
 @@ -158,7 +158,7 @@
@@ -2975,7 +2975,7 @@ index 00eb80338..8c1002fe5 100644
          :pswitch_6
          :pswitch_5
 diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda14.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda14.smali
-index d44c073d8..5a96910bc 100644
+index 2882bff41f..f30ccfc2cb 100644
 --- a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda14.smali
 +++ b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda14.smali
 @@ -51,19 +51,8 @@
@@ -3001,7 +3001,7 @@ index d44c073d8..5a96910bc 100644
      invoke-virtual {p0, v0, p1}, Lcom/android/keyguard/KeyguardSecUpdateMonitorImpl;->updateFaceListeningState(ILcom/android/systemui/deviceentry/shared/FaceAuthUiEvent;)V
 diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda23.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda23.smali
 new file mode 100644
-index 000000000..135827665
+index 0000000000..1358276658
 --- /dev/null
 +++ b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda23.smali
 @@ -0,0 +1,92 @@
@@ -3099,7 +3099,7 @@ index 000000000..135827665
 +.end method
 diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda27.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda27.smali
 new file mode 100644
-index 000000000..faf21ecbf
+index 0000000000..faf21ecbfb
 --- /dev/null
 +++ b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda27.smali
 @@ -0,0 +1,97 @@
@@ -3201,15 +3201,10 @@ index 000000000..faf21ecbf
 +    .end packed-switch
 +.end method
 diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda28.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda28.smali
-index 924a9ddcc..abc64db18 100644
+index e45d40b4ea..a909d8e0a5 100644
 --- a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda28.smali
 +++ b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda28.smali
-@@ -3,50 +3,74 @@
- .source "qb/101886872 05bd3f759fde43bd963747fc6c20c848fb5367a8195771ce140d1171a6d7ee1b"
- 
- # interfaces
--.implements Ljava/lang/Runnable;
-+.implements Ljava/util/function/Consumer;
+@@ -7,46 +7,70 @@
  
  
  # instance fields
@@ -3298,7 +3293,7 @@ index 924a9ddcc..abc64db18 100644
  .end method
 diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda32.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda32.smali
 new file mode 100644
-index 000000000..b036a20f9
+index 0000000000..b036a20f97
 --- /dev/null
 +++ b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda32.smali
 @@ -0,0 +1,112 @@
@@ -3416,7 +3411,7 @@ index 000000000..b036a20f9
 +.end method
 diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda39.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda39.smali
 new file mode 100644
-index 000000000..add44c2e4
+index 0000000000..add44c2e4e
 --- /dev/null
 +++ b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda39.smali
 @@ -0,0 +1,86 @@
@@ -3508,7 +3503,7 @@ index 000000000..add44c2e4
 +.end method
 diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda41.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda41.smali
 new file mode 100644
-index 000000000..2cea7ed0b
+index 0000000000..2cea7ed0b8
 --- /dev/null
 +++ b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda41.smali
 @@ -0,0 +1,42 @@
@@ -3555,7 +3550,7 @@ index 000000000..2cea7ed0b
 +    return-void
 +.end method
 diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda9.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda9.smali
-index af35f3d71..d89e79828 100644
+index 7fd0b378a2..fb552da800 100644
 --- a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda9.smali
 +++ b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$$ExternalSyntheticLambda9.smali
 @@ -28,19 +28,19 @@
@@ -3602,7 +3597,7 @@ index af35f3d71..d89e79828 100644
      .packed-switch 0x0
          :pswitch_0
 diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$1.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$1.smali
-index f69fbfc18..61429b95b 100644
+index b236fa67f9..f918a0d525 100644
 --- a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$1.smali
 +++ b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl$1.smali
 @@ -28,7 +28,9 @@
@@ -3617,7 +3612,7 @@ index f69fbfc18..61429b95b 100644
      const-string p0, "KeyguardFingerprint"
  
 diff --git a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl.smali b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl.smali
-index 24a4ad53e..65c583657 100644
+index faeaac1cb9..ba4c5374c1 100644
 --- a/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl.smali
 +++ b/smali/com/android/keyguard/KeyguardSecUpdateMonitorImpl.smali
 @@ -48,8 +48,6 @@
@@ -10557,7 +10552,7 @@ index 24a4ad53e..65c583657 100644
      .locals 7
  
 diff --git a/smali/com/android/keyguard/KeyguardTextBuilder.smali b/smali/com/android/keyguard/KeyguardTextBuilder.smali
-index 91475225e..b44a01416 100644
+index 508e312225..868297b221 100644
 --- a/smali/com/android/keyguard/KeyguardTextBuilder.smali
 +++ b/smali/com/android/keyguard/KeyguardTextBuilder.smali
 @@ -617,9 +617,7 @@
@@ -10833,7 +10828,7 @@ index 91475225e..b44a01416 100644
  
      return-void
 diff --git a/smali/com/android/keyguard/KeyguardUpdateMonitor.smali b/smali/com/android/keyguard/KeyguardUpdateMonitor.smali
-index 3f49ef139..69e2c04ae 100644
+index 6c5e65fee1..46698d8e33 100644
 --- a/smali/com/android/keyguard/KeyguardUpdateMonitor.smali
 +++ b/smali/com/android/keyguard/KeyguardUpdateMonitor.smali
 @@ -8161,9 +8161,6 @@
@@ -10847,7 +10842,7 @@ index 3f49ef139..69e2c04ae 100644
      .locals 8
  
 diff --git a/smali/com/android/keyguard/SecLockIconViewController$7.smali b/smali/com/android/keyguard/SecLockIconViewController$7.smali
-index cf01f0925..45f18f021 100644
+index aaf0bf07b2..bb352fe789 100644
 --- a/smali/com/android/keyguard/SecLockIconViewController$7.smali
 +++ b/smali/com/android/keyguard/SecLockIconViewController$7.smali
 @@ -80,9 +80,7 @@
@@ -10862,7 +10857,7 @@ index cf01f0925..45f18f021 100644
      iget-object p0, p0, Lcom/android/keyguard/SecLockIconViewController$7;->this$0:Lcom/android/keyguard/SecLockIconViewController;
  
 diff --git a/smali/com/android/keyguard/SecurityUtils.smali b/smali/com/android/keyguard/SecurityUtils.smali
-index 4ed08307f..2e203d662 100644
+index b3a040baef..bd38dea0a2 100644
 --- a/smali/com/android/keyguard/SecurityUtils.smali
 +++ b/smali/com/android/keyguard/SecurityUtils.smali
 @@ -61,7 +61,7 @@
@@ -11112,7 +11107,7 @@ index 4ed08307f..2e203d662 100644
      mul-float/2addr v0, v2
  
 diff --git a/smali/com/android/keyguard/StrongAuthPopup.smali b/smali/com/android/keyguard/StrongAuthPopup.smali
-index 0cbd69e3f..d17b07392 100644
+index 69a3bb81a0..fb1f0ceeba 100644
 --- a/smali/com/android/keyguard/StrongAuthPopup.smali
 +++ b/smali/com/android/keyguard/StrongAuthPopup.smali
 @@ -301,33 +301,6 @@
@@ -11833,7 +11828,7 @@ index 0cbd69e3f..d17b07392 100644
  
      return-void
 diff --git a/smali/com/android/keyguard/biometrics/KeyguardBiometricViewController.smali b/smali/com/android/keyguard/biometrics/KeyguardBiometricViewController.smali
-index ffa1b5837..1e027aba3 100644
+index 503053a96d..1074d0bbe2 100644
 --- a/smali/com/android/keyguard/biometrics/KeyguardBiometricViewController.smali
 +++ b/smali/com/android/keyguard/biometrics/KeyguardBiometricViewController.smali
 @@ -679,7 +679,7 @@
@@ -12389,7 +12384,7 @@ index ffa1b5837..1e027aba3 100644
  
      iget-object p0, p0, Lcom/android/systemui/util/ViewController;->mView:Landroid/view/View;
 diff --git a/smali/com/android/systemui/LsRune.smali b/smali/com/android/systemui/LsRune.smali
-index 08143bd82..61d60656c 100644
+index 182a4a41b2..4997ee6901 100644
 --- a/smali/com/android/systemui/LsRune.smali
 +++ b/smali/com/android/systemui/LsRune.smali
 @@ -124,11 +124,9 @@
@@ -12471,7 +12466,7 @@ index 08143bd82..61d60656c 100644
  
      invoke-static {}, Lcom/android/systemui/util/DeviceType;->isCoverSupported()Z
 diff --git a/smali/com/android/systemui/biometrics/AuthController.smali b/smali/com/android/systemui/biometrics/AuthController.smali
-index 49350cc78..d19a4c532 100644
+index 3cb67165dd..efa17b417e 100644
 --- a/smali/com/android/systemui/biometrics/AuthController.smali
 +++ b/smali/com/android/systemui/biometrics/AuthController.smali
 @@ -2535,89 +2535,83 @@
@@ -13053,7 +13048,7 @@ index 49350cc78..d19a4c532 100644
      return-void
  .end method
 diff --git a/smali_classes2/com/android/systemui/deviceentry/ui/binder/UdfpsAccessibilityOverlayBinder$bind$1.smali b/smali_classes2/com/android/systemui/deviceentry/ui/binder/UdfpsAccessibilityOverlayBinder$bind$1.smali
-index ae7997f68..faa2d7b61 100644
+index 900be10874..0b86a778d6 100644
 --- a/smali_classes2/com/android/systemui/deviceentry/ui/binder/UdfpsAccessibilityOverlayBinder$bind$1.smali
 +++ b/smali_classes2/com/android/systemui/deviceentry/ui/binder/UdfpsAccessibilityOverlayBinder$bind$1.smali
 @@ -24,7 +24,7 @@
@@ -13340,7 +13335,7 @@ index ae7997f68..faa2d7b61 100644
 +    return v1
  .end method
 diff --git a/smali_classes2/com/android/systemui/doze/DozeScreenState.smali b/smali_classes2/com/android/systemui/doze/DozeScreenState.smali
-index dc9a32fa7..2a17e5f3b 100644
+index c42bec31c1..e1d5a892a3 100644
 --- a/smali_classes2/com/android/systemui/doze/DozeScreenState.smali
 +++ b/smali_classes2/com/android/systemui/doze/DozeScreenState.smali
 @@ -369,42 +369,42 @@
@@ -13758,7 +13753,7 @@ index dc9a32fa7..2a17e5f3b 100644
      return-void
  
 diff --git a/smali_classes2/com/android/systemui/globalactions/presentation/features/GlobalActionFeatures.smali b/smali_classes2/com/android/systemui/globalactions/presentation/features/GlobalActionFeatures.smali
-index 66e7610a0..69789c191 100644
+index 95af3dc78c..0ebfdb6cdb 100644
 --- a/smali_classes2/com/android/systemui/globalactions/presentation/features/GlobalActionFeatures.smali
 +++ b/smali_classes2/com/android/systemui/globalactions/presentation/features/GlobalActionFeatures.smali
 @@ -240,7 +240,7 @@
@@ -13906,7 +13901,7 @@ index 66e7610a0..69789c191 100644
      :goto_2
      iget-object p0, p0, Lcom/android/systemui/globalactions/presentation/features/GlobalActionFeatures;->mLogWrapper:Lcom/samsung/android/globalactions/util/LogWrapper;
 diff --git a/smali_classes2/com/android/systemui/keyguard/KeyguardFastBioUnlockController.smali b/smali_classes2/com/android/systemui/keyguard/KeyguardFastBioUnlockController.smali
-index 7736b9aa4..0a64d2a7e 100644
+index e2b77194be..fab6a494ac 100644
 --- a/smali_classes2/com/android/systemui/keyguard/KeyguardFastBioUnlockController.smali
 +++ b/smali_classes2/com/android/systemui/keyguard/KeyguardFastBioUnlockController.smali
 @@ -475,9 +475,9 @@
@@ -14112,7 +14107,7 @@ index 7736b9aa4..0a64d2a7e 100644
  .end method
  
 diff --git a/smali_classes2/com/android/systemui/keyguard/KeyguardViewMediator.smali b/smali_classes2/com/android/systemui/keyguard/KeyguardViewMediator.smali
-index cfb215a58..5d2c15a0d 100644
+index 90d47bb794..e3e485ec1c 100644
 --- a/smali_classes2/com/android/systemui/keyguard/KeyguardViewMediator.smali
 +++ b/smali_classes2/com/android/systemui/keyguard/KeyguardViewMediator.smali
 @@ -7954,7 +7954,7 @@
@@ -14125,7 +14120,7 @@ index cfb215a58..5d2c15a0d 100644
      if-nez v5, :cond_8
  
 diff --git a/smali_classes2/com/android/systemui/keyguard/animator/ActionDownHandler.smali b/smali_classes2/com/android/systemui/keyguard/animator/ActionDownHandler.smali
-index 1aae2203a..d08532475 100644
+index 634631bf37..38386bbb4e 100644
 --- a/smali_classes2/com/android/systemui/keyguard/animator/ActionDownHandler.smali
 +++ b/smali_classes2/com/android/systemui/keyguard/animator/ActionDownHandler.smali
 @@ -79,58 +79,58 @@
@@ -14273,7 +14268,7 @@ index 1aae2203a..d08532475 100644
      move-result p0
  
 diff --git a/smali_classes2/com/android/systemui/keyguard/animator/ActionUpOrCancelHandler.smali b/smali_classes2/com/android/systemui/keyguard/animator/ActionUpOrCancelHandler.smali
-index cc95fe64d..d28c6cbfa 100644
+index 3cce5f3feb..f6f573af8b 100644
 --- a/smali_classes2/com/android/systemui/keyguard/animator/ActionUpOrCancelHandler.smali
 +++ b/smali_classes2/com/android/systemui/keyguard/animator/ActionUpOrCancelHandler.smali
 @@ -17,240 +17,248 @@
@@ -15346,7 +15341,7 @@ index cc95fe64d..d28c6cbfa 100644
      const/16 v19, 0x1
  
 diff --git a/smali_classes2/com/android/systemui/keyguard/animator/FullScreenViewController.smali b/smali_classes2/com/android/systemui/keyguard/animator/FullScreenViewController.smali
-index 6e820e1bd..9bca07cac 100644
+index da0a5dbc66..a54fb74f40 100644
 --- a/smali_classes2/com/android/systemui/keyguard/animator/FullScreenViewController.smali
 +++ b/smali_classes2/com/android/systemui/keyguard/animator/FullScreenViewController.smali
 @@ -407,52 +407,19 @@
@@ -15409,7 +15404,7 @@ index 6e820e1bd..9bca07cac 100644
  
      move-result-object p1
 diff --git a/smali_classes2/com/android/systemui/keyguard/animator/KeyguardTouchAnimator$2.smali b/smali_classes2/com/android/systemui/keyguard/animator/KeyguardTouchAnimator$2.smali
-index 1249d5f2f..518a60073 100644
+index b5a0e27ecb..4f329ec62f 100644
 --- a/smali_classes2/com/android/systemui/keyguard/animator/KeyguardTouchAnimator$2.smali
 +++ b/smali_classes2/com/android/systemui/keyguard/animator/KeyguardTouchAnimator$2.smali
 @@ -4,8 +4,6 @@
@@ -15575,7 +15570,7 @@ index 1249d5f2f..518a60073 100644
      return v1
  .end method
 diff --git a/smali_classes2/com/android/systemui/keyguard/animator/KeyguardTouchAnimator.smali b/smali_classes2/com/android/systemui/keyguard/animator/KeyguardTouchAnimator.smali
-index f7a28570d..768a28d3b 100644
+index cc21828767..36fc8b6432 100644
 --- a/smali_classes2/com/android/systemui/keyguard/animator/KeyguardTouchAnimator.smali
 +++ b/smali_classes2/com/android/systemui/keyguard/animator/KeyguardTouchAnimator.smali
 @@ -292,36 +292,34 @@
@@ -15628,7 +15623,7 @@ index f7a28570d..768a28d3b 100644
      if-gez p0, :cond_0
  
 diff --git a/smali_classes2/com/android/systemui/keyguard/animator/KeyguardTouchSecurityInjector.smali b/smali_classes2/com/android/systemui/keyguard/animator/KeyguardTouchSecurityInjector.smali
-index cf22723bc..99f63b556 100644
+index ae4cfa54e8..53f7fcd1ad 100644
 --- a/smali_classes2/com/android/systemui/keyguard/animator/KeyguardTouchSecurityInjector.smali
 +++ b/smali_classes2/com/android/systemui/keyguard/animator/KeyguardTouchSecurityInjector.smali
 @@ -4,12 +4,8 @@
@@ -15736,7 +15731,7 @@ index cf22723bc..99f63b556 100644
 -    return p0
 -.end method
 diff --git a/smali_classes2/com/android/systemui/keyguard/ui/binder/KeyguardBlueprintViewBinder$bind$1$1.smali b/smali_classes2/com/android/systemui/keyguard/ui/binder/KeyguardBlueprintViewBinder$bind$1$1.smali
-index 1d77afdfc..bed69bc29 100644
+index f3793aa6eb..82fc77b5c2 100644
 --- a/smali_classes2/com/android/systemui/keyguard/ui/binder/KeyguardBlueprintViewBinder$bind$1$1.smali
 +++ b/smali_classes2/com/android/systemui/keyguard/ui/binder/KeyguardBlueprintViewBinder$bind$1$1.smali
 @@ -120,13 +120,13 @@
@@ -15857,7 +15852,7 @@ index 1d77afdfc..bed69bc29 100644
  
      const-string p1, "call to \'resume\' before \'invoke\' with coroutine"
 diff --git a/smali_classes2/com/android/systemui/keyguard/ui/view/layout/sections/DefaultUdfpsAccessibilityOverlaySection.smali b/smali_classes2/com/android/systemui/keyguard/ui/view/layout/sections/DefaultUdfpsAccessibilityOverlaySection.smali
-index e9ce596d7..384828148 100644
+index 459aa17ade..c5884ec942 100644
 --- a/smali_classes2/com/android/systemui/keyguard/ui/view/layout/sections/DefaultUdfpsAccessibilityOverlaySection.smali
 +++ b/smali_classes2/com/android/systemui/keyguard/ui/view/layout/sections/DefaultUdfpsAccessibilityOverlaySection.smali
 @@ -53,7 +53,7 @@
@@ -16052,7 +16047,7 @@ index e9ce596d7..384828148 100644
      return-void
  .end method
 diff --git a/smali_classes2/com/android/systemui/power/SecPowerNotificationWarnings.smali b/smali_classes2/com/android/systemui/power/SecPowerNotificationWarnings.smali
-index bbd1a9040..564f10f33 100644
+index 6fab047a3c..f1d970f9ce 100644
 --- a/smali_classes2/com/android/systemui/power/SecPowerNotificationWarnings.smali
 +++ b/smali_classes2/com/android/systemui/power/SecPowerNotificationWarnings.smali
 @@ -497,7 +497,7 @@
@@ -16162,7 +16157,7 @@ index bbd1a9040..564f10f33 100644
      :try_end_1
      .catchall {:try_start_1 .. :try_end_1} :catchall_0
 diff --git a/smali_classes3/com/android/systemui/shade/NotificationPanelViewController.smali b/smali_classes3/com/android/systemui/shade/NotificationPanelViewController.smali
-index e5560f1e1..f5e10f753 100644
+index a1be85f2f6..5a1559c900 100644
 --- a/smali_classes3/com/android/systemui/shade/NotificationPanelViewController.smali
 +++ b/smali_classes3/com/android/systemui/shade/NotificationPanelViewController.smali
 @@ -10247,33 +10247,6 @@
@@ -16377,7 +16372,7 @@ index e5560f1e1..f5e10f753 100644
      invoke-static {v4}, Ljava/lang/Boolean;->valueOf(Z)Ljava/lang/Boolean;
  
 diff --git a/smali_classes3/com/android/systemui/statusbar/DragDownHelper.smali b/smali_classes3/com/android/systemui/statusbar/DragDownHelper.smali
-index a6dd29898..df5d1dc0f 100644
+index d28a15e1c9..60c619108c 100644
 --- a/smali_classes3/com/android/systemui/statusbar/DragDownHelper.smali
 +++ b/smali_classes3/com/android/systemui/statusbar/DragDownHelper.smali
 @@ -866,7 +866,7 @@
@@ -16640,7 +16635,7 @@ index a6dd29898..df5d1dc0f 100644
      if-lez p1, :cond_1d
  
 diff --git a/smali_classes3/com/android/systemui/statusbar/KeyguardSecIndicationController$$ExternalSyntheticLambda3.smali b/smali_classes3/com/android/systemui/statusbar/KeyguardSecIndicationController$$ExternalSyntheticLambda3.smali
-index e57a332de..18b2f080a 100644
+index ca1ac98e74..b0147ce611 100644
 --- a/smali_classes3/com/android/systemui/statusbar/KeyguardSecIndicationController$$ExternalSyntheticLambda3.smali
 +++ b/smali_classes3/com/android/systemui/statusbar/KeyguardSecIndicationController$$ExternalSyntheticLambda3.smali
 @@ -49,62 +49,19 @@
@@ -16724,7 +16719,7 @@ index e57a332de..18b2f080a 100644
      .packed-switch 0x0
          :pswitch_0
 diff --git a/smali_classes3/com/android/systemui/statusbar/KeyguardSecIndicationController$SecKeyguardCallback.smali b/smali_classes3/com/android/systemui/statusbar/KeyguardSecIndicationController$SecKeyguardCallback.smali
-index cfc7be73f..f1aa20e36 100644
+index a83432a72b..d14149345a 100644
 --- a/smali_classes3/com/android/systemui/statusbar/KeyguardSecIndicationController$SecKeyguardCallback.smali
 +++ b/smali_classes3/com/android/systemui/statusbar/KeyguardSecIndicationController$SecKeyguardCallback.smali
 @@ -255,98 +255,100 @@
@@ -17075,7 +17070,7 @@ index cfc7be73f..f1aa20e36 100644
      return-void
  .end method
 diff --git a/smali_classes3/com/android/systemui/statusbar/phone/BiometricUnlockController.smali b/smali_classes3/com/android/systemui/statusbar/phone/BiometricUnlockController.smali
-index e143ac72b..e95aa5395 100644
+index 352aed096c..61a91f7011 100644
 --- a/smali_classes3/com/android/systemui/statusbar/phone/BiometricUnlockController.smali
 +++ b/smali_classes3/com/android/systemui/statusbar/phone/BiometricUnlockController.smali
 @@ -946,9 +946,7 @@
@@ -18332,7 +18327,7 @@ index e143ac72b..e95aa5395 100644
      return-void
  .end method
 diff --git a/smali_classes3/com/android/systemui/statusbar/phone/CentralSurfacesImpl$16.smali b/smali_classes3/com/android/systemui/statusbar/phone/CentralSurfacesImpl$16.smali
-index cd2d7f451..7a41729be 100644
+index 365af1a61d..653c809d73 100644
 --- a/smali_classes3/com/android/systemui/statusbar/phone/CentralSurfacesImpl$16.smali
 +++ b/smali_classes3/com/android/systemui/statusbar/phone/CentralSurfacesImpl$16.smali
 @@ -73,34 +73,19 @@
@@ -18375,7 +18370,7 @@ index cd2d7f451..7a41729be 100644
  .end method
  
 diff --git a/smali_classes3/com/android/systemui/statusbar/phone/CentralSurfacesImpl.smali b/smali_classes3/com/android/systemui/statusbar/phone/CentralSurfacesImpl.smali
-index 0e624a87d..d3d6b03b6 100644
+index 9f97b3c262..03245f2098 100644
 --- a/smali_classes3/com/android/systemui/statusbar/phone/CentralSurfacesImpl.smali
 +++ b/smali_classes3/com/android/systemui/statusbar/phone/CentralSurfacesImpl.smali
 @@ -6440,23 +6440,6 @@
@@ -18457,7 +18452,7 @@ index 0e624a87d..d3d6b03b6 100644
  
      const-string/jumbo v1, "post init tasks have already been executed!"
 diff --git a/smali_classes3/com/android/systemui/statusbar/phone/KeyguardSecBottomAreaView.smali b/smali_classes3/com/android/systemui/statusbar/phone/KeyguardSecBottomAreaView.smali
-index 0180e6a1b..37fe46215 100644
+index 789e05798d..63373e932e 100644
 --- a/smali_classes3/com/android/systemui/statusbar/phone/KeyguardSecBottomAreaView.smali
 +++ b/smali_classes3/com/android/systemui/statusbar/phone/KeyguardSecBottomAreaView.smali
 @@ -32,8 +32,6 @@
@@ -19065,7 +19060,7 @@ index 0180e6a1b..37fe46215 100644
  
      invoke-virtual {v0}, Lcom/android/systemui/statusbar/KeyguardShortcutManager;->getShortcutSideMargin()I
 diff --git a/smali_classes3/com/android/systemui/statusbar/phone/KeyguardSecBottomAreaViewController.smali b/smali_classes3/com/android/systemui/statusbar/phone/KeyguardSecBottomAreaViewController.smali
-index c9d805714..478477858 100644
+index 64f9076d09..d980092ac7 100644
 --- a/smali_classes3/com/android/systemui/statusbar/phone/KeyguardSecBottomAreaViewController.smali
 +++ b/smali_classes3/com/android/systemui/statusbar/phone/KeyguardSecBottomAreaViewController.smali
 @@ -2066,59 +2066,8 @@
@@ -19148,7 +19143,7 @@ index c9d805714..478477858 100644
      iget-boolean p1, p0, Lcom/android/systemui/statusbar/phone/KeyguardSecBottomAreaViewController;->nowBarVisible:Z
  
 diff --git a/smali_classes3/com/android/systemui/statusbar/phone/SecStatusBarKeyguardViewManager$3.smali b/smali_classes3/com/android/systemui/statusbar/phone/SecStatusBarKeyguardViewManager$3.smali
-index b22db7e01..fc58d9150 100644
+index 6617e95d37..72f53873fb 100644
 --- a/smali_classes3/com/android/systemui/statusbar/phone/SecStatusBarKeyguardViewManager$3.smali
 +++ b/smali_classes3/com/android/systemui/statusbar/phone/SecStatusBarKeyguardViewManager$3.smali
 @@ -25,25 +25,11 @@
@@ -19181,7 +19176,7 @@ index b22db7e01..fc58d9150 100644
      :cond_0
      return-void
 diff --git a/smali_classes3/com/android/systemui/util/DeviceState.smali b/smali_classes3/com/android/systemui/util/DeviceState.smali
-index 0ea059938..011a469da 100644
+index 09110fa05c..5c956068c0 100644
 --- a/smali_classes3/com/android/systemui/util/DeviceState.smali
 +++ b/smali_classes3/com/android/systemui/util/DeviceState.smali
 @@ -2088,163 +2088,15 @@
@@ -19351,7 +19346,7 @@ index 0ea059938..011a469da 100644
  
  .method public static isSmartViewFitToActiveDisplay()Z
 diff --git a/smali_classes3/com/android/systemui/util/DeviceType.smali b/smali_classes3/com/android/systemui/util/DeviceType.smali
-index f63ab233d..7aa5cde6a 100644
+index 697d363c16..36376ea720 100644
 --- a/smali_classes3/com/android/systemui/util/DeviceType.smali
 +++ b/smali_classes3/com/android/systemui/util/DeviceType.smali
 @@ -480,7 +480,7 @@
@@ -19413,5 +19408,5 @@ index f63ab233d..7aa5cde6a 100644
  
  .method public static isSupport5G()Z
 -- 
-2.51.0
+2.51.1
 
