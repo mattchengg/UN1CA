@@ -63,7 +63,7 @@ ENCODE_MP4()
 }
 # ]
 
-ADD_TO_WORK_DIR "pa1qxxx" "system" \
+ADD_TO_WORK_DIR "pa2qxxx" "system" \
     "system/priv-app/wallpaper-res/wallpaper-res.apk" 0 0 644 "u:object_r:system_file:s0"
 DECODE_APK "system" "system/priv-app/wallpaper-res/wallpaper-res.apk"
 for f in "$APKTOOL_DIR/system/priv-app/wallpaper-res/wallpaper-res.apk/res/drawable-nodpi/dex_wallpaper_"*.webp; do
