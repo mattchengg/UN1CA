@@ -505,12 +505,12 @@ if [[ "$SOURCE_LCD_CONFIG_HFR_MODE" != "$TARGET_LCD_CONFIG_HFR_MODE" ]]; then
         "$TARGET_LCD_CONFIG_HFR_MODE"
     SMALI_PATCH "system" "system/framework/secinputdev-service.jar" \
         "smali/com/samsung/android/hardware/secinputdev/utils/SemInputFeatures.smali" "replaceall" \
-        "$SOURCE_LCD_CONFIG_HFR_MODE" \
-        "$TARGET_LCD_CONFIG_HFR_MODE"
+        "\\\"$SOURCE_LCD_CONFIG_HFR_MODE\\\"" \
+        "\\\"$TARGET_LCD_CONFIG_HFR_MODE\\\""
     SMALI_PATCH "system" "system/framework/secinputdev-service.jar" \
         "smali/com/samsung/android/hardware/secinputdev/utils/SemInputFeaturesExtra.smali" "replaceall" \
-        "$SOURCE_LCD_CONFIG_HFR_MODE" \
-        "$TARGET_LCD_CONFIG_HFR_MODE"
+        "\\\"$SOURCE_LCD_CONFIG_HFR_MODE\\\"" \
+        "\\\"$TARGET_LCD_CONFIG_HFR_MODE\\\""
     SMALI_PATCH "system" "system/framework/services.jar" \
         "smali_classes2/com/android/server/power/PowerManagerUtil.smali" "replace" \
         "<clinit>()V" \
