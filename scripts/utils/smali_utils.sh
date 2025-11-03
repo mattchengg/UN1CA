@@ -332,9 +332,9 @@ SMALI_PATCH()
             /^\.method/ && index($0, FN) {
                 print
                 print "    " LOC
-                print "    "
+                print ""
                 print "    " VAL
-                print "    "
+                print ""
                 print "    " RET
                 inside = 1
                 next
