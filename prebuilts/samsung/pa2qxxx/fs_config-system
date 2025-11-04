@@ -18,6 +18,10 @@ system/etc/permissions/privapp-permissions-com.samsung.android.sead.xml 0 0 644 
 system/etc/permissions/signature-permissions-com.samsung.android.game.gamehome.xml 0 0 644 capabilities=0x0
 system/etc/sysconfig 0 0 755 capabilities=0x0
 system/etc/sysconfig/moments.xml 0 0 644 capabilities=0x0
+system/etc/audio_ae_intervals.conf 0 0 644 capabilities=0x0
+system/etc/fastScanner.tflite 0 0 644 capabilities=0x0
+system/etc/mss_v0.13.0_4ch.sorione 0 0 644 capabilities=0x0
+system/etc/public.libraries-audio.samsung.txt 0 0 644 capabilities=0x0
 system/etc/ringtones_count_list.txt 0 0 644 capabilities=0x0
 system/hidden 0 0 755 capabilities=0x0
 system/hidden/INTERNAL_SDCARD 0 0 755 capabilities=0x0
@@ -27,6 +31,11 @@ system/hidden/INTERNAL_SDCARD/Music/Samsung/Over_the_Horizon.m4a 0 0 644 capabil
 system/lib64 0 0 755 capabilities=0x0
 system/lib64/libcontextanalyzer_jni.media.samsung.so 0 0 644 capabilities=0x0
 system/lib64/libmediacontextanalyzer.so 0 0 644 capabilities=0x0
+system/lib64/libmultisourceseparator.audio.samsung.so 0 0 644 capabilities=0x0
+system/lib64/libmultisourceseparator.so 0 0 644 capabilities=0x0
+system/lib64/libsbs.so 0 0 644 capabilities=0x0
+system/lib64/libtensorflowlite_gpu_delegate.so 0 0 644 capabilities=0x0
+system/lib64/libveframework.videoeditor.samsung.so 0 0 644 capabilities=0x0
 system/lib64/libvideo-highlight-arm64-v8a.so 0 0 644 capabilities=0x0
 system/media 0 0 755 capabilities=0x0
 system/media/audio 0 0 755 capabilities=0x0

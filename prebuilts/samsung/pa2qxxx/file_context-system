@@ -18,6 +18,10 @@
 /system/etc/permissions/signature-permissions-com\.samsung\.android\.game\.gamehome\.xml u:object_r:system_file:s0
 /system/etc/sysconfig u:object_r:system_file:s0
 /system/etc/sysconfig/moments\.xml u:object_r:system_file:s0
+/system/etc/audio_ae_intervals\.conf u:object_r:system_file:s0
+/system/etc/fastScanner\.tflite u:object_r:system_file:s0
+/system/etc/mss_v0\.13\.0_4ch\.sorione u:object_r:system_file:s0
+/system/etc/public\.libraries-audio\.samsung\.txt u:object_r:system_file:s0
 /system/etc/ringtones_count_list\.txt u:object_r:system_file:s0
 /system/hidden u:object_r:system_file:s0
 /system/hidden/INTERNAL_SDCARD u:object_r:system_file:s0
@@ -27,6 +31,11 @@
 /system/lib64 u:object_r:system_lib_file:s0
 /system/lib64/libcontextanalyzer_jni\.media\.samsung\.so u:object_r:system_lib_file:s0
 /system/lib64/libmediacontextanalyzer\.so u:object_r:system_lib_file:s0
+/system/lib64/libmultisourceseparator\.audio\.samsung\.so u:object_r:system_lib_file:s0
+/system/lib64/libmultisourceseparator\.so u:object_r:system_lib_file:s0
+/system/lib64/libsbs\.so u:object_r:system_lib_file:s0
+/system/lib64/libtensorflowlite_gpu_delegate\.so u:object_r:system_lib_file:s0
+/system/lib64/libveframework\.videoeditor\.samsung\.so u:object_r:system_lib_file:s0
 /system/lib64/libvideo-highlight-arm64-v8a\.so u:object_r:system_lib_file:s0
 /system/media u:object_r:system_file:s0
 /system/media/audio u:object_r:system_file:s0
