@@ -69,6 +69,9 @@ if [ -f "$WORK_DIR/system/system/priv-app/KmxService/KmxService.apk" ]; then
         "smali/com/samsung/android/kmxservice/common/util/IntegrityStatus.smali" "return" \
         'getStatus()I' '0'
     SMALI_PATCH "system" "system/priv-app/KmxService/KmxService.apk" \
+        "smali/com/samsung/android/kmxservice/common/util/IntegrityStatus.smali" "return" \
+        'isNormal()Z' 'true'
+    SMALI_PATCH "system" "system/priv-app/KmxService/KmxService.apk" \
         "smali/com/samsung/android/kmxservice/fabrickeystore/keystore/cert/IntegrityStatus.smali" "return" \
         'isNormal()Z' 'true'
     SMALI_PATCH "system" "system/priv-app/KmxService/KmxService.apk" \
