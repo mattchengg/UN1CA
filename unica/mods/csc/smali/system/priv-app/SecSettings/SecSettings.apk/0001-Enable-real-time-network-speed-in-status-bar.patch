@@ -1,16 +1,16 @@
-From ffc02395c0d46be9e53e9225eeb483b3be86725e Mon Sep 17 00:00:00 2001
+From cf9b438bc847d171dcfd6b54cd2c134052e982b0 Mon Sep 17 00:00:00 2001
 From: Salvo Giangreco <giangrecosalvo9@gmail.com>
 Date: Fri, 17 Oct 2025 12:02:03 +0200
 Subject: [PATCH] Enable real time network speed in status bar
 
 ---
- .../ConfigureNotificationMoreSettings$1.smali | 14 ++---------
- .../StatusBarNetworkSpeedController.smali     | 14 ++---------
- .../provider/items/NotificationsItem.smali    | 24 ++-----------------
- 3 files changed, 6 insertions(+), 46 deletions(-)
+ .../ConfigureNotificationMoreSettings$1.smali | 14 ++--------
+ .../StatusBarNetworkSpeedController.smali     | 14 ++--------
+ .../provider/items/NotificationsItem.smali    | 26 +++----------------
+ 3 files changed, 8 insertions(+), 46 deletions(-)
 
 diff --git a/smali_classes3/com/samsung/android/settings/notification/ConfigureNotificationMoreSettings$1.smali b/smali_classes3/com/samsung/android/settings/notification/ConfigureNotificationMoreSettings$1.smali
-index 9958b05cf..aa6cfb745 100644
+index 321d0ed7a..0d7fdfb3f 100644
 --- a/smali_classes3/com/samsung/android/settings/notification/ConfigureNotificationMoreSettings$1.smali
 +++ b/smali_classes3/com/samsung/android/settings/notification/ConfigureNotificationMoreSettings$1.smali
 @@ -5,7 +5,7 @@
@@ -42,7 +42,7 @@ index 9958b05cf..aa6cfb745 100644
      if-nez v0, :cond_2
  
 diff --git a/smali_classes3/com/samsung/android/settings/notification/StatusBarNetworkSpeedController.smali b/smali_classes3/com/samsung/android/settings/notification/StatusBarNetworkSpeedController.smali
-index 59773742d..a1b87f4ce 100644
+index ad56af565..e00810787 100644
 --- a/smali_classes3/com/samsung/android/settings/notification/StatusBarNetworkSpeedController.smali
 +++ b/smali_classes3/com/samsung/android/settings/notification/StatusBarNetworkSpeedController.smali
 @@ -22,19 +22,9 @@
@@ -68,10 +68,10 @@ index 59773742d..a1b87f4ce 100644
      sput-boolean v0, Lcom/samsung/android/settings/notification/StatusBarNetworkSpeedController;->SUPPORT_NETWORK_SPEED:Z
  
 diff --git a/smali_classes4/com/samsung/android/settings/eternal/provider/items/NotificationsItem.smali b/smali_classes4/com/samsung/android/settings/eternal/provider/items/NotificationsItem.smali
-index 8f2e82db2..c45c91f6b 100644
+index 73fc97737..36d4d6af9 100644
 --- a/smali_classes4/com/samsung/android/settings/eternal/provider/items/NotificationsItem.smali
 +++ b/smali_classes4/com/samsung/android/settings/eternal/provider/items/NotificationsItem.smali
-@@ -1395,17 +1395,7 @@
+@@ -1395,22 +1395,14 @@
      return-object v14
  
      :pswitch_17
@@ -90,7 +90,14 @@ index 8f2e82db2..c45c91f6b 100644
  
      if-eqz v0, :cond_1d
  
-@@ -2647,17 +2637,7 @@
+     const-string v0, "network_speed"
+ 
++    const/4 v3, 0x0
++
+     invoke-static {v15, v0, v3}, Landroid/provider/Settings$System;->getInt(Landroid/content/ContentResolver;Ljava/lang/String;I)I
+ 
+     move-result v0
+@@ -2647,17 +2639,7 @@
      goto/16 :goto_3
  
      :pswitch_c
@@ -110,5 +117,5 @@ index 8f2e82db2..c45c91f6b 100644
      if-eqz v0, :cond_2
  
 -- 
-2.51.0
+2.51.1
 
