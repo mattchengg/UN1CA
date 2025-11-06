@@ -1,6 +1,16 @@
 /system u:object_r:system_file:s0
 /system/etc u:object_r:system_file:s0
+/system/etc/mediacontextanalyzer u:object_r:system_file:s0
+/system/etc/mediacontextanalyzer/Detection\.tflite u:object_r:system_file:s0
+/system/etc/mediacontextanalyzer/human-pet-det_SR-V131\.tflite u:object_r:system_file:s0
+/system/etc/mediacontextanalyzer/human-pet-pose_SR-V200\.tflite u:object_r:system_file:s0
+/system/etc/mediacontextanalyzer/keyword-classification_SR-V031\.tflite u:object_r:system_file:s0
+/system/etc/mediacontextanalyzer/Keyword\.tflite u:object_r:system_file:s0
+/system/etc/mediacontextanalyzer/Pose\.tflite u:object_r:system_file:s0
 /system/etc/ringtones_count_list\.txt u:object_r:system_file:s0
+/system/lib64 u:object_r:system_lib_file:s0
+/system/lib64/libcontextanalyzer_jni\.media\.samsung\.so u:object_r:system_lib_file:s0
+/system/lib64/libmediacontextanalyzer\.so u:object_r:system_lib_file:s0
 /system/media u:object_r:system_file:s0
 /system/media/audio u:object_r:system_file:s0
 /system/media/audio/notifications u:object_r:system_file:s0
