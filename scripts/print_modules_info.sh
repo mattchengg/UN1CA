@@ -48,10 +48,12 @@ PRINT_MODULE_INFO()
         MODDESC="$(grep "^description" "$MODPATH/module.prop" | sed "s/description=//")"
     fi
 
+    ((MODULES_COUNT+=1))
+
     LOG "-- Module $MODULES_COUNT:"
     LOG "Name: $MODNAME"
     LOG "Author(s): $MODAUTH"
-    LOG "Description: $MODDESC"
+    [ "$MODDESC" ] && LOG "Description: $MODDESC"
 }
 #]
 
@@ -64,17 +66,14 @@ fi
 MODULES_COUNT=0
 
 while read -r i; do
-    ((MODULES_COUNT+=1))
     PRINT_MODULE_INFO "$i"
 done <<< "$(find "$SRC_DIR/unica/patches" -mindepth 1 -maxdepth 1 -type d)"
 
 while read -r i; do
-    ((MODULES_COUNT+=1))
     PRINT_MODULE_INFO "$i"
 done <<< "$(find "$SRC_DIR/unica/mods" -mindepth 1 -maxdepth 1 -type d)"
 
 while read -r i; do
-    ((MODULES_COUNT+=1))
     PRINT_MODULE_INFO "$i"
 done <<< "$(find "$SRC_DIR/target/$TARGET_CODENAME/patches" -mindepth 1 -maxdepth 1 -type d)"
 
