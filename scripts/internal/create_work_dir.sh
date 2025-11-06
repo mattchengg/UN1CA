@@ -75,8 +75,6 @@ COPY_SOURCE_FIRMWARE()
             sed "s/^system_ext/system\/system_ext/g" "$FW_DIR/$SOURCE_FIRMWARE_PATH/fs_config-system_ext" >> "$WORK_DIR/configs/fs_config-system"
 
             DELETE_FROM_WORK_DIR "system" "system/system_ext/etc/NOTICE.xml.gz"
-            DELETE_FROM_WORK_DIR "system" "system/system_ext/etc/fs_config_dirs"
-            DELETE_FROM_WORK_DIR "system" "system/system_ext/etc/fs_config_files"
 
             LOG_STEP_OUT
         fi
@@ -96,8 +94,6 @@ COPY_SOURCE_FIRMWARE()
             grep -F "system/system_ext" "$FW_DIR/$SOURCE_FIRMWARE_PATH/fs_config-system" | sed "s/^system\///" > "$WORK_DIR/configs/fs_config-system_ext"
 
             ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system_ext" "etc/NOTICE.xml.gz"
-            ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system_ext" "etc/fs_config_dirs"
-            ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system_ext" "etc/fs_config_files"
 
             LOG_STEP_OUT
         else
