@@ -428,7 +428,7 @@ GENERATE_UPDATER_SCRIPT()
         fi
 
         echo    'set_progress(1.000000);'
-        echo    'ui_print("************************************************");'
+        echo    'ui_print("****************************************");'
         echo    'ui_print(" ");'
     } > "$SCRIPT_FILE"
 }
@@ -445,16 +445,10 @@ GET_SUPER_GROUP_SIZE()
 
 PRINT_HEADER()
 {
-    local VERSION_INFO
-    local SIDE_PADDING
     local ONEUI_VERSION
     local MAJOR
     local MINOR
     local PATCH
-
-    VERSION_INFO="$ROM_VERSION for $TARGET_NAME"
-    SIDE_PADDING="$(bc -l <<< "scale=0; (49 - ${#VERSION_INFO}) / 2")"
-    [ "$SIDE_PADDING" -lt 1 ] && SIDE_PADDING=1
 
     ONEUI_VERSION="$(GET_PROP "system" "ro.build.version.oneui")"
     MAJOR=$(bc -l <<< "scale=0; $ONEUI_VERSION / 10000")
@@ -467,23 +461,12 @@ PRINT_HEADER()
     fi
 
     echo    'ui_print(" ");'
-    echo    'ui_print("************************************************");'
-    echo    'ui_print(" ");'
-    echo    'ui_print(" 11     11 111    11 11111   111111     1111");'
-    echo    'ui_print(" 11     11 11111  11    11 111    11   111111");'
-    echo    'ui_print(" 11     11 11 111 11    11 11         111  111");'
-    echo    'ui_print(" 11     11 11  11111    11 11         11111111");'
-    echo    'ui_print(" 111   111 11    111    11 111    11 111    111");'
-    echo    'ui_print("  1111111  11     11    11   111111  11      11");'
-    echo    'ui_print(" ");'
+    echo    'ui_print("****************************************");'
     echo -n 'ui_print("'
-    for i in $(seq 1 "$SIDE_PADDING"); do
-        echo -n ' '
-    done
-    echo -n "$VERSION_INFO"
+    echo -n "UN1CA $ROM_VERSION for $TARGET_NAME"
     echo    '");'
-    echo    'ui_print(" ");'
-    echo    'ui_print("************************************************");'
+    echo    'ui_print("Coded by salvo_giangri @XDAforums");'
+    echo    'ui_print("****************************************");'
     echo -n 'ui_print("'
     echo -n "One UI version: $ONEUI_VERSION"
     echo    '");'
@@ -493,7 +476,7 @@ PRINT_HEADER()
     echo -n 'ui_print("'
     echo -n "Target: $TARGET_FINGERPRINT"
     echo    '");'
-    echo    'ui_print("************************************************");'
+    echo    'ui_print("****************************************");'
 }
 
 SIGN_IMAGE_WITH_AVB()
