@@ -11,3 +11,6 @@ system/lib/libsmpsft.smps.samsung.so 0 0 644 capabilities=0x0
 system/lib64 0 0 755 capabilities=0x0
 system/lib64/libandroid_runtime.so 0 0 644 capabilities=0x0
 system/lib64/libsmpsft.smps.samsung.so 0 0 644 capabilities=0x0
+system/system_ext 0 0 755 capabilities=0x0
+system/system_ext/etc 0 0 755 capabilities=0x0
+system/system_ext/etc/build_flags.json 0 0 644 capabilities=0x0
