@@ -438,9 +438,11 @@ GET_SUPER_GROUP_SIZE()
     local GROUP_NAME="$TARGET_SUPER_GROUP_NAME"
     GROUP_NAME="$(tr "[:lower:]" "[:upper:]" <<< "$TARGET_SUPER_GROUP_NAME")"
 
-    _CHECK_NON_EMPTY_PARAM "TARGET_${GROUP_NAME}_SIZE" "${!TARGET_${GROUP_NAME}_SIZE}" || exit 1
+    local VAR="TARGET_${GROUP_NAME}_SIZE"
 
-    echo "${!TARGET_${GROUP_NAME}_SIZE}"
+    _CHECK_NON_EMPTY_PARAM "$VAR" "${!VAR}" || exit 1
+
+    echo "${!VAR}"
 }
 
 PRINT_HEADER()
