@@ -1,4 +1,4 @@
 id=vintf
-name=Target VINTF compatibility
+name=Vendor interface objects blobs
 author=salvogiangri
-description=Replace generic source vintf manifests with target ones
+description=Replaces VINTF objects blobs with target ones.
