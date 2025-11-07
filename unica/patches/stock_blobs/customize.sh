@@ -24,9 +24,6 @@ MATCH_TARGET_FEATURES()
 
 TARGET_FIRMWARE_PATH="$(cut -d "/" -f 1 -s <<< "$TARGET_FIRMWARE")_$(cut -d "/" -f 2 -s <<< "$TARGET_FIRMWARE")"
 
-DELETE_FROM_WORK_DIR "system" "system/cameradata"
-ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/cameradata" 0 0 755 "u:object_r:system_file:s0"
-
 MATCH_TARGET_FEATURES
 
 if [ -d "$FW_DIR/$TARGET_FIRMWARE_PATH/system/system/etc/saiv" ]; then

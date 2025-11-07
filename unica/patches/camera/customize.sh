@@ -11,6 +11,9 @@ LOG_MISSING_PATCHES()
 }
 # ]
 
+DELETE_FROM_WORK_DIR "system" "system/cameradata"
+ADD_TO_WORK_DIR "$TARGET_FIRMWARE" "system" "system/cameradata" 0 0 755 "u:object_r:system_file:s0"
+
 if ! $SOURCE_CAMERA_SUPPORT_MASS_APP_FLAVOR; then
     if $TARGET_CAMERA_SUPPORT_MASS_APP_FLAVOR; then
         ADD_TO_WORK_DIR "r9qxxx" "system" "system/priv-app/SamsungCamera/SamsungCamera.apk" 0 0 644 "u:object_r:system_file:s0"
