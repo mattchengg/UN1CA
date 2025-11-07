@@ -37,6 +37,19 @@ while IFS= read -r f; do
             _LOG "AOD Clock Transition is enabled but \"physical_power_button_center_screen_location_y\" is missing in dimens.xml"
         fi
         LOG_STEP_OUT
+    elif [[ "$f" == "SystemUI"* ]]; then
+        EVAL "rm -f \"$APKTOOL_DIR/product/overlay/${f//$SOURCE_PRODUCT_NAME/$TARGET_PRODUCT_NAME}/res/values/public.xml\""
+        if $TARGET_CAMERA_SUPPORT_CUTOUT_PROTECTION && \
+                ! grep -q "config_enableDisplayCutoutProtection" "$APKTOOL_DIR/product/overlay/${f//$SOURCE_PRODUCT_NAME/$TARGET_PRODUCT_NAME}/res/values/bools.xml" 2> /dev/null; \
+                then
+            LOG "- Enabling camera cutout protection"
+            EVAL "sed -i \"/<resources>/a \\\ \\\ \\\ \\\ <bool name=\\\"config_enableDisplayCutoutProtection\\\">true</bool>\" \"$APKTOOL_DIR/product/overlay/${f//$SOURCE_PRODUCT_NAME/$TARGET_PRODUCT_NAME}/res/values/bools.xml\""
+        elif ! $TARGET_CAMERA_SUPPORT_CUTOUT_PROTECTION && \
+                grep -q "config_enableDisplayCutoutProtection" "$APKTOOL_DIR/product/overlay/${f//$SOURCE_PRODUCT_NAME/$TARGET_PRODUCT_NAME}/res/values/bools.xml" 2> /dev/null; \
+                then
+            LOG "- Disabling camera cutout protection"
+            EVAL "sed -i \"/config_enableDisplayCutoutProtection/d\" \"$APKTOOL_DIR/product/overlay/${f//$SOURCE_PRODUCT_NAME/$TARGET_PRODUCT_NAME}/res/values/bools.xml\""
+        fi
     fi
 done < <(find "$WORK_DIR/product/overlay" -maxdepth 1 -type f -name "*$SOURCE_PRODUCT_NAME*.apk")
 
