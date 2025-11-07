@@ -35,7 +35,7 @@
 
     const-string v0, "persist.sys.pif.version"
 
-    const-string v1, "20251027"
+    const-string v1, "20251107"
 
     invoke-static {v0, v1}, Landroid/os/SemSystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
@@ -135,44 +135,46 @@
 .method static synthetic lambda$updatePIF$0(Lorg/json/JSONObject;Landroid/content/Context;Landroidx/preference/Preference;)V
     .locals 4
 
-    const-string v0, "0"
-
-    const/4 v1, 0x0
+    const/4 v0, 0x0
 
     :try_start_0
-    const-string v2, "persist.sys.pif.version"
+    const-string v1, "persist.sys.pif.version"
 
-    invoke-static {v2, v0}, Landroid/os/SemSystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+    const-string v2, "20251107"
 
-    move-result-object v2
+    invoke-static {v1, v2}, Landroid/os/SemSystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
-    invoke-static {v2}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
+    move-result-object v1
 
-    move-result v2
+    invoke-static {v1}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
+
+    move-result v1
     :try_end_0
     .catch Ljava/lang/NumberFormatException; {:try_start_0 .. :try_end_0} :catch_0
 
     goto :goto_0
 
     :catch_0
-    move v2, v1
+    move v1, v0
 
     :goto_0
     :try_start_1
-    const-string v3, "VERSION"
+    const-string v2, "VERSION"
 
-    invoke-virtual {p0, v3, v0}, Lorg/json/JSONObject;->optString(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+    const-string v3, "0"
 
-    move-result-object v0
+    invoke-virtual {p0, v2, v3}, Lorg/json/JSONObject;->optString(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 
-    invoke-static {v0}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
+    move-result-object v2
 
-    move-result v1
+    invoke-static {v2}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
+
+    move-result v0
     :try_end_1
     .catch Ljava/lang/NumberFormatException; {:try_start_1 .. :try_end_1} :catch_1
 
     :catch_1
-    if-ge v2, v1, :cond_0
+    if-ge v1, v0, :cond_0
 
     invoke-static {p0}, Lio/mesalabs/unica/settings/pif/PIFUtils;->setPIFProps(Lorg/json/JSONObject;)V
 

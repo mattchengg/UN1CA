@@ -105,7 +105,7 @@
 .end method
 
 .method public final onCreate(Landroid/os/Bundle;)V
-    .locals 1
+    .locals 0
 
     invoke-super {p0, p1}, Lcom/android/settings/dashboard/DashboardFragment;->onCreate(Landroid/os/Bundle;)V
 
@@ -113,36 +113,5 @@
 
     invoke-virtual {p0, p1}, Lcom/android/settings/SettingsPreferenceFragment;->setAnimationAllowed(Z)V
 
-    invoke-static {}, Lio/mesalabs/unica/settings/pif/PIFUtils;->isPIFInstallable()Z
-
-    move-result p1
-
-    if-eqz p1, :cond_0
-
-    const-string p1, "persist.sys.pif.version"
-
-    invoke-static {p1}, Landroid/os/SemSystemProperties;->get(Ljava/lang/String;)Ljava/lang/String;
-
-    move-result-object p1
-
-    invoke-static {p1}, Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z
-
-    move-result p1
-
-    if-eqz p1, :cond_0
-
-    invoke-virtual {p0}, Landroidx/fragment/app/Fragment;->getContext()Landroid/content/Context;
-
-    move-result-object p1
-
-    const-string v0, "unica_pif"
-
-    invoke-virtual {p0, v0}, Lcom/android/settings/core/InstrumentedPreferenceFragment;->findPreference(Ljava/lang/CharSequence;)Landroidx/preference/Preference;
-
-    move-result-object p0
-
-    invoke-static {p1, p0}, Lio/mesalabs/unica/settings/pif/PIFUtils;->updatePIF(Landroid/content/Context;Landroidx/preference/Preference;)V
-
-    :cond_0
     return-void
 .end method
