@@ -71,3 +71,5 @@ else
         ADD_TO_WORK_DIR "a73xqxx" "system" "system/app/FunModeSDK" 0 0 755 "u:object_r:system_file:s0"
     fi
 fi
+
+unset -f _LOG LOG_MISSING_PATCHES
