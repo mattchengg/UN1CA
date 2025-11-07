@@ -13,12 +13,11 @@ while IFS= read -r f; do
     f="$(basename "$f")"
 
     DECODE_APK "product" "overlay/$f"
-    DELETE_FROM_WORK_DIR "product" "overlay/$f"
     LOG_STEP_IN "- Renaming $f to ${f//$SOURCE_PRODUCT_NAME/$TARGET_PRODUCT_NAME}"
+    DELETE_FROM_WORK_DIR "product" "overlay/$f"
     EVAL "mv -f \"$APKTOOL_DIR/product/overlay/$f\" \"$APKTOOL_DIR/product/overlay/${f//$SOURCE_PRODUCT_NAME/$TARGET_PRODUCT_NAME}\""
     EVAL "sed -i \"s/${SOURCE_PRODUCT_NAME}/${TARGET_PRODUCT_NAME}/g\" \"$APKTOOL_DIR/product/overlay/${f//$SOURCE_PRODUCT_NAME/$TARGET_PRODUCT_NAME}/apktool.yml\""
     SET_METADATA "product" "overlay/${f//$SOURCE_PRODUCT_NAME/$TARGET_PRODUCT_NAME}" 0 0 644 "u:object_r:system_file:s0"
-    LOG_STEP_OUT
 
     if [[ "$f" == "framework-res"* ]]; then
         if [ ! -d "$SRC_DIR/target/$TARGET_CODENAME/overlay" ]; then
@@ -51,6 +50,8 @@ while IFS= read -r f; do
             EVAL "sed -i \"/config_enableDisplayCutoutProtection/d\" \"$APKTOOL_DIR/product/overlay/${f//$SOURCE_PRODUCT_NAME/$TARGET_PRODUCT_NAME}/res/values/bools.xml\""
         fi
     fi
+
+    LOG_STEP_OUT
 done < <(find "$WORK_DIR/product/overlay" -maxdepth 1 -type f -name "*$SOURCE_PRODUCT_NAME*.apk")
 
 unset SOURCE_PRODUCT_NAME TARGET_PRODUCT_NAME
