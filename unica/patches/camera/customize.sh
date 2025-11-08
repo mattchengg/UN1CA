@@ -76,6 +76,24 @@ else
     fi
 fi
 
+# SEC_PRODUCT_FEATURE_CAMERA_CONFIG_GPPM_SOLUTIONS
+if $SOURCE_CAMERA_SUPPORT_GPPM; then
+    if ! $TARGET_CAMERA_SUPPORT_GPPM; then
+        SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_CAMERA_CONFIG_GPPM_SOLUTIONS" --delete
+        SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_CAMERA_CONFIG_IS_GPPM_1_0_ENABLED" --delete
+        DELETE_FROM_WORK_DIR "system" "system/etc/default-permissions/default-permissions-com.samsung.android.globalpostprocmgr.xml"
+        DELETE_FROM_WORK_DIR "system" "system/etc/permissions/privapp-permissions-com.samsung.android.globalpostprocmgr.xml"
+        DELETE_FROM_WORK_DIR "system" "system/lib64/libdvs.camera.samsung.so"
+        DELETE_FROM_WORK_DIR "system" "system/lib64/libstartrail.camera.samsung.so"
+        DELETE_FROM_WORK_DIR "system" "system/priv-app/GlobalPostProcMgr"
+    fi
+else
+    if $TARGET_CAMERA_SUPPORT_GPPM; then
+        # TODO handle this condition
+        LOG_MISSING_PATCHES "SOURCE_CAMERA_SUPPORT_GPPM" "TARGET_CAMERA_SUPPORT_GPPM"
+    fi
+fi
+
 # SEC_PRODUCT_FEATURE_CAMERA_SUPPORT_SDK_SERVICE
 if $SOURCE_CAMERA_SUPPORT_SDK_SERVICE; then
     if ! $TARGET_CAMERA_SUPPORT_SDK_SERVICE; then
