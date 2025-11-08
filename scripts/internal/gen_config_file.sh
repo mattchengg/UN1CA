@@ -222,6 +222,9 @@ fi
 #     It can be checked in the following ways:
 #       - `AndroidManifest.xml` of `SamsungCamera.apk` has `hal3_mass-phone-release` value
 #
+#   [SOURCE/TARGET]_CAMERA_SUPPORT_SDK_SERVICE
+#     Boolean which describes whether the device supports the Samsung Camera SDK Service.
+#
 #   [SOURCE/TARGET]_COMMON_CONFIG_MDNIE_MODE
 #     Integer containing the device mDNIe feature bit flag.
 #     It can be checked in the following ways:
@@ -461,6 +464,8 @@ fi
     GET_BUILD_VAR "TARGET_CAMERA_SUPPORT_CUTOUT_PROTECTION"
     GET_BUILD_VAR "SOURCE_CAMERA_SUPPORT_MASS_APP_FLAVOR"
     GET_BUILD_VAR "TARGET_CAMERA_SUPPORT_MASS_APP_FLAVOR"
+    GET_BUILD_VAR "SOURCE_CAMERA_SUPPORT_SDK_SERVICE"
+    GET_BUILD_VAR "TARGET_CAMERA_SUPPORT_SDK_SERVICE"
     GET_BUILD_VAR "SOURCE_COMMON_CONFIG_MDNIE_MODE"
     GET_BUILD_VAR "TARGET_COMMON_CONFIG_MDNIE_MODE"
     GET_BUILD_VAR "SOURCE_COMMON_SUPPORT_DYN_RESOLUTION_CONTROL"

@@ -76,6 +76,20 @@ else
     fi
 fi
 
+# SEC_PRODUCT_FEATURE_CAMERA_SUPPORT_SDK_SERVICE
+if $SOURCE_CAMERA_SUPPORT_SDK_SERVICE; then
+    if ! $TARGET_CAMERA_SUPPORT_SDK_SERVICE; then
+        DELETE_FROM_WORK_DIR "system" "system/etc/permissions/cameraservice.xml"
+        DELETE_FROM_WORK_DIR "system" "system/framework/scamera_sep.jar"
+        DELETE_FROM_WORK_DIR "system" "system/priv-app/SCameraSDKService"
+    fi
+else
+    if $TARGET_CAMERA_SUPPORT_SDK_SERVICE; then
+        # TODO handle this condition
+        LOG_MISSING_PATCHES "SOURCE_CAMERA_SUPPORT_SDK_SERVICE" "TARGET_CAMERA_SUPPORT_SDK_SERVICE"
+    fi
+fi
+
 # SEC_PRODUCT_FEATURE_CAMERA_SUPPORT_CAMERAX_EXTENSION
 if $SOURCE_CAMERA_SUPPORT_CAMERAX_EXTENSION; then
     if ! $TARGET_CAMERA_SUPPORT_CAMERAX_EXTENSION; then
