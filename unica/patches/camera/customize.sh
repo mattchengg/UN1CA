@@ -76,6 +76,24 @@ else
     fi
 fi
 
+# SEC_PRODUCT_FEATURE_CAMERA_SUPPORT_CAMERAX_EXTENSION
+if $SOURCE_CAMERA_SUPPORT_CAMERAX_EXTENSION; then
+    if ! $TARGET_CAMERA_SUPPORT_CAMERAX_EXTENSION; then
+        DELETE_FROM_WORK_DIR "system" "system/etc/permissions/sec_camerax_impl.xml"
+        DELETE_FROM_WORK_DIR "system" "system/etc/permissions/sec_camerax_service.xml"
+        DELETE_FROM_WORK_DIR "system" "system/framework/sec_camerax_impl.jar"
+        DELETE_FROM_WORK_DIR "system" "system/lib/libsec_camerax_util_jni.camera.samsung.so"
+        DELETE_FROM_WORK_DIR "system" "system/lib64/libsec_camerax_util_jni.camera.samsung.so"
+        DELETE_FROM_WORK_DIR "system" "system/priv-app/sec_camerax_service"
+        SET_PROP "ro.camerax.extensions.enabled" --delete
+    fi
+else
+    if $TARGET_CAMERA_SUPPORT_CAMERAX_EXTENSION; then
+        # TODO handle this condition
+        LOG_MISSING_PATCHES "SOURCE_CAMERA_SUPPORT_CAMERAX_EXTENSION" "TARGET_CAMERA_SUPPORT_CAMERAX_EXTENSION"
+    fi
+fi
+
 # Fix portrait mode
 if [ -f "$WORK_DIR/vendor/lib64/libDualCamBokehCapture.camera.samsung.so" ]; then
     if grep -q "ro.build.flavor" "$WORK_DIR/vendor/lib64/libDualCamBokehCapture.camera.samsung.so" 2> /dev/null; then
