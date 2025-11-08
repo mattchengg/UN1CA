@@ -26,7 +26,7 @@ APPLY_PATCH "system" "system/framework/knoxsdk.jar" \
 # Bypass ICD verification
 SMALI_PATCH "system" "system/framework/samsungkeystoreutils.jar" \
     "smali/com/samsung/android/security/keystore/AttestParameterSpec.smali" "return" \
-    'isVerifiableIntegrity()Z' 'false'
+    'isVerifiableIntegrity()Z' 'true'
 APPLY_PATCH "system" "system/framework/services.jar" \
     "$MODPATH/services.jar/0001-Bypass-ICD-verification.patch"
 
