@@ -152,9 +152,6 @@ APPLY_TARGET_FEATURE()
 
         if [ ! "$TARGET_VALUE" ]; then
             TARGET_VALUE="$(cut -d "=" -f 2- < <(grep -w "$FEATURE" <<< "$FALLBACK"))"
-        elif [[ "$TARGET_VALUE"  == "-1" ]] && \
-                [[ "$FEATURE" == "SEC_FLOATING_FEATURE_CAMERA_CONFIG_HIGH_RESOLUTION_MAX_CAPTURE" ]]; then
-            TARGET_VALUE="0"
         fi
 
         if [ ! "$TARGET_VALUE" ]; then
