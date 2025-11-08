@@ -13,6 +13,7 @@ LOG_MISSING_PATCHES()
 }
 # ]
 
+SOURCE_FIRMWARE_PATH="$(cut -d "/" -f 1 -s <<< "$SOURCE_FIRMWARE")_$(cut -d "/" -f 2 -s <<< "$SOURCE_FIRMWARE")"
 TARGET_FIRMWARE_PATH="$(cut -d "/" -f 1 -s <<< "$TARGET_FIRMWARE")_$(cut -d "/" -f 2 -s <<< "$TARGET_FIRMWARE")"
 
 DELETE_FROM_WORK_DIR "system" "system/cameradata/portrait_data"
@@ -77,20 +78,42 @@ else
 fi
 
 # SEC_PRODUCT_FEATURE_CAMERA_CONFIG_GPPM_SOLUTIONS
-if $SOURCE_CAMERA_SUPPORT_GPPM; then
-    if ! $TARGET_CAMERA_SUPPORT_GPPM; then
-        SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_CAMERA_CONFIG_GPPM_SOLUTIONS" --delete
-        SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_CAMERA_CONFIG_IS_GPPM_1_0_ENABLED" --delete
-        DELETE_FROM_WORK_DIR "system" "system/etc/default-permissions/default-permissions-com.samsung.android.globalpostprocmgr.xml"
-        DELETE_FROM_WORK_DIR "system" "system/etc/permissions/privapp-permissions-com.samsung.android.globalpostprocmgr.xml"
-        DELETE_FROM_WORK_DIR "system" "system/lib64/libdvs.camera.samsung.so"
-        DELETE_FROM_WORK_DIR "system" "system/lib64/libstartrail.camera.samsung.so"
-        DELETE_FROM_WORK_DIR "system" "system/priv-app/GlobalPostProcMgr"
-    fi
-else
-    if $TARGET_CAMERA_SUPPORT_GPPM; then
-        # TODO handle this condition
-        LOG_MISSING_PATCHES "SOURCE_CAMERA_SUPPORT_GPPM" "TARGET_CAMERA_SUPPORT_GPPM"
+SOURCE_CAMERA_CONFIG_GPPM_SOLUTIONS="$(GET_FLOATING_FEATURE_CONFIG "$FW_DIR/$SOURCE_FIRMWARE_PATH/system/system/etc/floating_feature.xml" "SEC_FLOATING_FEATURE_CAMERA_CONFIG_GPPM_SOLUTIONS")"
+TARGET_CAMERA_CONFIG_GPPM_SOLUTIONS="$(GET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_CAMERA_CONFIG_GPPM_SOLUTIONS")"
+if [[ "$SOURCE_CAMERA_CONFIG_GPPM_SOLUTIONS" != "$TARGET_CAMERA_CONFIG_GPPM_SOLUTIONS" ]]; then
+    if [ "$SOURCE_CAMERA_CONFIG_GPPM_SOLUTIONS" ]; then
+        if [ ! "$TARGET_CAMERA_CONFIG_GPPM_SOLUTIONS" ]; then
+            SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_CAMERA_CONFIG_GPPM_SOLUTIONS" --delete
+            DELETE_FROM_WORK_DIR "system" "system/etc/default-permissions/default-permissions-com.samsung.android.globalpostprocmgr.xml"
+            DELETE_FROM_WORK_DIR "system" "system/etc/permissions/privapp-permissions-com.samsung.android.globalpostprocmgr.xml"
+            [ -f "$WORK_DIR/system/system/lib64/libdvs.camera.samsung.so" ] && \
+                DELETE_FROM_WORK_DIR "system" "system/lib64/libdvs.camera.samsung.so"
+            [ -f "$WORK_DIR/system/system/lib64/libstartrail.camera.samsung.so" ] && \
+                DELETE_FROM_WORK_DIR "system" "system/lib64/libstartrail.camera.samsung.so"
+            DELETE_FROM_WORK_DIR "system" "system/priv-app/GlobalPostProcMgr"
+        else
+            if [[ "$SOURCE_CAMERA_CONFIG_GPPM_SOLUTIONS" == *"startrail"* ]] && \
+                    [[ "$TARGET_CAMERA_CONFIG_GPPM_SOLUTIONS" != *"startrail"* ]]; then
+                DELETE_FROM_WORK_DIR "system" "system/lib64/libstartrail.camera.samsung.so"
+            elif [[ "$SOURCE_CAMERA_CONFIG_GPPM_SOLUTIONS" != *"startrail"* ]] && \
+                    [[ "$TARGET_CAMERA_CONFIG_GPPM_SOLUTIONS" == *"startrail"* ]]; then
+                # TODO handle this condition
+                LOG_MISSING_PATCHES "SOURCE_CAMERA_CONFIG_GPPM_SOLUTIONS" "TARGET_CAMERA_CONFIG_GPPM_SOLUTIONS"
+            fi
+            if [[ "$SOURCE_CAMERA_CONFIG_GPPM_SOLUTIONS" == *"motionclipper"* ]] && \
+                    [[ "$TARGET_CAMERA_CONFIG_GPPM_SOLUTIONS" != *"motionclipper"* ]]; then
+                DELETE_FROM_WORK_DIR "system" "system/lib64/libdvs.camera.samsung.so"
+            elif [[ "$SOURCE_CAMERA_CONFIG_GPPM_SOLUTIONS" != *"motionclipper"* ]] && \
+                    [[ "$TARGET_CAMERA_CONFIG_GPPM_SOLUTIONS" == *"motionclipper"* ]]; then
+                # TODO handle this condition
+                LOG_MISSING_PATCHES "SOURCE_CAMERA_CONFIG_GPPM_SOLUTIONS" "TARGET_CAMERA_CONFIG_GPPM_SOLUTIONS"
+            fi
+        fi
+    else
+        if [ "$TARGET_CAMERA_CONFIG_GPPM_SOLUTIONS" ]; then
+            # TODO handle this condition
+            LOG_MISSING_PATCHES "SOURCE_CAMERA_CONFIG_GPPM_SOLUTIONS" "TARGET_CAMERA_CONFIG_GPPM_SOLUTIONS"
+        fi
     fi
 fi
 
@@ -163,5 +186,5 @@ if [ ! "$(find "$WORK_DIR/product/overlay" -maxdepth 1 -type f -name "SystemUI*"
     fi
 fi
 
-unset TARGET_FIRMWARE_PATH
+unset SOURCE_FIRMWARE_PATH TARGET_FIRMWARE_PATH SOURCE_CAMERA_CONFIG_GPPM_SOLUTIONS TARGET_CAMERA_CONFIG_GPPM_SOLUTIONS
 unset -f _LOG LOG_MISSING_PATCHES

@@ -217,9 +217,6 @@ fi
 #     It can be checked in the following ways:
 #       - "config_enableDisplayCutoutProtection" in "res/values/bools.xml" inside `SystemUI.apk` is set to "true"
 #
-#   [SOURCE/TARGET]_CAMERA_SUPPORT_GPPM
-#     Boolean which describes whether the device supports the "Galaxy editing service" feature.
-#
 #   [SOURCE/TARGET]_CAMERA_SUPPORT_MASS_APP_FLAVOR
 #     Boolean which describes whether the device ships the mass Samsung Camera app flavor.
 #     It can be checked in the following ways:
@@ -465,8 +462,6 @@ fi
     GET_BUILD_VAR "TARGET_CAMERA_SUPPORT_CAMERAX_EXTENSION"
     GET_BUILD_VAR "SOURCE_CAMERA_SUPPORT_CUTOUT_PROTECTION"
     GET_BUILD_VAR "TARGET_CAMERA_SUPPORT_CUTOUT_PROTECTION"
-    GET_BUILD_VAR "SOURCE_CAMERA_SUPPORT_GPPM"
-    GET_BUILD_VAR "TARGET_CAMERA_SUPPORT_GPPM"
     GET_BUILD_VAR "SOURCE_CAMERA_SUPPORT_MASS_APP_FLAVOR"
     GET_BUILD_VAR "TARGET_CAMERA_SUPPORT_MASS_APP_FLAVOR"
     GET_BUILD_VAR "SOURCE_CAMERA_SUPPORT_SDK_SERVICE"
