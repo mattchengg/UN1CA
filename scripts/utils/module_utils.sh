@@ -198,13 +198,13 @@ HEX_PATCH()
     FROM="$(tr "[:upper:]" "[:lower:]" <<< "$FROM")"
     TO="$(tr "[:upper:]" "[:lower:]" <<< "$TO")"
 
-    if ! xxd -p "$FILE" | tr -d "\n" | tr -d " " | grep -q "$FROM"; then
+    if ! xxd -p -c 0 "$FILE" | grep -q "$FROM"; then
         LOGE "No \"$FROM\" match in ${FILE//$WORK_DIR/}"
         return 1
     fi
 
     LOG "- Patching \"$FROM\" to \"$TO\" in ${FILE//$WORK_DIR/}"
-    xxd -p "$FILE" | tr -d "\n" | tr -d " " | sed "s/$FROM/$TO/" | xxd -r -p > "$FILE.tmp"
+    xxd -p -c 0 "$FILE" | sed "s/$FROM/$TO/" | xxd -r -p > "$FILE.tmp"
     mv "$FILE.tmp" "$FILE"
 
     return 0
