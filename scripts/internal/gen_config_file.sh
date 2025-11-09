@@ -168,10 +168,11 @@ fi
 #
 #   TARGET_OS_SINGLE_SYSTEM_IMAGE
 #     String containing the target device SSI, it must match the `ro.build.product` prop.
-#     Currently, only "qssi" is supported.
+#     Currently, only "qssi" and "essi" are supported.
 #
 #   TARGET_OS_FILE_SYSTEM_TYPE
 #     String containing the target device firmware file system.
+#     Defaults to "erofs".
 #     Using a different value than stock will require patching the device fstab file in vendor and kernel ramdisk.
 #
 #   TARGET_OS_BUILD_SYSTEM_EXT_PARTITION
@@ -183,6 +184,7 @@ fi
 #
 #   [SOURCE/TARGET]_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION
 #     Integer containing the device RecordAlive lib version.
+#     Defaults to "none".
 #     It can be checked in the following ways:
 #       - `version` parameter in the `com.samsung.android.camera.mic.SemMultiMicManager.isSupported()` method inside `framework.jar`
 #       - Suffix number in "/vendor/lib(64)/lib_SamsungRec_*.so" lib
@@ -303,13 +305,13 @@ fi
 #
 #   [SOURCE/TARGET]_LCD_CONFIG_SEAMLESS_BRT
 #     String containing the device low/high brightness thresholds for VRR.
-#     Defaults to "none" for devices without VRR.
+#     Defaults to "none".
 #     It can be checked in the following ways:
 #       - `configBrt` value in the `com.samsung.android.hardware.display.RefreshRateConfig` class inside `framework.jar`
 #
 #   [SOURCE/TARGET]_LCD_CONFIG_SEAMLESS_LUX
 #     String containing the device low/high ambient lux thresholds for VRR.
-#     Defaults to "none" for devices without VRR.
+#     Defaults to "none".
 #     It can be checked in the following ways:
 #       - `configLux` value in the `com.samsung.android.hardware.display.RefreshRateConfig` class inside `framework.jar`
 #
@@ -447,7 +449,7 @@ fi
     GET_BUILD_VAR "TARGET_SUPER_GROUP_NAME" "$SOURCE_SUPER_GROUP_NAME"
     GET_BUILD_VAR "TARGET_$(tr "[:lower:]" "[:upper:]" <<< "${TARGET_SUPER_GROUP_NAME:-$SOURCE_SUPER_GROUP_NAME}")_SIZE"
     GET_BUILD_VAR "TARGET_OS_SINGLE_SYSTEM_IMAGE"
-    GET_BUILD_VAR "TARGET_OS_FILE_SYSTEM_TYPE"
+    GET_BUILD_VAR "TARGET_OS_FILE_SYSTEM_TYPE" "erofs"
     GET_BUILD_VAR "TARGET_OS_BUILD_SYSTEM_EXT_PARTITION"
     GET_BUILD_VAR "TARGET_OS_BOOT_DEVICE_PATH" "/dev/block/bootdevice/by-name"
     GET_BUILD_VAR "SOURCE_AUDIO_CONFIG_RECORDALIVE_LIB_VERSION" "none"
