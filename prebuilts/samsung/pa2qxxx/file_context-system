@@ -40,6 +40,8 @@
 /system/lib64 u:object_r:system_lib_file:s0
 /system/lib64/libcontextanalyzer_jni\.media\.samsung\.so u:object_r:system_lib_file:s0
 /system/lib64/libmediacontextanalyzer\.so u:object_r:system_lib_file:s0
+/system/lib64/libmediasndk\.mediacore\.samsung\.so u:object_r:system_lib_file:s0
+/system/lib64/libmediasndk\.so u:object_r:system_lib_file:s0
 /system/lib64/libmultisourceseparator\.audio\.samsung\.so u:object_r:system_lib_file:s0
 /system/lib64/libmultisourceseparator\.so u:object_r:system_lib_file:s0
 /system/lib64/libsbs\.so u:object_r:system_lib_file:s0

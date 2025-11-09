@@ -40,6 +40,8 @@ system/hidden/INTERNAL_SDCARD/Music/Samsung/Over_the_Horizon.m4a 0 0 644 capabil
 system/lib64 0 0 755 capabilities=0x0
 system/lib64/libcontextanalyzer_jni.media.samsung.so 0 0 644 capabilities=0x0
 system/lib64/libmediacontextanalyzer.so 0 0 644 capabilities=0x0
+system/lib64/libmediasndk.mediacore.samsung.so 0 0 644 capabilities=0x0
+system/lib64/libmediasndk.so 0 0 644 capabilities=0x0
 system/lib64/libmultisourceseparator.audio.samsung.so 0 0 644 capabilities=0x0
 system/lib64/libmultisourceseparator.so 0 0 644 capabilities=0x0
 system/lib64/libsbs.so 0 0 644 capabilities=0x0
