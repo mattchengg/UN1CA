@@ -19,6 +19,9 @@
 /system/lib64/libmdf\.so u:object_r:system_lib_file:s0
 /system/lib64/libsqlite\.so u:object_r:system_lib_file:s0
 /system/lib64/service\.incremental\.so u:object_r:system_lib_file:s0
+/system/priv-app u:object_r:system_file:s0
+/system/priv-app/SingleTakeService u:object_r:system_file:s0
+/system/priv-app/SingleTakeService/SingleTakeService\.apk u:object_r:system_file:s0
 /system/system_ext u:object_r:system_file:s0
 /system/system_ext/apex u:object_r:system_file:s0
 /system/system_ext/apex/com\.android\.vndk\.v30\.apex u:object_r:system_file:s0
