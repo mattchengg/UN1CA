@@ -30,8 +30,9 @@ if [[ "$PROCA_CONFIG_ADDR" != "00000000" ]] && [[ "$PROCA_CONFIG_ADDR" != "ecefe
     PATCHED=true
 fi
 
-if grep -q -P -w "proca_config\x00" "$TMP_DIR/out/kernel"; then
-    HEX_PATCH "$TMP_DIR/out/kernel" "70726f63615f636f6e66696700" "6675636b5f755f73616d6d7900"
+if xxd -p -c 0 "$TMP_DIR/out/kernel" | grep -q "70726f63615f636f6e66696700"; then
+    LOG "- Patching \"70726f63615f636f6e66696700\" to \"6675636b5f755f73616d6d7900\" in kernel image"
+    HEX_PATCH "$TMP_DIR/out/kernel" "70726f63615f636f6e66696700" "6675636b5f755f73616d6d7900" > /dev/null
     PATCHED=true
 fi
 
