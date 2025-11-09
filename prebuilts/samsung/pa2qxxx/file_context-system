@@ -6,19 +6,12 @@
 /system/etc/default-permissions u:object_r:system_file:s0
 /system/etc/default-permissions/default-permissions-com\.samsung\.android\.app\.moments\.xml u:object_r:system_file:s0
 /system/etc/default-permissions/default-permissions-com\.samsung\.mediasearch\.xml u:object_r:system_file:s0
-/system/etc/mediacontextanalyzer u:object_r:system_file:s0
-/system/etc/mediacontextanalyzer/Detection\.dlc u:object_r:system_file:s0
-/system/etc/mediacontextanalyzer/human-pet-det_SNPE-V227_SR-V131\.dlc u:object_r:system_file:s0
-/system/etc/mediacontextanalyzer/human-pet-pose_SNPE-V225_SR-V200\.dlc u:object_r:system_file:s0
-/system/etc/mediacontextanalyzer/keyword-classification_SNPE-V225_SR-V031\.dlc u:object_r:system_file:s0
-/system/etc/mediacontextanalyzer/Keyword\.dlc u:object_r:system_file:s0
-/system/etc/mediacontextanalyzer/Pose\.dlc u:object_r:system_file:s0
 /system/etc/mediasearch u:object_r:system_file:s0
+/system/etc/mediasearch/data u:object_r:system_file:s0
 /system/etc/mediasearch/data/dec_adaptor\.tflite u:object_r:system_file:s0
 /system/etc/mediasearch/data/dec_event\.tflite u:object_r:system_file:s0
 /system/etc/mediasearch/data/enc_image\.tflite u:object_r:system_file:s0
 /system/etc/mediasearch/data/enc_text\.tflite u:object_r:system_file:s0
-/system/etc/mediasearch/data u:object_r:system_file:s0
 /system/etc/mediasearch/data/versioninfo\.json u:object_r:system_file:s0
 /system/etc/permissions u:object_r:system_file:s0
 /system/etc/permissions/privapp-permissions-com\.samsung\.android\.app\.moments\.xml u:object_r:system_file:s0
@@ -38,8 +31,6 @@
 /system/hidden/INTERNAL_SDCARD/Music/Samsung u:object_r:system_file:s0
 /system/hidden/INTERNAL_SDCARD/Music/Samsung/Over_the_Horizon\.m4a u:object_r:system_file:s0
 /system/lib64 u:object_r:system_lib_file:s0
-/system/lib64/libcontextanalyzer_jni\.media\.samsung\.so u:object_r:system_lib_file:s0
-/system/lib64/libmediacontextanalyzer\.so u:object_r:system_lib_file:s0
 /system/lib64/libmediasndk\.mediacore\.samsung\.so u:object_r:system_lib_file:s0
 /system/lib64/libmediasndk\.so u:object_r:system_lib_file:s0
 /system/lib64/libmultisourceseparator\.audio\.samsung\.so u:object_r:system_lib_file:s0
@@ -47,7 +38,6 @@
 /system/lib64/libsbs\.so u:object_r:system_lib_file:s0
 /system/lib64/libtensorflowlite_gpu_delegate\.so u:object_r:system_lib_file:s0
 /system/lib64/libveframework\.videoeditor\.samsung\.so u:object_r:system_lib_file:s0
-/system/lib64/libvideo-highlight-arm64-v8a\.so u:object_r:system_lib_file:s0
 /system/media u:object_r:system_file:s0
 /system/media/audio u:object_r:system_file:s0
 /system/media/audio/notifications u:object_r:system_file:s0
