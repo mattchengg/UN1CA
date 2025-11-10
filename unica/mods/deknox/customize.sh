@@ -53,6 +53,7 @@ DELETE_FROM_WORK_DIR "system" "system/lib/libsdp_sdk.so"
 ADD_TO_WORK_DIR "$DONOR" "system" "system/lib/libsqlite.so" 0 0 644 "u:object_r:system_lib_file:s0"
 DELETE_FROM_WORK_DIR "system" "system/lib/vendor.samsung.hardware.tlc.ddar@1.0.so"
 DELETE_FROM_WORK_DIR "system" "system/lib64/android.hardware.weaver@1.0.so"
+DELETE_FROM_WORK_DIR "system" "system/lib64/hidl_comm_ddar_client.so"
 ADD_TO_WORK_DIR "$DONOR" "system" "system/lib64/libandroid_servers.so" 0 0 644 "u:object_r:system_lib_file:s0"
 DELETE_FROM_WORK_DIR "system" "system/lib64/libdualdar.so"
 ADD_TO_WORK_DIR "$DONOR" "system" "system/lib64/libepm.so" 0 0 644 "u:object_r:system_lib_file:s0"
@@ -176,6 +177,7 @@ if [[ "$SOURCE_PRODUCT_SHIPPING_API_LEVEL" != "$TARGET_PRODUCT_SHIPPING_API_LEVE
         "$SOURCE_PRODUCT_SHIPPING_API_LEVEL" \
         > /dev/null
 fi
+# TODO nuke HdmVendorController.smali
 APPLY_PATCH "system" "system/framework/services.jar" \
     "$MODPATH/hdm/services.jar/0001-Nuke-Knox-HDM.patch"
 SMALI_PATCH "system" "system/priv-app/DeviceDiagnostics/DeviceDiagnostics.apk" \
@@ -302,7 +304,7 @@ APPLY_PATCH "system" "system/framework/services.jar" \
 APPLY_PATCH "system" "system/framework/framework.jar" \
     "$MODPATH/kmxai/framework.jar/0001-Nuke-Knox-Matrix-AI-Privacy.patch"
 
-# TODO
+# TODO get rid of the following features
 # SEC_PRODUCT_FEATURE_KNOX_SUPPORT_UCS
 # SEC_PRODUCT_FEATURE_FRAMEWORK_SUPPORT_BLOCKCHAIN_SERVICE
 # SEC_PRODUCT_FEATURE_FRAMEWORK_SUPPORT_MOBILE_PAYMENT
