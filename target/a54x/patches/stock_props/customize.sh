@@ -1,0 +1,2 @@
+LOG "- Adding \"ro.netflix.bsp_rev\" prop with \"EXYNOS1380-36589-1\" in /system/system/build.prop"
+EVAL "sed -i \"/ro.smps.gain.spk/i ro.netflix.bsp_rev=EXYNOS1380-36589-1\" \"$WORK_DIR/system/system/build.prop\""
