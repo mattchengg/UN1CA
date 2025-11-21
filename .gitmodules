@@ -22,3 +22,6 @@
 	path = external/signapk
 	url = https://github.com/salvogiangri/signapk.git
 	ignore = dirty
+[submodule "target/a54x/patches/vendor"]
+	path = target/a54x/patches/vendor
+	url = git@github.com:mattchengg/UN1CA_vendor_samsung_a54x.git
