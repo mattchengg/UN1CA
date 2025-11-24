@@ -11,6 +11,7 @@
     <dimen name="cover_clear_view_right">360.0dp</dimen>
     <dimen name="cover_clear_view_rounded_corner">33.0dp</dimen>
     <dimen name="cover_clear_view_top">1.0dp</dimen>
+    <dimen name="physical_power_button_center_screen_location_y">1070.0px</dimen>
     <dimen name="rounded_corner_radius_bottom">40.0dp</dimen>
     <dimen name="rounded_corner_radius_top">40.0dp</dimen>
     <dimen name="status_bar_camera_side_padding">30.0px</dimen>
