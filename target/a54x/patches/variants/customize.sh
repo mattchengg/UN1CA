@@ -1,4 +1,4 @@
-DELETE_FROM_WORK_DIR "vendor" "tee"
+rm -rf "$WORK_DIR/vendor/tee"
 mkdir -p "$WORK_DIR/vendor/tee"
 
 POLICY_FILE="$WORK_DIR/vendor/etc/selinux/vendor_sepolicy.cil"
