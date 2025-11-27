@@ -1,0 +1,4 @@
+id=vendor
+name=Vendor blobs
+author=salvogiangri, mattchengg
+description=Adds support for all the device variants.
