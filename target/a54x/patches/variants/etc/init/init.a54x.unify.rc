@@ -1,35 +1,35 @@
-# a5460 (asia_open)
+# a5460 (A5460_open)
 on early-fs && property:ro.boot.em.model=SM-A5460
     # Firmware blobs
-    mount none /vendor/firmware/asia/AIE.bin /vendor/firmware/AIE.bin bind
-    mount none /vendor/firmware/asia/calliope_sram.bin /vendor/firmware/calliope_sram.bin bind
-    mount none /vendor/firmware/asia/mfc_fw.bin /vendor/firmware/mfc_fw.bin bind
-    mount none /vendor/firmware/asia/os.checked.bin /vendor/firmware/os.checked.bin bind
-    mount none /vendor/firmware/asia/pablo_icpufw.bin /vendor/firmware/pablo_icpufw.bin bind
-    mount none /vendor/firmware/asia/vts.bin /vendor/firmware/vts.bin bind
+    mount none /vendor/firmware/A5460/AIE.bin /vendor/firmware/AIE.bin bind
+    mount none /vendor/firmware/A5460/calliope_sram.bin /vendor/firmware/calliope_sram.bin bind
+    mount none /vendor/firmware/A5460/mfc_fw.bin /vendor/firmware/mfc_fw.bin bind
+    mount none /vendor/firmware/A5460/os.checked.bin /vendor/firmware/os.checked.bin bind
+    mount none /vendor/firmware/A5460/pablo_icpufw.bin /vendor/firmware/pablo_icpufw.bin bind
+    mount none /vendor/firmware/A5460/vts.bin /vendor/firmware/vts.bin bind
     # TEEgris
-    mount none /vendor/tee_asia /vendor/tee bind
+    mount none /vendor/tee_A5460 /vendor/tee bind
 
-# a54xnaxx (eur_open)
+# a54xnaxx (A546B_open)
 on early-fs && property:ro.boot.em.model=SM-A546B
     # Firmware blobs
-    mount none /vendor/firmware/eur/AIE.bin /vendor/firmware/AIE.bin bind
-    mount none /vendor/firmware/eur/calliope_sram.bin /vendor/firmware/calliope_sram.bin bind
-    mount none /vendor/firmware/eur/mfc_fw.bin /vendor/firmware/mfc_fw.bin bind
-    mount none /vendor/firmware/eur/os.checked.bin /vendor/firmware/os.checked.bin bind
-    mount none /vendor/firmware/eur/pablo_icpufw.bin /vendor/firmware/pablo_icpufw.bin bind
-    mount none /vendor/firmware/eur/vts.bin /vendor/firmware/vts.bin bind
+    mount none /vendor/firmware/A546B/AIE.bin /vendor/firmware/AIE.bin bind
+    mount none /vendor/firmware/A546B/calliope_sram.bin /vendor/firmware/calliope_sram.bin bind
+    mount none /vendor/firmware/A546B/mfc_fw.bin /vendor/firmware/mfc_fw.bin bind
+    mount none /vendor/firmware/A546B/os.checked.bin /vendor/firmware/os.checked.bin bind
+    mount none /vendor/firmware/A546B/pablo_icpufw.bin /vendor/firmware/pablo_icpufw.bin bind
+    mount none /vendor/firmware/A546B/vts.bin /vendor/firmware/vts.bin bind
     # TEEgris
-    mount none /vendor/tee_eur /vendor/tee bind
+    mount none /vendor/tee_A546B /vendor/tee bind
 
-# a54xnsxx (sea_open)
+# a54xnsxx (A546E_open)
 on early-fs && property:ro.boot.em.model=SM-A546E
     # Firmware blobs
-    mount none /vendor/firmware/sea/AIE.bin /vendor/firmware/AIE.bin bind
-    mount none /vendor/firmware/sea/calliope_sram.bin /vendor/firmware/calliope_sram.bin bind
-    mount none /vendor/firmware/sea/mfc_fw.bin /vendor/firmware/mfc_fw.bin bind
-    mount none /vendor/firmware/sea/os.checked.bin /vendor/firmware/os.checked.bin bind
-    mount none /vendor/firmware/sea/pablo_icpufw.bin /vendor/firmware/pablo_icpufw.bin bind
-    mount none /vendor/firmware/sea/vts.bin /vendor/firmware/vts.bin bind
+    mount none /vendor/firmware/A546E/AIE.bin /vendor/firmware/AIE.bin bind
+    mount none /vendor/firmware/A546E/calliope_sram.bin /vendor/firmware/calliope_sram.bin bind
+    mount none /vendor/firmware/A546E/mfc_fw.bin /vendor/firmware/mfc_fw.bin bind
+    mount none /vendor/firmware/A546E/os.checked.bin /vendor/firmware/os.checked.bin bind
+    mount none /vendor/firmware/A546E/pablo_icpufw.bin /vendor/firmware/pablo_icpufw.bin bind
+    mount none /vendor/firmware/A546E/vts.bin /vendor/firmware/vts.bin bind
     # TEEgris
-    mount none /vendor/tee_sea /vendor/tee bind
+    mount none /vendor/tee_A546E /vendor/tee bind
