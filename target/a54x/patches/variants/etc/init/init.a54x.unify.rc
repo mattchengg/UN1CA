@@ -8,7 +8,7 @@ on early-fs && property:ro.boot.em.model=SM-SM-A5460
     mount none /vendor/firmware/SM-A5460/pablo_icpufw.bin /vendor/firmware/pablo_icpufw.bin bind
     mount none /vendor/firmware/SM-A5460/vts.bin /vendor/firmware/vts.bin bind
     # TEEgris
-    mount none /vendor/tee_A5460 /vendor/tee bind
+    mount none /vendor/tee_SM-A5460 /vendor/tee bind
 
 # a54xnaxx (A546B_open)
 on early-fs && property:ro.boot.em.model=SM-SM-A546B
@@ -20,7 +20,7 @@ on early-fs && property:ro.boot.em.model=SM-SM-A546B
     mount none /vendor/firmware/SM-A546B/pablo_icpufw.bin /vendor/firmware/pablo_icpufw.bin bind
     mount none /vendor/firmware/SM-A546B/vts.bin /vendor/firmware/vts.bin bind
     # TEEgris
-    mount none /vendor/tee_A546B /vendor/tee bind
+    mount none /vendor/tee_SM-A546B /vendor/tee bind
 
 # a54xnsxx (A546E_open)
 on early-fs && property:ro.boot.em.model=SM-SM-A546E
@@ -32,4 +32,4 @@ on early-fs && property:ro.boot.em.model=SM-SM-A546E
     mount none /vendor/firmware/SM-A546E/pablo_icpufw.bin /vendor/firmware/pablo_icpufw.bin bind
     mount none /vendor/firmware/SM-A546E/vts.bin /vendor/firmware/vts.bin bind
     # TEEgris
-    mount none /vendor/tee_A546E /vendor/tee bind
+    mount none /vendor/tee_SM-A546E /vendor/tee bind
