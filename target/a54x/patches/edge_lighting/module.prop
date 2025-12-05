@@ -1,0 +1,4 @@
+id=edge_lighting
+name=Edge lighting fix
+author=mattchengg
+description=Fixes edge lighting corner radius.
