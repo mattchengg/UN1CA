@@ -1,0 +1,98 @@
+From 2ee74250da3a365e233f71fe6e0676f0c032fb6a Mon Sep 17 00:00:00 2001
+From: mattchengg <mattcheng20080205@gmail.com>
+Date: Tue, 6 Jan 2026 16:04:42 +0800
+Subject: [PATCH] Disable all ESIMs except A546B
+
+---
+ .../telephony/euicc/EuiccManager.smali        | 66 ++-----------------
+ 1 file changed, 6 insertions(+), 60 deletions(-)
+
+diff --git a/smali_classes4/android/telephony/euicc/EuiccManager.smali b/smali_classes4/android/telephony/euicc/EuiccManager.smali
+index 4abf86a..a7015d5 100644
+--- a/smali_classes4/android/telephony/euicc/EuiccManager.smali
++++ b/smali_classes4/android/telephony/euicc/EuiccManager.smali
+@@ -988,75 +988,21 @@
+ .end method
+ 
+ .method public whitelist isEnabled()Z
+-    .locals 3
+-
+-    iget-object v0, p0, Landroid/telephony/euicc/EuiccManager;->mContext:Landroid/content/Context;
+-
+-    invoke-virtual {v0}, Landroid/content/Context;->getPackageManager()Landroid/content/pm/PackageManager;
+-
+-    move-result-object v0
+-
+-    const-string v1, "android.hardware.telephony.euicc"
+-
+-    invoke-virtual {v0, v1}, Landroid/content/pm/PackageManager;->hasSystemFeature(Ljava/lang/String;)Z
+-
+-    move-result v0
+-
+-    const/4 v1, 0x0
++    .locals 2
+ 
+-    if-eqz v0, :cond_2
++    const-string/jumbo v0, "ro.boot.em.model"
+ 
+-    invoke-static {}, Lcom/samsung/android/feature/SemCscFeature;->getInstance()Lcom/samsung/android/feature/SemCscFeature;
++    invoke-static {v0}, Landroid/os/SystemProperties;->get(Ljava/lang/String;)Ljava/lang/String;
+ 
+     move-result-object v0
+ 
+-    const-string v2, "CscFeature_RIL_SupportForceEsimDeactivate"
++    const-string v1, "SM-A546B"
+ 
+-    invoke-virtual {v0, v2}, Lcom/samsung/android/feature/SemCscFeature;->getBoolean(Ljava/lang/String;)Z
++    invoke-virtual {v0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+ 
+     move-result v0
+ 
+-    if-eqz v0, :cond_0
+-
+-    goto :goto_0
+-
+-    :cond_0
+-    invoke-static {}, Lcom/samsung/android/feature/SemFloatingFeature;->getInstance()Lcom/samsung/android/feature/SemFloatingFeature;
+-
+-    move-result-object v0
+-
+-    const-string v2, "SEC_FLOATING_FEATURE_COMMON_CONFIG_EMBEDDED_SIM_SLOTSWITCH"
+-
+-    invoke-virtual {v0, v2}, Lcom/samsung/android/feature/SemFloatingFeature;->getString(Ljava/lang/String;)Ljava/lang/String;
+-
+-    move-result-object v0
+-
+-    invoke-static {}, Landroid/telephony/euicc/EuiccManager;->getIEuiccController()Lcom/android/internal/telephony/euicc/IEuiccController;
+-
+-    move-result-object v2
+-
+-    if-eqz v2, :cond_2
+-
+-    invoke-direct {p0}, Landroid/telephony/euicc/EuiccManager;->refreshCardIdIfUninitialized()Z
+-
+-    move-result p0
+-
+-    if-nez p0, :cond_1
+-
+-    invoke-static {v0}, Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z
+-
+-    move-result p0
+-
+-    if-nez p0, :cond_2
+-
+-    :cond_1
+-    const/4 p0, 0x1
+-
+-    return p0
+-
+-    :cond_2
+-    :goto_0
+-    return v1
++    return v0
+ .end method
+ 
+ .method public whitelist isPsimConversionSupported(I)Z
+-- 
+2.52.0
+
