@@ -1,0 +1,67 @@
+From bde84f2e43790087464e76233d9eb66dd7a93a4e Mon Sep 17 00:00:00 2001
+From: mattchengg <mattcheng20080205@gmail.com>
+Date: Sat, 24 Jan 2026 00:46:23 +0800
+Subject: [PATCH] Disable all ESIMs except A546B
+
+---
+ .../TelephonyFrameworkInitializer.smali       | 19 ++++++++++++++++++-
+ .../telephony/euicc/EuiccManager.smali        | 12 ++++++++++++
+ 2 files changed, 30 insertions(+), 1 deletion(-)
+
+diff --git a/smali_classes4/android/telephony/TelephonyFrameworkInitializer.smali b/smali_classes4/android/telephony/TelephonyFrameworkInitializer.smali
+index 4b94d3a0..d8e8f464 100644
+--- a/smali_classes4/android/telephony/TelephonyFrameworkInitializer.smali
++++ b/smali_classes4/android/telephony/TelephonyFrameworkInitializer.smali
+@@ -27,8 +27,25 @@
+ .end method
+ 
+ .method private static blacklist hasSystemFeature(Landroid/content/Context;Ljava/lang/String;)Z
+-    .locals 3
++    .locals 4
+ 
++    const-string v3, "android.hardware.telephony.euicc"
++    invoke-virtual {p1, v3}, Ljava/lang/String;->startsWith(Ljava/lang/String;)Z
++    move-result v3
++    if-eqz v3, :cond_orig
++
++    const-string v3, "ro.boot.em.model"
++    const-string v2, ""
++    invoke-static {v3, v2}, Landroid/os/SystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
++    move-result-object v3
++    const-string v2, "SM-A546B"
++    invoke-virtual {v3, v2}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++    move-result v3
++    if-nez v3, :cond_orig
++    const/4 v3, 0x0
++    return v3
++
++    :cond_orig
+     const-string/jumbo v0, "ro.vendor.api_level"
+ 
+     sget v1, Landroid/os/Build$VERSION;->DEVICE_INITIAL_SDK_INT:I
+diff --git a/smali_classes4/android/telephony/euicc/EuiccManager.smali b/smali_classes4/android/telephony/euicc/EuiccManager.smali
+index 4abf86ac..65caa166 100644
+--- a/smali_classes4/android/telephony/euicc/EuiccManager.smali
++++ b/smali_classes4/android/telephony/euicc/EuiccManager.smali
+@@ -990,6 +990,18 @@
+ .method public whitelist isEnabled()Z
+     .locals 3
+ 
++    const-string v0, "ro.boot.em.model"
++    const-string v1, ""
++    invoke-static {v0, v1}, Landroid/os/SystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
++    move-result-object v0
++    const-string v1, "SM-A546B"
++    invoke-virtual {v0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++    move-result v0
++    if-nez v0, :cond_is_a546b
++    const/4 v0, 0x0
++    return v0
++
++    :cond_is_a546b
+     iget-object v0, p0, Landroid/telephony/euicc/EuiccManager;->mContext:Landroid/content/Context;
+ 
+     invoke-virtual {v0}, Landroid/content/Context;->getPackageManager()Landroid/content/pm/PackageManager;
+-- 
+2.52.0
+

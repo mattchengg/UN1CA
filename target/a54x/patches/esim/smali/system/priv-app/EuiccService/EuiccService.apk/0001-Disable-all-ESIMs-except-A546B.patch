@@ -1,0 +1,100 @@
+From 58bf00afac07ef78cc9d157ac85324812ad476e3 Mon Sep 17 00:00:00 2001
+From: mattchengg <mattcheng20080205@gmail.com>
+Date: Sat, 24 Jan 2026 00:51:14 +0800
+Subject: [PATCH] Disable all ESIMs except A546B
+
+---
+ .../euicc/service/EuiccServiceImpl.smali      | 26 ++++++++++++++++++-
+ smali/com/samsung/euicc/util/SlotSwitch.smali | 24 +++++++++++++++++
+ 2 files changed, 49 insertions(+), 1 deletion(-)
+
+diff --git a/smali/com/samsung/euicc/service/EuiccServiceImpl.smali b/smali/com/samsung/euicc/service/EuiccServiceImpl.smali
+index 103f9e1..d680cf4 100644
+--- a/smali/com/samsung/euicc/service/EuiccServiceImpl.smali
++++ b/smali/com/samsung/euicc/service/EuiccServiceImpl.smali
+@@ -2212,8 +2212,20 @@
+ .end method
+ 
+ .method public onBind(Landroid/content/Intent;)Landroid/os/IBinder;
+-    .locals 1
++    .locals 2
++
++    const-string v0, "ro.boot.em.model"
++    const-string v1, ""
++    invoke-static {v0, v1}, Landroid/os/SystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
++    move-result-object v0
++    const-string v1, "SM-A546B"
++    invoke-virtual {v0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++    move-result v0
++    if-nez v0, :cond_a546b
++    const/4 v0, 0x0
++    return-object v0
+ 
++    :cond_a546b
+     const-string v0, "EuiccServiceImpl.onBind()"
+ 
+     invoke-static {v0}, Lcom/samsung/euicc/util/EuiccSvcLog;->d(Ljava/lang/String;)V
+@@ -3811,6 +3823,18 @@
+ .method public onGetEid(I)Ljava/lang/String;
+     .locals 4
+ 
++    const-string v0, "ro.boot.em.model"
++    const-string v1, ""
++    invoke-static {v0, v1}, Landroid/os/SystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
++    move-result-object v0
++    const-string v1, "SM-A546B"
++    invoke-virtual {v0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++    move-result v0
++    if-nez v0, :cond_a546b
++    const/4 v0, 0x0
++    return-object v0
++
++    :cond_a546b
+     new-instance v0, Ljava/lang/StringBuilder;
+ 
+     invoke-direct {v0}, Ljava/lang/StringBuilder;-><init>()V
+diff --git a/smali/com/samsung/euicc/util/SlotSwitch.smali b/smali/com/samsung/euicc/util/SlotSwitch.smali
+index 3be385e..7fd4390 100644
+--- a/smali/com/samsung/euicc/util/SlotSwitch.smali
++++ b/smali/com/samsung/euicc/util/SlotSwitch.smali
+@@ -7,6 +7,18 @@
+ .method public static hasSlotSwitch()Z
+     .locals 2
+ 
++    const-string v0, "ro.boot.em.model"
++    const-string v1, ""
++    invoke-static {v0, v1}, Landroid/os/SemSystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
++    move-result-object v0
++    const-string v1, "SM-A546B"
++    invoke-virtual {v0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++    move-result v0
++    if-nez v0, :cond_a546b
++    const/4 v0, 0x0
++    return v0
++
++    :cond_a546b
+     const-string v0, "persist.ril.esim.slotswitch"
+ 
+     const-string v1, ""
+@@ -27,6 +39,18 @@
+ .method public static isEsimSwitchOn()Z
+     .locals 3
+ 
++    const-string v0, "ro.boot.em.model"
++    const-string v1, ""
++    invoke-static {v0, v1}, Landroid/os/SemSystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
++    move-result-object v0
++    const-string v1, "SM-A546B"
++    invoke-virtual {v0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++    move-result v0
++    if-nez v0, :cond_a546b
++    const/4 v0, 0x0
++    return v0
++
++    :cond_a546b
+     const-string v0, "ril.simslottype1"
+ 
+     const-string v1, ""
+-- 
+2.52.0
+

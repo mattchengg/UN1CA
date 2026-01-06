@@ -1,0 +1,89 @@
+From 1de86c4d1a22c5e37524a666229d5d0fce87982f Mon Sep 17 00:00:00 2001
+From: mattchengg <mattcheng20080205@gmail.com>
+Date: Sat, 24 Jan 2026 00:48:53 +0800
+Subject: [PATCH] Disable all ESIMs except A546B
+
+---
+ .../internal/telephony/euicc/EuiccController.smali | 12 ++++++++++++
+ .../internal/telephony/uicc/AnswerToReset.smali    | 14 +++++++++++++-
+ .../android/internal/telephony/uicc/UiccSlot.smali | 14 +++++++++++++-
+ 3 files changed, 38 insertions(+), 2 deletions(-)
+
+diff --git a/smali/com/android/internal/telephony/euicc/EuiccController.smali b/smali/com/android/internal/telephony/euicc/EuiccController.smali
+index 437af9e..e0d3fd8 100644
+--- a/smali/com/android/internal/telephony/euicc/EuiccController.smali
++++ b/smali/com/android/internal/telephony/euicc/EuiccController.smali
+@@ -1571,6 +1571,18 @@
+ .method private blacklist hasEuicc()Z
+     .locals 2
+ 
++    const-string v0, "ro.boot.em.model"
++    const-string v1, ""
++    invoke-static {v0, v1}, Landroid/os/SystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
++    move-result-object v0
++    const-string v1, "SM-A546B"
++    invoke-virtual {v0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++    move-result v0
++    if-nez v0, :cond_a546b
++    const/4 v0, 0x0
++    return v0
++
++    :cond_a546b
+     iget-object p0, p0, Lcom/android/internal/telephony/euicc/EuiccController;->mTelephonyManager:Landroid/telephony/TelephonyManager;
+ 
+     invoke-virtual {p0}, Landroid/telephony/TelephonyManager;->getUiccCardsInfo()Ljava/util/List;
+diff --git a/smali/com/android/internal/telephony/uicc/AnswerToReset.smali b/smali/com/android/internal/telephony/uicc/AnswerToReset.smali
+index 8d54584..05c971b 100644
+--- a/smali/com/android/internal/telephony/uicc/AnswerToReset.smali
++++ b/smali/com/android/internal/telephony/uicc/AnswerToReset.smali
+@@ -880,8 +880,20 @@
+ .end method
+ 
+ .method public blacklist isEuiccSupported()Z
+-    .locals 0
++    .locals 2
++
++    const-string v0, "ro.boot.em.model"
++    const-string v1, ""
++    invoke-static {v0, v1}, Landroid/os/SystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
++    move-result-object v0
++    const-string v1, "SM-A546B"
++    invoke-virtual {v0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++    move-result v0
++    if-nez v0, :cond_a546b
++    const/4 v0, 0x0
++    return v0
+ 
++    :cond_a546b
+     iget-boolean p0, p0, Lcom/android/internal/telephony/uicc/AnswerToReset;->mIsEuiccSupported:Z
+ 
+     return p0
+diff --git a/smali/com/android/internal/telephony/uicc/UiccSlot.smali b/smali/com/android/internal/telephony/uicc/UiccSlot.smali
+index 62fac46..843df93 100644
+--- a/smali/com/android/internal/telephony/uicc/UiccSlot.smali
++++ b/smali/com/android/internal/telephony/uicc/UiccSlot.smali
+@@ -2495,8 +2495,20 @@
+ .end method
+ 
+ .method public blacklist isEuicc()Z
+-    .locals 0
++    .locals 2
++
++    const-string v0, "ro.boot.em.model"
++    const-string v1, ""
++    invoke-static {v0, v1}, Landroid/os/SystemProperties;->get(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
++    move-result-object v0
++    const-string v1, "SM-A546B"
++    invoke-virtual {v0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++    move-result v0
++    if-nez v0, :cond_a546b
++    const/4 v0, 0x0
++    return v0
+ 
++    :cond_a546b
+     iget-boolean p0, p0, Lcom/android/internal/telephony/uicc/UiccSlot;->mIsEuicc:Z
+ 
+     return p0
+-- 
+2.52.0
+
