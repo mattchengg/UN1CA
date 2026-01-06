@@ -1,0 +1,3 @@
+ro.netflix.bsp_rev=EXYNOS1380-36589-1
+persist.audio.deepbuffer_delay=33
+enable_detecting_gnss_assert=false
