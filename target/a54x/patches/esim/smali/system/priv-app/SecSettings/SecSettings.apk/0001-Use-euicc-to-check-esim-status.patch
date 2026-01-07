@@ -1,0 +1,86 @@
+From 85f8be27a26dc6295b0bd944257b29ac2cb1077f Mon Sep 17 00:00:00 2001
+From: mattchengg <mattcheng20080205@gmail.com>
+Date: Wed, 7 Jan 2026 10:36:53 +0800
+Subject: [PATCH] Use euicc to check esim status
+
+---
+ .../SecSimManagerPreferenceController.smali   | 33 ++++++++++++-------
+ 1 file changed, 22 insertions(+), 11 deletions(-)
+
+diff --git a/smali_classes4/com/samsung/android/settings/connection/SecSimManagerPreferenceController.smali b/smali_classes4/com/samsung/android/settings/connection/SecSimManagerPreferenceController.smali
+index 9838152..9e8f40d 100644
+--- a/smali_classes4/com/samsung/android/settings/connection/SecSimManagerPreferenceController.smali
++++ b/smali_classes4/com/samsung/android/settings/connection/SecSimManagerPreferenceController.smali
+@@ -97,8 +97,6 @@
+ 
+     move-result v1
+ 
+-    const-string v2, "CscFeature_RIL_SupportForceEsimDeactivate"
+-
+     const/4 v3, 0x0
+ 
+     if-eqz v1, :cond_1
+@@ -113,11 +111,17 @@
+ 
+     if-nez v1, :cond_1
+ 
+-    invoke-static {}, Lcom/samsung/android/feature/SemCscFeature;->getInstance()Lcom/samsung/android/feature/SemCscFeature;
++    iget-object v1, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
++
++    const-string v4, "euicc"
++
++    invoke-virtual {v1, v4}, Landroid/content/Context;->getSystemService(Ljava/lang/String;)Ljava/lang/Object;
+ 
+     move-result-object v1
+ 
+-    invoke-virtual {v1, v2, v3}, Lcom/samsung/android/feature/SemCscFeature;->getBoolean(Ljava/lang/String;Z)Z
++    check-cast v1, Landroid/telephony/euicc/EuiccManager;
++
++    invoke-virtual {v1}, Landroid/telephony/euicc/EuiccManager;->isEnabled()Z
+ 
+     move-result v1
+ 
+@@ -136,6 +140,9 @@
+ 
+     :cond_1
+     :goto_0
++
++    iget-object v2, p0, Lcom/android/settingslib/core/AbstractPreferenceController;->mContext:Landroid/content/Context;
++
+     sget-object v1, Lcom/samsung/android/settings/connection/SecSimManagerPreferenceController;->TAG:Ljava/lang/String;
+ 
+     new-instance v4, Ljava/lang/StringBuilder;
+@@ -170,19 +177,23 @@
+ 
+     invoke-virtual {v4, p0}, Ljava/lang/StringBuilder;->append(Z)Ljava/lang/StringBuilder;
+ 
+-    const-string p0, " EsimDeactivate : "
++    const-string v0, " EuiccEnabled: "
+ 
+-    invoke-virtual {v4, p0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
++    invoke-virtual {v4, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+ 
+-    invoke-static {}, Lcom/samsung/android/feature/SemCscFeature;->getInstance()Lcom/samsung/android/feature/SemCscFeature;
++    const-string v0, "euicc"
+ 
+-    move-result-object p0
++    invoke-virtual {v2, v0}, Landroid/content/Context;->getSystemService(Ljava/lang/String;)Ljava/lang/Object;
+ 
+-    invoke-virtual {p0, v2, v3}, Lcom/samsung/android/feature/SemCscFeature;->getBoolean(Ljava/lang/String;Z)Z
++    move-result-object v0
+ 
+-    move-result p0
++    check-cast v0, Landroid/telephony/euicc/EuiccManager;
+ 
+-    invoke-virtual {v4, p0}, Ljava/lang/StringBuilder;->append(Z)Ljava/lang/StringBuilder;
++    invoke-virtual {v0}, Landroid/telephony/euicc/EuiccManager;->isEnabled()Z
++
++    move-result v0
++
++    invoke-virtual {v4, v0}, Ljava/lang/StringBuilder;->append(Z)Ljava/lang/StringBuilder;
+ 
+     invoke-virtual {v4}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+ 
+-- 
+2.52.0
+
