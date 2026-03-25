@@ -143,7 +143,7 @@ IMG2SDAT_EXEC=(
 )
 CHECK_TOOLS "${IMG2SDAT_EXEC[@]}" && IMG2SDAT=false
 SAMLOADER_EXEC=(
-    "../venv/bin/samloader"
+    "samloader"
 )
 CHECK_TOOLS "${SAMLOADER_EXEC[@]}" && SAMLOADER=false
 SIGNAPK_EXEC=(
@@ -220,13 +220,12 @@ if $IMG2SDAT; then
 fi
 if $SAMLOADER; then
     SAMLOADER_CMDS=(
-        "git reset --hard"
-        "git apply \"$SRC_DIR/external/patches/samloader/0001-Add-timeout-to-version.xml-request.patch\""
-        "python3 -m venv \"$TOOLS_DIR/venv\""
-        "source \"$TOOLS_DIR/venv/bin/activate\"; pip3 install ."
-    )
+        "cmake -B \"build\" $(GET_CMAKE_FLAGS)"
+        "make -C \"build\" -j$(nproc)"
+        "cp -a \"$SRC_DIR/external/samloader.cpp/build/samloader\" \"$TOOLS_DIR/bin\""
+)
 
-    BUILD "samloader" "$SRC_DIR/external/samloader" "${SAMLOADER_CMDS[@]}"
+    BUILD "samloader" "$SRC_DIR/external/samloader.cpp" "${SAMLOADER_CMDS[@]}"
 fi
 if $SIGNAPK; then
     SIGNAPK_CMDS=(
