@@ -1,0 +1,7 @@
+ 0 2000 755 capabilities=0x0
+vendor/etc 0 2000 755 capabilities=0x0
+vendor/etc/permissions 0 2000 755 capabilities=0x0
+vendor/etc/permissions/android.hardware.camera.full.xml 0 0 644 capabilities=0x0
+vendor/etc/permissions/android.hardware.camera.manual_postprocessing.xml 0 0 644 capabilities=0x0
+vendor/etc/permissions/android.hardware.camera.manual_sensor.xml 0 0 644 capabilities=0x0
+vendor/etc/permissions/android.hardware.camera.raw.xml 0 0 644 capabilities=0x0
