@@ -1,0 +1,7 @@
+/vendor u:object_r:vendor_file:s0
+/vendor/etc u:object_r:vendor_configs_file:s0
+/vendor/etc/permissions u:object_r:vendor_configs_file:s0
+/vendor/etc/permissions/android\.hardware\.camera\.full\.xml u:object_r:vendor_configs_file:s0
+/vendor/etc/permissions/android\.hardware\.camera\.manual_postprocessing\.xml u:object_r:vendor_configs_file:s0
+/vendor/etc/permissions/android\.hardware\.camera\.manual_sensor\.xml u:object_r:vendor_configs_file:s0
+/vendor/etc/permissions/android\.hardware\.camera\.raw\.xml u:object_r:vendor_configs_file:s0
